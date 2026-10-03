@@ -1,0 +1,35 @@
+strategy_id,label,family,K,cut,draws,cash_rate,roi,margin,p_any,source
+rand10_of_top200_simcash,Random 10 from the top 200 by sim cash rate,sim_cash,10,200,200,0.596,0.184101694915254,1.71989499999999,1,GPP pool
+rand1_of_top200_simcash,Random 1 from the top 200 by sim cash rate,sim_cash,1,200,200,0.595,0.180182529335072,2.05554999999999,0.595,GPP pool
+rand3_of_top200_simcash,Random 3 from the top 200 by sim cash rate,sim_cash,3,200,200,0.586666666666667,0.160230334637114,1.60396666666666,0.92,GPP pool
+rand10_of_top100_simcash,Random 10 from the top 100 by sim cash rate,sim_cash,10,100,200,0.5555,0.092245110821382,0.935589999999993,1,GPP pool
+topn_med_edge,Top N by sim median minus projection,sim_edge,20,20,1,0.55,0.1,2.30399999999999,1,Cash tab
+rand3_of_top100_simcash,Random 3 from the top 100 by sim cash rate,sim_cash,3,100,200,0.548333333333333,0.0671621034332899,1.10809999999999,0.92,GPP pool
+rand10_of_top50_simcash,Random 10 from the top 50 by sim cash rate,sim_cash,10,50,200,0.5405,0.0395084745762712,1.23395499999999,1,GPP pool
+rand3_of_top50_simcash,Random 3 from the top 50 by sim cash rate,sim_cash,3,50,200,0.528333333333333,0.0206084311169057,1.25269999999999,0.87,GPP pool
+rand1_of_top100_simcash,Random 1 from the top 100 by sim cash rate,sim_cash,1,100,200,0.51,0.000365058670143416,0.986599999999994,0.51,GPP pool
+rand1_of_top100_simcash,Random 1 from the top 100 by sim cash rate,sim_cash,1,50,200,0.505,-0.0194524119947849,1.15959999999999,0.505,Cash tab
+rand1_of_top200_simcash,Random 1 from the top 200 by sim cash rate,sim_cash,1,50,200,0.505,-0.0194524119947849,1.15959999999999,0.505,Cash tab
+rand3_of_top50_simcash,Random 3 from the top 50 by sim cash rate,sim_cash,3,50,200,0.5,-0.036045197740113,0.977333333333327,0.885,Cash tab
+rand10_of_top100_simcash,Random 10 from the top 100 by sim cash rate,sim_cash,10,50,200,0.484,-0.0705071707953064,0.749209999999993,1,Cash tab
+rand10_of_top200_simcash,Random 10 from the top 200 by sim cash rate,sim_cash,10,50,200,0.484,-0.0705071707953064,0.749209999999993,1,Cash tab
+rand3_of_top100_simcash,Random 3 from the top 100 by sim cash rate,sim_cash,3,50,200,0.483333333333333,-0.082477183833116,0.873299999999994,0.875,Cash tab
+rand3_of_top200_simcash,Random 3 from the top 200 by sim cash rate,sim_cash,3,50,200,0.483333333333333,-0.082477183833116,0.873299999999994,0.875,Cash tab
+rand200_med_edge,Random from top 200 by sim median minus projection,sim_edge,20,50,200,0.479,-0.0827307692307693,0.769214999999993,1,Cash tab
+floor_p25,Sim p25 floor (top quarter),sim_floor,20,2500,200,0.47725,-0.0472415254237288,-0.681947500000007,1,GPP pool
+random_full,"Random, whole source",baseline,20,50,200,0.477,-0.0907014341590613,0.700309999999993,1,Cash tab
+floor_p10,Sim p10 floor (top quarter),sim_floor,20,2500,200,0.4645,-0.072240221642764,-0.843187500000007,1,GPP pool
+rand10_of_top50_simcash,Random 10 from the top 50 by sim cash rate,sim_cash,10,50,200,0.456,-0.129435462842243,0.497669999999993,0.995,Cash tab
+rand1_of_top50_simcash,Random 1 from the top 50 by sim cash rate,sim_cash,1,50,200,0.45,-0.119634941329857,0.684699999999993,0.45,GPP pool
+rand1_of_top50_simcash,Random 1 from the top 50 by sim cash rate,sim_cash,1,50,200,0.43,-0.159634941329857,0.281099999999993,0.43,Cash tab
+field_like,Field-like (ownership-weighted),baseline,20,10000,200,0.40325,-0.197962198840178,-2.36368000000001,1,GPP pool
+proj_topn,Top N by projection,baseline,20,20,1,0.4,-0.299087353324641,0.344999999999994,1,Cash tab
+topn_simcash,Top N by sim cash rate,sim_cash,20,20,1,0.4,-0.299087353324641,0.400999999999994,1,Cash tab
+proj_topn,Top N by projection,baseline,20,20,1,0.4,-0.299087353324641,-0.136000000000006,1,GPP pool
+topn_simcash,Top N by sim cash rate,sim_cash,20,20,1,0.4,-0.299087353324641,0.400999999999994,1,GPP pool
+random_full,"Random, whole source",baseline,20,10000,200,0.39725,-0.206490221642764,-2.66427000000001,1,GPP pool
+low_sd,Low spread at a good mean,sim_floor,20,1191,200,0.38325,-0.2335,-2.29967750000001,1,GPP pool
+field_like,Field-like (ownership-weighted),baseline,20,50,200,0.37425,-0.325784224250326,-0.621240000000007,1,Cash tab
+cash_tab_default,Cash tab default,baseline,20,20,1,0.35,-0.398956975228162,0.133999999999994,1,Cash tab
+topn_med_edge,Top N by sim median minus projection,sim_edge,20,20,1,0.3,-0.4,-3.56200000000001,1,GPP pool
+rand200_med_edge,Random from top 200 by sim median minus projection,sim_edge,20,200,200,0.2895,-0.421,-3.02910000000001,0.995,GPP pool

@@ -1,0 +1,36 @@
+strategy_id,label,family,K,cut,draws,cash_rate,roi,margin,p_any,source
+simcash_ge60,Sim cash rate >= 60%,sim_cash,1,44,200,0.415,-0.17,-12.9335,0.415,Cash tab
+floor_p25,Sim p25 floor (top quarter),sim_floor,1,13,200,0.41,-0.18,-9.48600000000001,0.41,Cash tab
+simcash_ge55,Sim cash rate >= 55%,sim_cash,1,50,200,0.375,-0.25,-13.9385,0.375,Cash tab
+rand1_of_top50_simcash,Random 1 from the top 50 by sim cash rate,sim_cash,1,50,200,0.375,-0.25,-7.80200000000001,0.375,GPP pool
+rand1_of_top50_simcash,Random 1 from the top 50 by sim cash rate,sim_cash,1,50,200,0.365,-0.27,-16.576,0.365,Cash tab
+rand1_of_top100_simcash,Random 1 from the top 100 by sim cash rate,sim_cash,1,100,200,0.35,-0.3,-10.332,0.35,GPP pool
+rand200_med_edge,Random from top 200 by sim median minus projection,sim_edge,1,50,200,0.34,-0.32,-14.724,0.34,Cash tab
+own_low_simcash55,"Low ownership, sim cash >= 55%",ownership,1,17,200,0.335,-0.33,-15.832,0.335,Cash tab
+rand1_of_top100_simcash,Random 1 from the top 100 by sim cash rate,sim_cash,1,50,200,0.33,-0.34,-17.435,0.33,Cash tab
+rand1_of_top200_simcash,Random 1 from the top 200 by sim cash rate,sim_cash,1,50,200,0.33,-0.34,-17.435,0.33,Cash tab
+own_mid_simcash55,"Middle ownership, sim cash >= 55%",ownership,1,16,200,0.33,-0.34,-16.117,0.33,Cash tab
+field_like,Field-like (ownership-weighted),baseline,1,50,200,0.325,-0.35,-13.91,0.325,Cash tab
+simcash_ge60,Sim cash rate >= 60%,sim_cash,1,144,200,0.315,-0.37,-13.4985,0.315,GPP pool
+rand1_of_top200_simcash,Random 1 from the top 200 by sim cash rate,sim_cash,1,200,200,0.285,-0.43,-13.454,0.285,GPP pool
+floor_p10,Sim p10 floor (top quarter),sim_floor,1,13,200,0.28,-0.44,-11.186,0.28,Cash tab
+random_full,"Random, whole source",baseline,1,50,200,0.275,-0.45,-19.478,0.275,Cash tab
+own_high_simcash55,"High ownership, sim cash >= 55%",ownership,1,17,200,0.235,-0.53,-21.1685,0.235,Cash tab
+own_mid_simcash55,"Middle ownership, sim cash >= 55%",ownership,1,530,200,0.22,-0.56,-21.0915,0.22,GPP pool
+floor_p25,Sim p25 floor (top quarter),sim_floor,1,1287,200,0.21,-0.58,-20.556,0.21,GPP pool
+own_low_simcash55,"Low ownership, sim cash >= 55%",ownership,1,501,200,0.18,-0.64,-19.0975,0.18,GPP pool
+low_sd,Low spread at a good mean,sim_floor,1,5,200,0.175,-0.65,-9.27950000000001,0.175,Cash tab
+simcash_ge55,Sim cash rate >= 55%,sim_cash,1,1583,200,0.145,-0.71,-24.1475,0.145,GPP pool
+floor_p10,Sim p10 floor (top quarter),sim_floor,1,1263,200,0.135,-0.73,-24.361,0.135,GPP pool
+rand200_med_edge,Random from top 200 by sim median minus projection,sim_edge,1,200,200,0.135,-0.73,-20.851,0.135,GPP pool
+random_full,"Random, whole source",baseline,1,5000,200,0.1,-0.8,-31.9855,0.1,GPP pool
+own_high_simcash55,"High ownership, sim cash >= 55%",ownership,1,552,200,0.1,-0.8,-27.383,0.1,GPP pool
+field_like,Field-like (ownership-weighted),baseline,1,5000,200,0.075,-0.855,-37.209,0.075,GPP pool
+low_sd,Low spread at a good mean,sim_floor,1,420,200,0.055,-0.89,-37.735,0.055,GPP pool
+cash_tab_default,Cash tab default,baseline,1,1,1,0,-1,-0.400000000000006,0,Cash tab
+proj_topn,Top N by projection,baseline,1,1,1,0,-1,-17.8,0,Cash tab
+topn_simcash,Top N by sim cash rate,sim_cash,1,1,1,0,-1,-7.40000000000001,0,Cash tab
+topn_med_edge,Top N by sim median minus projection,sim_edge,1,1,1,0,-1,-7.40000000000001,0,Cash tab
+proj_topn,Top N by projection,baseline,1,1,1,0,-1,-17.8,0,GPP pool
+topn_simcash,Top N by sim cash rate,sim_cash,1,1,1,0,-1,-7.40000000000001,0,GPP pool
+topn_med_edge,Top N by sim median minus projection,sim_edge,1,1,1,0,-1,-40.7,0,GPP pool
