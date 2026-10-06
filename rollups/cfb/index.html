@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>CFB Contest Review</title><style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:980px;margin:0 auto;padding:16px;color:#e8e8e8;background:#111}
+table{border-collapse:collapse;width:100%;margin:8px 0 20px;font-size:14px}th,td{padding:6px 8px;border-bottom:1px solid #333;text-align:right}
+th:first-child,td:first-child{text-align:left}th{color:#f5c542}h1,h2{color:#f5c542}a{color:#f5c542}li{margin:4px 0}
+@media (max-width:640px){table{font-size:12px}th,td{padding:4px}}
+</style></head><body>
+<p><a href='../../cfb/'>&larr; College Football reviews</a></p>
+<h1>CFB contest review: rolling (06 Oct 2026)</h1>
+<p>483 contests across 15 slates (2026-09-19_CFB_LATE to 2026-10-03_CFB_SAT). New this run: 2026-09-19_CFB_LATE, 2026-09-19_CFB_MAIN, 2026-09-19_CFB_NIGHT, 2026-09-24_CFB_LIB_CCU_SD, 2026-09-25_CFB_ARMY_TEMP_SD, 2026-09-25_CFB_FRI, 2026-09-26_CFB_LATENIGHT, 2026-09-26_CFB_NIGHT, 2026-09-26_CFB_SAT, 2026-10-01_CFB_THU, 2026-10-02_CFB_FRI, 2026-10-03_CFB_AFTERNOON, 2026-10-03_CFB_LATENIGHT, 2026-10-03_CFB_NIGHT, 2026-10-03_CFB_SAT.</p>
+<p>Each lineup is scored as if entered against the real field. Top K by each sort, K = min(max entries, 150). ROI w/o best drops each contest's best entry.</p>
+<h2>Ideas and research directions</h2>
+<ul>
+<li><strong>Classic GPPs:</strong> best sort Top1% +237% ROI vs projection +37% (214 contests; beats projection on 9 of 13 slates). <em>Next:</em> Test Top1% as the CFB classic default sort; keep monitoring by slate.</li>
+<li><strong>Showdown GPPs:</strong> best sort Win% +32% ROI vs projection -48% (98 contests; beats projection on 8 of 13 slates). <em>Next:</em> Test Win% as the CFB showdown default sort; keep monitoring by slate.</li>
+<li><strong>Pool vs field:</strong> pool cashes under 0.85x the field in Flagship Showdown (0.67x), Single entry Showdown (0.71x), High stakes Showdown (0.77x), Mid GPP Showdown (0.78x). <em>Next:</em> Find what the pool does differently from the field there (salary, captain, stacks).</li>
+<li><strong>Showdown salary:</strong> $49k floor: whole-pool cash 21.7% -> 25.8%, better on 13 of 13 slates. <em>Next:</em> Turn on the SD salary floor in SimApp (draft PR astukas12/GTS#5) once approved.</li>
+<li><strong>Cash games:</strong> the contest DB holds the GPP pool only; the Cash tab's field and CashRate picks are not saved. <em>Next:</em> Save the Cash tab outputs with each re-sim so cash rooms can be reviewed the way the cash page asks.</li>
+<li><strong>Small rooms:</strong> 3-player: Top5% pick won 55% of 40; 4-player: Top5% pick won 42% of 73. <em>Next:</em> Break-even is about 37% (3-player) and 28% (4-player): track whether the edge holds.</li>
+</ul>
+<h2>Classic by contest type</h2>
+<table>
+<tr><th>Contest type</th><th>n</th><th>Best sort</th><th>ROI</th><th>ROI w/o best</th><th>Projection ROI</th><th>Random ROI</th><th>Pool cash vs field</th></tr>
+<tr><td>Flagship</td><td>21</td><td>Top1%</td><td>+99%</td><td>+34%</td><td>-0%</td><td>+32%</td><td>0.97x</td></tr>
+<tr><td>Large-field GPP</td><td>72</td><td>Top1%</td><td>+304%</td><td>+81%</td><td>+69%</td><td>-41%</td><td>1.25x</td></tr>
+<tr><td>Mid GPP</td><td>16</td><td>Top10%</td><td>+691%</td><td>+507%</td><td>+155%</td><td>+316%</td><td>1.11x</td></tr>
+<tr><td>High stakes</td><td>20</td><td>Top1%</td><td>+375%</td><td>+39%</td><td>+33%</td><td>+45%</td><td>0.88x</td></tr>
+<tr><td>3-max</td><td>20</td><td>Top1%</td><td>+154%</td><td>-38%</td><td>+4%</td><td>-74%</td><td>1.00x</td></tr>
+<tr><td>Single entry</td><td>20</td><td>Top10%</td><td>+406%</td><td>-100%</td><td>+226%</td><td>-96%</td><td>1.01x</td></tr>
+<tr><td>Satellites</td><td>45</td><td>Top5%</td><td>+318%</td><td>+101%</td><td>+54%</td><td>-92%</td><td>1.10x</td></tr>
+<tr><td>3-player</td><td>29</td><td>Top5%</td><td>+77%</td><td>-100%</td><td>+7%</td><td>-46%</td><td>0.54x</td></tr>
+<tr><td>4-player</td><td>51</td><td>Top5%</td><td>+44%</td><td>-100%</td><td>+22%</td><td>-45%</td><td>0.65x</td></tr>
+<tr><td>Double-ups (low $)</td><td>18</td><td>Top5%</td><td>-25%</td><td>-59%</td><td>-33%</td><td>-58%</td><td>0.66x</td></tr>
+<tr><td>Double-ups (high $)</td><td>17</td><td>Top5%</td><td>-7%</td><td>-100%</td><td>-31%</td><td>-27%</td><td>0.40x</td></tr>
+</table>
+<h2>Showdown by contest type</h2>
+<table>
+<tr><th>Contest type</th><th>n</th><th>Best sort</th><th>ROI</th><th>ROI w/o best</th><th>Projection ROI</th><th>Random ROI</th><th>Pool cash vs field</th></tr>
+<tr><td>Flagship</td><td>21</td><td>Win%</td><td>+27%</td><td>-65%</td><td>-60%</td><td>+9%</td><td>0.67x</td></tr>
+<tr><td>Large-field GPP</td><td>18</td><td>Win%</td><td>+16%</td><td>-28%</td><td>-34%</td><td>-26%</td><td>0.95x</td></tr>
+<tr><td>Mid GPP</td><td>14</td><td>Projection</td><td>-19%</td><td>-40%</td><td>-19%</td><td>-42%</td><td>0.78x</td></tr>
+<tr><td>High stakes</td><td>13</td><td>Win%</td><td>+58%</td><td>-100%</td><td>-8%</td><td>-65%</td><td>0.77x</td></tr>
+<tr><td>3-max</td><td>4</td><td>Win%</td><td>-76%</td><td>-96%</td><td>-96%</td><td>-69%</td><td>0.84x</td></tr>
+<tr><td>Single entry</td><td>20</td><td>Win%</td><td>+22%</td><td>-100%</td><td>-90%</td><td>-82%</td><td>0.71x</td></tr>
+<tr><td>Satellites</td><td>8</td><td>Top1%</td><td>-100%</td><td>-100%</td><td>-100%</td><td>+987%</td><td>0.85x</td></tr>
+<tr><td>3-player</td><td>11</td><td>Top10%</td><td>+126%</td><td>-100%</td><td>+39%</td><td>-48%</td><td>0.85x</td></tr>
+<tr><td>4-player</td><td>22</td><td>Top10%</td><td>+126%</td><td>-100%</td><td>+30%</td><td>-5%</td><td>0.88x</td></tr>
+<tr><td>Double-ups (low $)</td><td>19</td><td>Top10%</td><td>+21%</td><td>-100%</td><td>-13%</td><td>-72%</td><td>0.53x</td></tr>
+<tr><td>Double-ups (high $)</td><td>4</td><td>Top1%</td><td>+73%</td><td>-100%</td><td>+33%</td><td>+20%</td><td>0.46x</td></tr>
+</table>
+<h2>Showdown salary floor ($49k)</h2>
+<table>
+<tr><th>Strategy</th><th>Floor</th><th>Contests</th><th>Cash rate</th><th>ROI</th></tr>
+<tr><td>Whole pool</td><td>none</td><td>154</td><td>21.7%</td><td>-13%</td></tr>
+<tr><td>Whole pool</td><td>$49k</td><td>154</td><td>25.8%</td><td>+4%</td></tr>
+<tr><td>Random</td><td>none</td><td>154</td><td>18.7%</td><td>-19%</td></tr>
+<tr><td>Random</td><td>$49k</td><td>154</td><td>23.9%</td><td>+11%</td></tr>
+<tr><td>Top1%</td><td>none</td><td>154</td><td>34.2%</td><td>+30%</td></tr>
+<tr><td>Top1%</td><td>$49k</td><td>154</td><td>41.5%</td><td>+108%</td></tr>
+<tr><td>Top5%</td><td>none</td><td>154</td><td>34.1%</td><td>+34%</td></tr>
+<tr><td>Top5%</td><td>$49k</td><td>154</td><td>38.9%</td><td>+85%</td></tr>
+</table>
+</body></html>
