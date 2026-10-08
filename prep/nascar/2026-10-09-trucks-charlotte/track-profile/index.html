@@ -1,0 +1,510 @@
+<title>Charlotte Trucks: Track Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{
+  --gold:#FFE500; --gold-dark:#D4B000; --gold-light:#FFF4B3; --black:#000;
+  --g900:#121212; --g850:#1a1a1a; --g800:#1e1e1e; --g700:#2d2d2d; --g600:#404040; --g500:#666;
+  --t1:#ffffff; --t2:#cccccc; --t3:#999999;
+  /* data: gold leads, three supporting hues, neutral for "everyone else" */
+  --c-lead:#FFE500; --c-blue:#3987e5; --c-green:#199e70; --c-orange:#d95926; --c-rest:#6b6b6b;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--g900);color:var(--t1);font-family:var(--font);font-size:15px;line-height:1.55;margin:0}
+.num{font-variant-numeric:tabular-nums}
+header.bar{background:var(--black);border-bottom:3px solid var(--gold);padding:12px 24px;display:flex;align-items:center;gap:16px}
+header.bar img{height:52px;width:auto;border-radius:4px}
+header.bar h1{margin:0;color:var(--gold);text-transform:uppercase;font-weight:700;font-size:26px;letter-spacing:.02em;text-shadow:0 0 15px rgba(255,229,0,.4);text-wrap:balance}
+header.bar .sub{color:var(--t3);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+main{max-width:1100px;margin:0 auto;padding:28px 24px 64px;display:flex;flex-direction:column;gap:44px}
+h2{font-size:22px;font-weight:700;margin:0;text-wrap:balance}
+h2 .step{color:var(--gold);margin-right:10px}
+h3{font-size:12px;font-weight:600;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--t3)}
+p{margin:0}
+.lede{color:var(--t2);max-width:70ch}
+.muted{color:var(--t3)} .small{font-size:13px}
+b.hl{color:var(--gold-light);font-weight:600}
+section > .head{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+
+.read{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--accent,var(--gold))}
+.tile .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3)}
+.tile .v{font-size:30px;font-weight:700;line-height:1.1}
+.tile .v small{font-size:14px;font-weight:600;color:var(--t2);margin-left:4px}
+.tile .d{font-size:13px;color:var(--t2)}
+@media (max-width:860px){.read{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.read{grid-template-columns:1fr}}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.facts{display:flex;flex-direction:column;gap:12px}
+.fact{background:var(--g850);border:1px solid var(--g700);border-radius:8px;padding:12px 14px;color:var(--t2);font-size:14px}
+.fact .big{display:block;font-size:22px;font-weight:700;color:var(--t1);line-height:1.2}
+
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--t3);font-family:var(--font);font-size:11px}
+svg .lab{fill:var(--t2)} svg .lab.strong{fill:var(--t1);font-weight:600}
+svg .gridl{stroke:var(--g700)} svg .axisl{stroke:var(--g600)}
+svg .hit{fill:transparent;cursor:default}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--t2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px}
+.sw.dot{border-radius:50%}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.pick button{font:inherit;font-size:13px;background:var(--g850);color:var(--t2);border:1px solid var(--g600);border-radius:4px;padding:4px 10px;cursor:pointer}
+.pick button:hover{color:var(--t1);border-color:var(--t3)}
+.pick button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.pick button[aria-pressed="true"]{color:var(--black);background:var(--gold);border-color:var(--gold);font-weight:600}
+.tip{position:fixed;pointer-events:none;background:var(--black);border:1px solid var(--g600);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--t1);z-index:10;max-width:260px;line-height:1.45}
+.tip .muted{color:var(--t3)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--g700);border-radius:8px;background:var(--g800)}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);font-weight:600;border-bottom:1px solid var(--g600)}
+th.l,td.l{text-align:left}
+td.wrap{white-space:normal;min-width:260px}
+tbody tr{border-bottom:1px solid var(--g700)}
+tbody tr:hover{background:var(--g850)}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;letter-spacing:.02em}
+.tag.same{background:rgba(255,229,0,.14);color:var(--gold-light)}
+.tag.borrow{background:rgba(57,135,229,.18);color:#9cc3f3}
+.tag.out{background:rgba(217,89,38,.18);color:#f0a585}
+
+footer{color:var(--t3);font-size:12px;border-top:1px solid var(--g700);padding-top:16px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:520px){main{padding:20px 16px 48px} header.bar{padding:10px 16px} header.bar h1{font-size:20px}}
+.grp{display:flex;align-items:center;gap:8px}
+.trust{display:inline-block;height:6px;border-radius:3px;background:var(--g600);width:60px;vertical-align:middle;position:relative;overflow:hidden;margin-right:6px}
+.trust i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
+td.hlc{color:var(--gold-light);font-weight:600}
+.tiergroup{border:1px solid var(--g700);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--g850)}
+.tiertitle{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;gap:8px}
+.tiertitle .muted{font-weight:400}
+.rbar{display:flex;align-items:center;gap:10px}
+.rbar + .rbar{margin-top:6px}
+.rbar .rtag{flex:0 0 70px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 0;border-radius:4px;text-align:center}
+.rbar .rtag.trk{background:rgba(255,229,0,.18);color:var(--gold-light)}
+.rbar .rtag.ov{background:var(--g700);color:var(--t3)}
+.rbar .rtrack{flex:1;display:flex;height:24px;border-radius:4px;overflow:hidden;background:var(--g900)}
+.rbar .rtrack div{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden}
+</style>
+
+
+<header class="bar">
+  <img alt="Golden Ticket Sims" src="data:image/jpeg;base64,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">
+  <div>
+    <h1>Charlotte Trucks: Track Profile</h1>
+    <div class="sub" id="subline"></div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="head">
+      <h2>The short version</h2>
+      <p class="lede" id="read-lede"></p>
+    </div>
+    <div class="read" id="read"></div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">01</span>Range of outcomes, by pre-race strength</h2>
+      <p class="lede" id="tier-lede"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="legend" id="tier-legend"></div>
+        <div id="chart-tier"></div>
+      </div>
+      <div class="facts" id="tier-facts"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">02</span>Range of outcomes, by how fast you actually ran</h2>
+      <p class="lede" id="speed-lede"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="legend" id="speed-legend"></div>
+        <div id="chart-speed"></div>
+      </div>
+      <div class="facts" id="speed-facts"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">03</span>What moves a driver within its tier</h2>
+      <p class="lede" id="mod-lede"></p>
+    </div>
+    <h3 style="margin:4px 0 4px">DNF profile by tier</h3>
+    <p class="small muted" style="margin-bottom:10px">This track's value, with a normal oval in parentheses.</p>
+    <div class="tablewrap">
+      <table class="num">
+        <thead><tr><th class="l">Tier</th><th>DNF</th><th>Crash</th><th>Mechanical</th><th>Lead lap</th></tr></thead>
+        <tbody id="dnf-body"></tbody>
+      </table>
+    </div>
+    <h3 style="margin:20px 0 4px">Practice: how much should it move the sheet?</h3>
+    <p class="lede small muted" id="prac-lede"></p>
+    <div class="facts" id="prac-facts" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px"></div>
+    <div id="prac-races"></div>
+    <h4 style="margin:18px 0 4px;font-size:13px;color:var(--t2);font-weight:600">The mismatches: who practice got wrong</h4>
+    <p class="small muted" id="mismatch-lede" style="margin-bottom:10px"></p>
+    <div class="tablewrap">
+      <table class="num">
+        <thead><tr><th class="l">Race</th><th class="l">Driver</th><th class="l">Why it stands out</th><th>Tier coming in</th><th>Practice rank</th><th>Started</th><th>Finished</th><th>Laps led</th></tr></thead>
+        <tbody id="mismatch-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">04</span>The races behind these numbers</h2>
+      <p class="lede" id="races-lede"></p>
+    </div>
+    <div class="tablewrap">
+      <table class="num">
+        <thead><tr><th class="l">Race</th><th class="l">Fastest car finished</th><th>DNFs (crash / mech.)</th><th>Cautions</th><th>On lead lap</th></tr></thead>
+        <tbody id="races-body"></tbody>
+      </table>
+    </div>
+    <h3 style="margin:22px 0 10px">Other ovals used</h3>
+    <p class="small muted" id="others" style="max-width:90ch"></p>
+    <h3 style="margin:22px 0 10px">Races we left out</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th class="l">Races</th><th class="l">Why they're out</th></tr></thead>
+        <tbody id="excl-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const D = {"meta":{"series":"Truck","race_id":5688,"race_name":"Ecosave 250","track":"Charlotte Motor Speedway","race_date":"2026-10-09","n_races":78,"n_same":4,"locked":"2026-10-08 08:48","last_result":"2026-10-04"},"summary":{"spd_fin":{"question":"speed","label":"Speed rank vs finish (cars running at the end)","track":0.7702,"track_min":0.5105,"track_max":0.8754,"track_n":4,"oval":0.7764,"oval_n":77,"short_track":0.8272,"intermediate":0.7363,"k":2.645,"tau2":0.0091,"sigma2":0.024,"trust":0.602,"credible":0.7727},"spd_arp":{"question":"speed","label":"Speed rank vs average running position","track":0.966,"track_min":0.9557,"track_max":0.9761,"track_n":4,"oval":0.9589,"oval_n":77,"short_track":0.9614,"intermediate":0.957,"k":null,"tau2":-1.0216e-06,"sigma2":0.0006,"trust":0,"credible":0.9589},"arp_fin":{"question":"speed","label":"Running position vs finish","track":0.758,"track_min":0.5097,"track_max":0.8478,"track_n":4,"oval":0.7924,"oval_n":77,"short_track":0.8343,"intermediate":0.7593,"k":2.505,"tau2":0.0076,"sigma2":0.0191,"trust":0.6149,"credible":0.7713},"pre_fin":{"question":"speed","label":"Pre-race strength vs finish (all cars)","track":0.6912,"track_min":0.4671,"track_max":0.8652,"track_n":4,"oval":0.5783,"oval_n":78,"short_track":0.6361,"intermediate":0.5313,"k":4.9069,"tau2":0.0056,"sigma2":0.0273,"trust":0.4491,"credible":0.629},"pre_fin_run":{"question":"speed","label":"Pre-race strength vs finish (cars running)","track":0.6848,"track_min":0.406,"track_max":0.842,"track_n":4,"oval":0.6198,"oval_n":78,"short_track":0.6664,"intermediate":0.5819,"k":8.1446,"tau2":0.003,"sigma2":0.0245,"trust":0.3294,"credible":0.6412},"fastest_fin":{"question":"speed","label":"Finish of the fastest car","track":5.75,"track_min":1,"track_max":16,"track_n":4,"oval":4.6234,"oval_n":77,"short_track":4.9118,"intermediate":4.3953,"k":null,"tau2":-2.3127,"sigma2":53.5974,"trust":0,"credible":4.6234},"fast5_top10":{"question":"speed","label":"Top-5 speed cars finishing top 10","track":3.75,"track_min":2,"track_max":5,"track_n":4,"oval":4.1299,"oval_n":77,"short_track":4.2941,"intermediate":4,"k":null,"tau2":-0.0727,"sigma2":1.1681,"trust":0,"credible":4.1299},"start_fin":{"question":"start","label":"Starting spot vs finish","track":0.5577,"track_min":0.4327,"track_max":0.77,"track_n":4,"oval":0.5213,"oval_n":78,"short_track":0.5847,"intermediate":0.4697,"k":4.8621,"tau2":0.0054,"sigma2":0.0261,"trust":0.4514,"credible":0.5378},"start_coef":{"question":"start","label":"Start effect once speed is known","track":-0.0585,"track_min":-0.2622,"track_max":0.2168,"track_n":4,"oval":-0.089,"oval_n":77,"short_track":-0.1443,"intermediate":-0.0452,"k":7.6517,"tau2":0.0044,"sigma2":0.0335,"trust":0.3433,"credible":-0.0785},"w_q_race":{"question":"start","label":"Grid weight (w_q) fitted on the race","track":0.4692,"track_min":0.3404,"track_max":0.6596,"track_n":4,"oval":0.4647,"oval_n":75,"short_track":0.4802,"intermediate":0.4518,"k":27258.9522,"tau2":1.0324e-06,"sigma2":0.0281,"trust":0.0001,"credible":0.4647},"grid_spd":{"question":"start","label":"Starting spot vs race speed","track":0.7583,"track_min":0.6651,"track_max":0.8933,"track_n":4,"oval":0.7501,"oval_n":77,"short_track":0.7866,"intermediate":0.7212,"k":6.2801,"tau2":0.002,"sigma2":0.0123,"trust":0.3891,"credible":0.7533},"prac_spd":{"question":"practice","label":"Practice long run vs race speed (Lap Raptor)","track":0.5731,"track_min":0.5731,"track_max":0.5731,"track_n":1,"oval":0.6789,"oval_n":12,"short_track":0.7497,"intermediate":0.6081,"k":0.1306,"tau2":0.0211,"sigma2":0.0028,"trust":0.8845,"credible":0.5853},"feed_prac_spd":{"question":"practice","label":"Practice best lap vs race speed (NASCAR feed)","track":0.6059,"track_min":0.5013,"track_max":0.7104,"track_n":2,"oval":0.6234,"oval_n":46,"short_track":0.6458,"intermediate":0.6009,"k":3.8708,"tau2":0.0042,"sigma2":0.0164,"trust":0.3407,"credible":0.6174},"dnf_rate":{"question":"chaos","label":"DNF share of the field","track":0.0992,"track_min":0.0556,"track_max":0.1389,"track_n":4,"oval":0.1389,"oval_n":78,"short_track":0.14,"intermediate":0.1379,"k":3.6948,"tau2":0.0017,"sigma2":0.0061,"trust":0.5198,"credible":0.1183},"dnf_crash":{"question":"chaos","label":"Crash DNFs","track":2,"track_min":1,"track_max":4,"track_n":4,"oval":3.1026,"oval_n":78,"short_track":3.0286,"intermediate":3.1628,"k":2.7628,"tau2":2.2687,"sigma2":6.2678,"trust":0.5915,"credible":2.4504},"dnf_mech":{"question":"chaos","label":"Mechanical DNFs","track":1.5,"track_min":1,"track_max":2,"track_n":4,"oval":1.7564,"oval_n":78,"short_track":1.9429,"intermediate":1.6047,"k":3.8573,"tau2":0.4418,"sigma2":1.7041,"trust":0.5091,"credible":1.6259},"cautions_100":{"question":"chaos","label":"Cautions per 100 laps","track":3.2995,"track_min":2.2388,"track_max":3.7313,"track_n":4,"oval":3.7452,"oval_n":78,"short_track":3.1811,"intermediate":4.2043,"k":1.3571,"tau2":1.2029,"sigma2":1.6325,"trust":0.7467,"credible":3.4124},"caution_laps_100":{"question":"chaos","label":"Caution laps per 100 laps","track":19.8557,"track_min":14.9254,"track_max":23.8806,"track_n":4,"oval":23.2293,"oval_n":78,"short_track":23.3353,"intermediate":23.143,"k":2.6835,"tau2":20.7265,"sigma2":55.6189,"trust":0.5985,"credible":21.2102},"fast10_out15":{"question":"chaos","label":"Top-10 speed cars finishing outside the top 15","track":0.175,"track_min":0.1,"track_max":0.3,"track_n":4,"oval":0.1753,"oval_n":77,"short_track":0.1382,"intermediate":0.2047,"k":2.7597,"tau2":0.0058,"sigma2":0.0161,"trust":0.5917,"credible":0.1751},"lead_lap_share":{"question":"chaos","label":"Share of field on the lead lap","track":0.5775,"track_min":0.3529,"track_max":0.7778,"track_n":4,"oval":0.5386,"oval_n":78,"short_track":0.5426,"intermediate":0.5353,"k":2.6406,"tau2":0.0071,"sigma2":0.0186,"trust":0.6024,"credible":0.562}},"same":[{"race_id":5227,"date":"2022-05-27","season":2022,"race_name":"North Carolina Education Lottery 200","cars":35,"running":31,"speed_src":"lap feed","spd_fin":0.8391,"spd_arp":0.9745,"pre_fin":0.8652,"pre_fin_run":0.842,"fastest_fin":16,"fast5_top10":2,"start_fin":0.77,"grid_spd":0.8933,"dnf_crash":2,"dnf_mech":2,"dnf_rate":0.1143,"cautions":5,"cautions_100":3.4965,"fast10_out15":0.2,"lead_lap":16,"prac_spd":null,"prac_n":0,"feed_prac_spd":null,"feed_prac_n":0},{"race_id":5356,"date":"2023-05-26","season":2023,"race_name":"North Carolina Education Lottery 200","cars":36,"running":34,"speed_src":"lap feed","spd_fin":0.8558,"spd_arp":0.9557,"pre_fin":0.7882,"pre_fin_run":0.7527,"fastest_fin":4,"fast5_top10":5,"start_fin":0.5889,"grid_spd":0.6651,"dnf_crash":1,"dnf_mech":1,"dnf_rate":0.0556,"cautions":5,"cautions_100":3.7313,"fast10_out15":0.1,"lead_lap":26,"prac_spd":null,"prac_n":0,"feed_prac_spd":null,"feed_prac_n":0},{"race_id":5472,"date":"2024-05-24","season":2024,"race_name":"North Carolina Education Lottery 200","cars":36,"running":31,"speed_src":"lap feed","spd_fin":0.5105,"spd_arp":0.9761,"pre_fin":0.4671,"pre_fin_run":0.406,"fastest_fin":2,"fast5_top10":3,"start_fin":0.4327,"grid_spd":0.723,"dnf_crash":4,"dnf_mech":1,"dnf_rate":0.1389,"cautions":5,"cautions_100":3.7313,"fast10_out15":0.3,"lead_lap":28,"prac_spd":null,"prac_n":0,"feed_prac_spd":0.7104,"feed_prac_n":36},{"race_id":5495,"date":"2025-05-23","season":2025,"race_name":"North Carolina Education Lottery 200","cars":34,"running":31,"speed_src":"lap feed","spd_fin":0.8754,"spd_arp":0.9575,"pre_fin":0.6441,"pre_fin_run":0.7384,"fastest_fin":1,"fast5_top10":5,"start_fin":0.4393,"grid_spd":0.7519,"dnf_crash":1,"dnf_mech":2,"dnf_rate":0.0882,"cautions":3,"cautions_100":2.2388,"fast10_out15":0.1,"lead_lap":12,"prac_spd":0.5731,"prac_n":28,"feed_prac_spd":0.5013,"feed_prac_n":34}],"ovals":[{"race_id":5675,"date":"2026-09-26","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.4586,"start_fin":0.2564,"dnf_rate":0.0833},{"race_id":5686,"date":"2026-09-17","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.7253,"start_fin":0.5012,"dnf_rate":0.0833},{"race_id":5687,"date":"2026-08-22","track":"New Hampshire Motor Speedway","track_type":"short_track","spd_fin":0.6895,"start_fin":0.6088,"dnf_rate":0.1389},{"race_id":5684,"date":"2026-08-14","track":"Richmond Raceway","track_type":"short_track","spd_fin":0.923,"start_fin":0.6811,"dnf_rate":0.0278},{"race_id":5682,"date":"2026-07-24","track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","spd_fin":0.8493,"start_fin":0.7218,"dnf_rate":0.0833},{"race_id":5676,"date":"2026-07-18","track":"North Wilkesboro Speedway","track_type":"short_track","spd_fin":0.8506,"start_fin":0.6245,"dnf_rate":0.0833},{"race_id":5679,"date":"2026-06-06","track":"Michigan International Speedway","track_type":"intermediate","spd_fin":0.7669,"start_fin":0.3462,"dnf_rate":0.1111},{"race_id":5678,"date":"2026-05-29","track":"Nashville Superspeedway","track_type":"intermediate","spd_fin":0.6485,"start_fin":-0.0641,"dnf_rate":0.1667},{"race_id":5690,"date":"2026-05-15","track":"Dover Motor Speedway","track_type":"intermediate","spd_fin":0.7772,"start_fin":0.5351,"dnf_rate":0.1944},{"race_id":5674,"date":"2026-05-01","track":"Texas Motor Speedway","track_type":"intermediate","spd_fin":0.8382,"start_fin":0.2084,"dnf_rate":0.2286},{"race_id":5672,"date":"2026-04-10","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.7707,"start_fin":0.3817,"dnf_rate":0.2222},{"race_id":5673,"date":"2026-04-03","track":"Rockingham Speedway","track_type":"intermediate","spd_fin":0.8851,"start_fin":0.4976,"dnf_rate":0.0556},{"race_id":5685,"date":"2026-03-20","track":"Darlington Raceway","track_type":"intermediate","spd_fin":0.6067,"start_fin":0.5362,"dnf_rate":0.1667},{"race_id":5507,"date":"2025-10-31","track":"Phoenix Raceway","track_type":"short_track","spd_fin":0.8399,"start_fin":0.3531,"dnf_rate":0.3235},{"race_id":5506,"date":"2025-10-24","track":"Martinsville Speedway","track_type":"short_track","spd_fin":0.8703,"start_fin":0.5244,"dnf_rate":0.2},{"race_id":5508,"date":"2025-09-20","track":"New Hampshire Motor Speedway","track_type":"short_track","spd_fin":0.9575,"start_fin":0.5776,"dnf_rate":0.3611},{"race_id":5502,"date":"2025-09-11","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.8486,"start_fin":0.5408,"dnf_rate":0.1111},{"race_id":5493,"date":"2025-08-30","track":"Darlington Raceway","track_type":"intermediate","spd_fin":0.639,"start_fin":0.5205,"dnf_rate":0.1875},{"race_id":5500,"date":"2025-08-15","track":"Richmond Raceway","track_type":"short_track","spd_fin":0.8299,"start_fin":0.5633,"dnf_rate":0.0857},{"race_id":5499,"date":"2025-07-25","track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","spd_fin":0.9714,"start_fin":0.7457,"dnf_rate":0.1143},{"race_id":5501,"date":"2025-06-07","track":"Michigan International Speedway","track_type":"intermediate","spd_fin":-0.1225,"start_fin":0.3816,"dnf_rate":0.2812},{"race_id":5497,"date":"2025-05-30","track":"Nashville Superspeedway","track_type":"intermediate","spd_fin":0.9649,"start_fin":0.7042,"dnf_rate":0.0312},{"race_id":5494,"date":"2025-05-17","track":"North Wilkesboro Speedway","track_type":"short_track","spd_fin":0.7499,"start_fin":0.5969,"dnf_rate":0.1176},{"race_id":5492,"date":"2025-05-10","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.7436,"start_fin":0.531,"dnf_rate":0.129},{"race_id":5491,"date":"2025-05-02","track":"Texas Motor Speedway","track_type":"intermediate","spd_fin":0.4581,"start_fin":0.0693,"dnf_rate":0.4062},{"race_id":5496,"date":"2025-04-18","track":"Rockingham Speedway","track_type":"intermediate","spd_fin":0.6785,"start_fin":0.3342,"dnf_rate":0.2857},{"race_id":5488,"date":"2025-04-11","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.9023,"start_fin":0.5479,"dnf_rate":0.2857},{"race_id":5490,"date":"2025-03-28","track":"Martinsville Speedway","track_type":"short_track","spd_fin":0.4999,"start_fin":0.5445,"dnf_rate":0.1429},{"race_id":5489,"date":"2025-03-21","track":"Homestead-Miami Speedway","track_type":"intermediate","spd_fin":0.9575,"start_fin":0.751,"dnf_rate":0.0588},{"race_id":5487,"date":"2025-03-14","track":"Las Vegas Motor Speedway","track_type":"intermediate","spd_fin":0.7749,"start_fin":0.3347,"dnf_rate":0.0645},{"race_id":5484,"date":"2024-11-08","track":"Phoenix Raceway","track_type":"short_track","spd_fin":0.9524,"start_fin":0.719,"dnf_rate":0.1429},{"race_id":5475,"date":"2024-11-01","track":"Martinsville Speedway","track_type":"short_track","spd_fin":0.8785,"start_fin":0.4366,"dnf_rate":0.2222},{"race_id":5483,"date":"2024-10-26","track":"Homestead-Miami Speedway","track_type":"intermediate","spd_fin":0.8553,"start_fin":0.7439,"dnf_rate":0.0294},{"race_id":5480,"date":"2024-09-27","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.8607,"start_fin":0.3543,"dnf_rate":0.1176},{"race_id":5481,"date":"2024-09-19","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.8503,"start_fin":0.6541,"dnf_rate":0.0556},{"race_id":5479,"date":"2024-08-25","track":"The Milwaukee Mile","track_type":"short_track","spd_fin":0.9426,"start_fin":0.8412,"dnf_rate":0.0556},{"race_id":5477,"date":"2024-08-10","track":"Richmond Raceway","track_type":"short_track","spd_fin":0.7712,"start_fin":0.6273,"dnf_rate":0.2222},{"race_id":5478,"date":"2024-07-19","track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","spd_fin":0.9034,"start_fin":0.6126,"dnf_rate":0.0286},{"race_id":5474,"date":"2024-06-28","track":"Nashville Superspeedway","track_type":"intermediate","spd_fin":0.7053,"start_fin":0.4049,"dnf_rate":0.1111},{"race_id":5473,"date":"2024-06-01","track":"World Wide Technology Raceway","track_type":"intermediate","spd_fin":0.8367,"start_fin":0.6327,"dnf_rate":0.0625},{"race_id":5471,"date":"2024-05-18","track":"North Wilkesboro Speedway","track_type":"short_track","spd_fin":0.8717,"start_fin":0.4654,"dnf_rate":0.0556},{"race_id":5470,"date":"2024-05-10","track":"Darlington Raceway","track_type":"intermediate","spd_fin":0.5831,"start_fin":0.2518,"dnf_rate":0.2188},{"race_id":5469,"date":"2024-05-04","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.7757,"start_fin":0.0832,"dnf_rate":0.0303},{"race_id":5466,"date":"2024-04-12","track":"Texas Motor Speedway","track_type":"intermediate","spd_fin":0.7854,"start_fin":0.5267,"dnf_rate":0.1765},{"race_id":5468,"date":"2024-04-05","track":"Martinsville Speedway","track_type":"short_track","spd_fin":0.7827,"start_fin":0.6446,"dnf_rate":0.1765},{"race_id":5467,"date":"2024-03-16","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.8971,"start_fin":0.6515,"dnf_rate":0.0833},{"race_id":5463,"date":"2024-03-01","track":"Las Vegas Motor Speedway","track_type":"intermediate","spd_fin":0.8706,"start_fin":0.5755,"dnf_rate":0.0312},{"race_id":5373,"date":"2023-11-03","track":"Phoenix Raceway","track_type":"short_track","spd_fin":0.4122,"start_fin":0.2891,"dnf_rate":0.3333},{"race_id":5372,"date":"2023-10-21","track":"Homestead-Miami Speedway","track_type":"intermediate","spd_fin":0.8402,"start_fin":0.6801,"dnf_rate":0.0588},{"race_id":5370,"date":"2023-09-14","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.885,"start_fin":0.3243,"dnf_rate":0.0833},{"race_id":5369,"date":"2023-09-08","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.8179,"start_fin":0.5861,"dnf_rate":0.0556},{"race_id":5358,"date":"2023-08-27","track":"Milwaukee Mile Speedway","track_type":"short_track","spd_fin":0.8275,"start_fin":0.6793,"dnf_rate":0.0833},{"race_id":5367,"date":"2023-08-11","track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","spd_fin":null,"start_fin":0.6855,"dnf_rate":0.1667},{"race_id":5368,"date":"2023-07-29","track":"Richmond Raceway","track_type":"short_track","spd_fin":0.9447,"start_fin":0.8157,"dnf_rate":0},{"race_id":5364,"date":"2023-06-23","track":"Nashville Superspeedway","track_type":"intermediate","spd_fin":0.8464,"start_fin":0.5197,"dnf_rate":0.1111},{"race_id":5357,"date":"2023-06-03","track":"World Wide Technology Raceway","track_type":"intermediate","spd_fin":0.7467,"start_fin":0.5529,"dnf_rate":0.1429},{"race_id":5359,"date":"2023-05-20","track":"North Wilkesboro Speedway","track_type":"short_track","spd_fin":0.7143,"start_fin":0.5575,"dnf_rate":0.1944},{"race_id":5353,"date":"2023-05-12","track":"Darlington Raceway","track_type":"intermediate","spd_fin":0.6685,"start_fin":0.4867,"dnf_rate":0.1667},{"race_id":5354,"date":"2023-05-06","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.9035,"start_fin":0.3079,"dnf_rate":0.25},{"race_id":5355,"date":"2023-04-01","track":"Texas Motor Speedway","track_type":"intermediate","spd_fin":0.3723,"start_fin":0.5352,"dnf_rate":0.2647},{"race_id":5344,"date":"2023-03-03","track":"Las Vegas Motor Speedway","track_type":"intermediate","spd_fin":0.9089,"start_fin":0.4952,"dnf_rate":0.1714},{"race_id":5240,"date":"2022-11-04","track":"Phoenix Raceway","track_type":"short_track","spd_fin":0.7535,"start_fin":0.6375,"dnf_rate":0.1429},{"race_id":5239,"date":"2022-10-22","track":"Homestead-Miami Speedway","track_type":"intermediate","spd_fin":0.9571,"start_fin":0.6577,"dnf_rate":0.0278},{"race_id":5237,"date":"2022-09-15","track":"Bristol Motor Speedway","track_type":"short_track","spd_fin":0.8472,"start_fin":0.4165,"dnf_rate":0.1389},{"race_id":5236,"date":"2022-09-09","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.8341,"start_fin":0.7866,"dnf_rate":0.0556},{"race_id":5235,"date":"2022-08-13","track":"Richmond Raceway","track_type":"short_track","spd_fin":0.9417,"start_fin":0.773,"dnf_rate":0.0278},{"race_id":5234,"date":"2022-07-29","track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","spd_fin":0.7512,"start_fin":0.5882,"dnf_rate":0.1389},{"race_id":5231,"date":"2022-06-24","track":"Nashville Superspeedway","track_type":"intermediate","spd_fin":0.8412,"start_fin":0.39,"dnf_rate":0.1667},{"race_id":5228,"date":"2022-06-04","track":"World Wide Technology Raceway","track_type":"intermediate","spd_fin":0.7991,"start_fin":0.2486,"dnf_rate":0.25},{"race_id":5226,"date":"2022-05-20","track":"Texas Motor Speedway","track_type":"intermediate","spd_fin":0.7413,"start_fin":0.4314,"dnf_rate":0.0833},{"race_id":5225,"date":"2022-05-14","track":"Kansas Speedway","track_type":"intermediate","spd_fin":0.741,"start_fin":0.6644,"dnf_rate":0.0571},{"race_id":5224,"date":"2022-05-06","track":"Darlington Raceway","track_type":"intermediate","spd_fin":0.665,"start_fin":0.6947,"dnf_rate":0.1944},{"race_id":5222,"date":"2022-04-07","track":"Martinsville Speedway","track_type":"short_track","spd_fin":0.9181,"start_fin":0.5333,"dnf_rate":0.1667},{"race_id":5219,"date":"2022-03-04","track":"Las Vegas Motor Speedway","track_type":"intermediate","spd_fin":0.5513,"start_fin":0.4154,"dnf_rate":0.25}],"by_type":[{"track_type":"intermediate","races":43,"spd_fin":0.7363},{"track_type":"short_track","races":35,"spd_fin":0.8272}],"used_tracks":[{"track":"Kansas Speedway","track_type":"intermediate","races":8},{"track":"Bristol Motor Speedway","track_type":"short_track","races":8},{"track":"Richmond Raceway","track_type":"short_track","races":5},{"track":"Lucas Oil Indianapolis Raceway Park","track_type":"short_track","races":5},{"track":"Nashville Superspeedway","track_type":"intermediate","races":5},{"track":"Texas Motor Speedway","track_type":"intermediate","races":5},{"track":"Darlington Raceway","track_type":"intermediate","races":5},{"track":"Martinsville Speedway","track_type":"short_track","races":5},{"track":"North Wilkesboro Speedway","track_type":"short_track","races":4},{"track":"Phoenix Raceway","track_type":"short_track","races":4},{"track":"Homestead-Miami Speedway","track_type":"intermediate","races":4},{"track":"Las Vegas Motor Speedway","track_type":"intermediate","races":4},{"track":"World Wide Technology Raceway","track_type":"intermediate","races":3},{"track":"New Hampshire Motor Speedway","track_type":"short_track","races":2},{"track":"Michigan International Speedway","track_type":"intermediate","races":2},{"track":"Rockingham Speedway","track_type":"intermediate","races":2},{"track":"Dover Motor Speedway","track_type":"intermediate","races":1},{"track":"The Milwaukee Mile","track_type":"short_track","races":1},{"track":"Milwaukee Mile Speedway","track_type":"short_track","races":1}],"tiers":[{"tier":1,"scope":"oval","cars":602,"races":78,"rate_dnf":0.0748,"rate_crash":0.0631,"rate_mech":0.0116,"rate_lead_lap":0.8223,"rate_top1":0.1047,"rate_top3":0.2708,"rate_top5":0.4103,"rate_top10":0.6412,"rate_top15":0.7674,"rate_top20":0.8505,"rate_top25":0.8987,"rate_top30":0.9419,"dnf_rate":0.0748,"crash_rate":0.0631},{"tier":2,"scope":"oval","cars":551,"races":78,"rate_dnf":0.0962,"rate_crash":0.0762,"rate_mech":0.02,"rate_lead_lap":0.6824,"rate_top1":0.0145,"rate_top3":0.0835,"rate_top5":0.1652,"rate_top10":0.3938,"rate_top15":0.6116,"rate_top20":0.7332,"rate_top25":0.8367,"rate_top30":0.9238,"dnf_rate":0.0962,"crash_rate":0.0762},{"tier":3,"scope":"oval","cars":469,"races":78,"rate_dnf":0.1151,"rate_crash":0.1002,"rate_mech":0.0149,"rate_lead_lap":0.5608,"rate_top1":0.0064,"rate_top3":0.0299,"rate_top5":0.0597,"rate_top10":0.2281,"rate_top15":0.4264,"rate_top20":0.6226,"rate_top25":0.7804,"rate_top30":0.9126,"dnf_rate":0.1151,"crash_rate":0.1002},{"tier":4,"scope":"oval","cars":383,"races":78,"rate_dnf":0.1436,"rate_crash":0.1201,"rate_mech":0.0235,"rate_lead_lap":0.4256,"rate_top1":0,"rate_top3":0.0026,"rate_top5":0.0104,"rate_top10":0.0731,"rate_top15":0.2324,"rate_top20":0.4674,"rate_top25":0.7102,"rate_top30":0.8695,"dnf_rate":0.1436,"crash_rate":0.1201},{"tier":5,"scope":"oval","cars":527,"races":78,"rate_dnf":0.241,"rate_crash":0.0968,"rate_mech":0.1442,"rate_lead_lap":0.1992,"rate_top1":0,"rate_top3":0.0038,"rate_top5":0.0076,"rate_top10":0.0171,"rate_top15":0.0569,"rate_top20":0.1822,"rate_top25":0.3833,"rate_top30":0.6717,"dnf_rate":0.241,"crash_rate":0.0968},{"tier":1,"scope":"track","cars":34,"races":4,"rate_dnf":0.0588,"rate_crash":0.0588,"rate_mech":0,"rate_lead_lap":0.9118,"rate_top1":0.1176,"rate_top3":0.2647,"rate_top5":0.4412,"rate_top10":0.7059,"rate_top15":0.8235,"rate_top20":0.8529,"rate_top25":0.9118,"rate_top30":0.9118,"dnf_rate":0.0588,"crash_rate":0.0588},{"tier":2,"scope":"track","cars":25,"races":4,"rate_dnf":0,"rate_crash":0,"rate_mech":0,"rate_lead_lap":0.68,"rate_top1":0,"rate_top3":0.04,"rate_top5":0.08,"rate_top10":0.32,"rate_top15":0.6,"rate_top20":0.84,"rate_top25":0.92,"rate_top30":0.96,"dnf_rate":0,"crash_rate":0},{"tier":3,"scope":"track","cars":28,"races":4,"rate_dnf":0,"rate_crash":0,"rate_mech":0,"rate_lead_lap":0.6071,"rate_top1":0,"rate_top3":0.0714,"rate_top5":0.0714,"rate_top10":0.2143,"rate_top15":0.3571,"rate_top20":0.6071,"rate_top25":0.7857,"rate_top30":0.9643,"dnf_rate":0,"crash_rate":0},{"tier":4,"scope":"track","cars":18,"races":4,"rate_dnf":0.1667,"rate_crash":0.0556,"rate_mech":0.1111,"rate_lead_lap":0.5,"rate_top1":0,"rate_top3":0,"rate_top5":0.0556,"rate_top10":0.1111,"rate_top15":0.2778,"rate_top20":0.4444,"rate_top25":0.6667,"rate_top30":0.8333,"dnf_rate":0.1667,"crash_rate":0.0556},{"tier":5,"scope":"track","cars":31,"races":4,"rate_dnf":0.2581,"rate_crash":0.129,"rate_mech":0.129,"rate_lead_lap":0.2258,"rate_top1":0,"rate_top3":0,"rate_top5":0,"rate_top10":0,"rate_top15":0,"rate_top20":0.0968,"rate_top25":0.3226,"rate_top30":0.6129,"dnf_rate":0.2581,"crash_rate":0.129}],"starts":[{"bkt":"1-5","scope":"oval","cars":390,"races":78,"rate_dnf":0.0667,"rate_crash":0.059,"rate_mech":0.0077,"rate_lead_lap":0.8051,"rate_top1":0.1103,"rate_top3":0.2769,"rate_top5":0.4205,"rate_top10":0.6436,"rate_top15":0.7769,"rate_top20":0.8462,"rate_top25":0.8872,"rate_top30":0.9564,"p_top10":0.6436,"p_win":0.1103},{"bkt":"6-10","scope":"oval","cars":390,"races":78,"rate_dnf":0.0872,"rate_crash":0.0769,"rate_mech":0.0103,"rate_lead_lap":0.7026,"rate_top1":0.0359,"rate_top3":0.1359,"rate_top5":0.2359,"rate_top10":0.4462,"rate_top15":0.6256,"rate_top20":0.7462,"rate_top25":0.8333,"rate_top30":0.9179,"p_top10":0.4462,"p_win":0.0359},{"bkt":"11-20","scope":"oval","cars":780,"races":78,"rate_dnf":0.1154,"rate_crash":0.0949,"rate_mech":0.0205,"rate_lead_lap":0.6359,"rate_top1":0.0231,"rate_top3":0.0718,"rate_top5":0.1346,"rate_top10":0.3346,"rate_top15":0.5051,"rate_top20":0.6769,"rate_top25":0.8141,"rate_top30":0.9128,"p_top10":0.3346,"p_win":0.0231},{"bkt":"21+","scope":"oval","cars":1173,"races":78,"rate_dnf":0.1952,"rate_crash":0.098,"rate_mech":0.0972,"rate_lead_lap":0.3299,"rate_top1":0.0026,"rate_top3":0.0145,"rate_top5":0.0247,"rate_top10":0.0801,"rate_top15":0.1952,"rate_top20":0.3504,"rate_top25":0.549,"rate_top30":0.7647,"p_top10":0.0801,"p_win":0.0026},{"bkt":"1-5","scope":"track","cars":20,"races":4,"rate_dnf":0,"rate_crash":0,"rate_mech":0,"rate_lead_lap":0.8,"rate_top1":0.1,"rate_top3":0.3,"rate_top5":0.35,"rate_top10":0.45,"rate_top15":0.55,"rate_top20":0.7,"rate_top25":0.85,"rate_top30":1,"p_top10":0.45,"p_win":0.1},{"bkt":"6-10","scope":"track","cars":20,"races":4,"rate_dnf":0.05,"rate_crash":0.05,"rate_mech":0,"rate_lead_lap":0.9,"rate_top1":0,"rate_top3":0.05,"rate_top5":0.15,"rate_top10":0.5,"rate_top15":0.75,"rate_top20":0.85,"rate_top25":0.9,"rate_top30":0.95,"p_top10":0.5,"p_win":0},{"bkt":"11-20","scope":"track","cars":40,"races":4,"rate_dnf":0.05,"rate_crash":0.025,"rate_mech":0.025,"rate_lead_lap":0.775,"rate_top1":0.05,"rate_top3":0.125,"rate_top5":0.25,"rate_top10":0.5,"rate_top15":0.65,"rate_top20":0.8,"rate_top25":0.925,"rate_top30":0.925,"p_top10":0.5,"p_win":0.05},{"bkt":"21+","scope":"track","cars":61,"races":4,"rate_dnf":0.1803,"rate_crash":0.0984,"rate_mech":0.082,"rate_lead_lap":0.2787,"rate_top1":0,"rate_top3":0,"rate_top5":0,"rate_top10":0.0164,"rate_top15":0.1311,"rate_top20":0.2787,"rate_top25":0.459,"rate_top30":0.7213,"p_top10":0.0164,"p_win":0}],"speeds":[{"sbkt":"1-5","scope":"oval","cars":390,"races":78,"rate_dnf":0.0487,"rate_crash":0.0436,"rate_mech":0.0051,"rate_lead_lap":0.9051,"rate_top1":0.1846,"rate_top3":0.4487,"rate_top5":0.6487,"rate_top10":0.8179,"rate_top15":0.8769,"rate_top20":0.9205,"rate_top25":0.9333,"rate_top30":0.9667},{"sbkt":"6-10","scope":"oval","cars":390,"races":78,"rate_dnf":0.0923,"rate_crash":0.0769,"rate_mech":0.0154,"rate_lead_lap":0.7923,"rate_top1":0.0051,"rate_top3":0.0923,"rate_top5":0.2231,"rate_top10":0.5923,"rate_top15":0.7615,"rate_top20":0.8154,"rate_top25":0.8821,"rate_top30":0.9436},{"sbkt":"11-20","scope":"oval","cars":780,"races":78,"rate_dnf":0.1128,"rate_crash":0.0923,"rate_mech":0.0205,"rate_lead_lap":0.6397,"rate_top1":0.0026,"rate_top3":0.0256,"rate_top5":0.0564,"rate_top10":0.2538,"rate_top15":0.5449,"rate_top20":0.7385,"rate_top25":0.8397,"rate_top30":0.9128},{"sbkt":"21+","scope":"oval","cars":1173,"races":78,"rate_dnf":0.2012,"rate_crash":0.1049,"rate_mech":0.0963,"rate_lead_lap":0.2643,"rate_top1":0.0017,"rate_top3":0.0026,"rate_top5":0.0051,"rate_top10":0.0273,"rate_top15":0.0904,"rate_top20":0.2617,"rate_top25":0.5004,"rate_top30":0.7528},{"sbkt":"1-5","scope":"track","cars":20,"races":4,"rate_dnf":0,"rate_crash":0,"rate_mech":0,"rate_lead_lap":1,"rate_top1":0.15,"rate_top3":0.45,"rate_top5":0.6,"rate_top10":0.75,"rate_top15":0.9,"rate_top20":1,"rate_top25":1,"rate_top30":1},{"sbkt":"6-10","scope":"track","cars":20,"races":4,"rate_dnf":0.05,"rate_crash":0.05,"rate_mech":0,"rate_lead_lap":0.9,"rate_top1":0.05,"rate_top3":0.1,"rate_top5":0.2,"rate_top10":0.65,"rate_top15":0.75,"rate_top20":0.85,"rate_top25":0.95,"rate_top30":0.95},{"sbkt":"11-20","scope":"track","cars":40,"races":4,"rate_dnf":0.05,"rate_crash":0.025,"rate_mech":0.025,"rate_lead_lap":0.725,"rate_top1":0,"rate_top3":0.025,"rate_top5":0.1,"rate_top10":0.275,"rate_top15":0.575,"rate_top20":0.8,"rate_top25":0.875,"rate_top30":0.925},{"sbkt":"21+","scope":"track","cars":61,"races":4,"rate_dnf":0.1803,"rate_crash":0.0984,"rate_mech":0.082,"rate_lead_lap":0.2459,"rate_top1":0,"rate_top3":0,"rate_top5":0,"rate_top10":0.0164,"rate_top15":0.0656,"rate_top20":0.1803,"rate_top25":0.4262,"rate_top30":0.7213}],"context":[{"track_type":"superspeedway","races":8,"spd_fin":0.4026,"pre_fin":0.2539,"start_fin":0.1205,"grid_spd":0.3115,"dnf_rate":0.2635,"cautions_100":7.8007,"fast10_out15":0.475,"lead_lap_share":0.5985},{"track_type":"intermediate","races":47,"spd_fin":0.7428,"pre_fin":0.5398,"start_fin":0.4699,"grid_spd":0.7192,"dnf_rate":0.1375,"cautions_100":4.429,"fast10_out15":0.2064,"lead_lap_share":0.557},{"track_type":"atlanta","races":5,"spd_fin":0.613,"pre_fin":0.3186,"start_fin":0.2179,"grid_spd":0.5592,"dnf_rate":0.1675,"cautions_100":4.7525,"fast10_out15":0.3,"lead_lap_share":0.5844},{"track_type":"road_course","races":13,"spd_fin":0.6507,"pre_fin":0.4206,"start_fin":0.3879,"grid_spd":0.7344,"dnf_rate":0.1882,"cautions_100":9.7378,"fast10_out15":0.3308,"lead_lap_share":0.6788},{"track_type":"short_track","races":35,"spd_fin":0.8272,"pre_fin":0.6361,"start_fin":0.5847,"grid_spd":0.7866,"dnf_rate":0.14,"cautions_100":3.1811,"fast10_out15":0.1382,"lead_lap_share":0.5426},{"track_type":"this track (Charlotte)","races":4,"spd_fin":0.7702,"pre_fin":0.6912,"start_fin":0.5577,"grid_spd":0.7583,"dnf_rate":0.0992,"cautions_100":3.2995,"fast10_out15":0.175,"lead_lap_share":0.5775}],"practice_detail":[{"race_id":5472,"driver":"Ty Majeski","start":3,"finish":24,"prac_rank":null,"prac_n":null,"feed_prac_rank":1,"lead_laps":0,"fast_laps":2,"spd_rank":5,"pre_arp":10.0826,"date":"2024-05-24"},{"race_id":5472,"driver":"Jack Wood","start":8,"finish":22,"prac_rank":null,"prac_n":null,"feed_prac_rank":2,"lead_laps":0,"fast_laps":0,"spd_rank":20,"pre_arp":16.6257,"date":"2024-05-24"},{"race_id":5472,"driver":"Christian Eckes","start":35,"finish":11,"prac_rank":null,"prac_n":null,"feed_prac_rank":3,"lead_laps":37,"fast_laps":7,"spd_rank":8,"pre_arp":5.9938,"date":"2024-05-24"},{"race_id":5472,"driver":"Tanner Gray","start":1,"finish":18,"prac_rank":null,"prac_n":null,"feed_prac_rank":4,"lead_laps":11,"fast_laps":3,"spd_rank":4,"pre_arp":14.9214,"date":"2024-05-24"},{"race_id":5472,"driver":"Layne Riggs","start":5,"finish":29,"prac_rank":null,"prac_n":null,"feed_prac_rank":5,"lead_laps":0,"fast_laps":1,"spd_rank":22,"pre_arp":16.6202,"date":"2024-05-24"},{"race_id":5472,"driver":"Daniel Dye","start":36,"finish":20,"prac_rank":null,"prac_n":null,"feed_prac_rank":6,"lead_laps":0,"fast_laps":0,"spd_rank":16,"pre_arp":15.4631,"date":"2024-05-24"},{"race_id":5472,"driver":"Dean Thompson","start":11,"finish":10,"prac_rank":null,"prac_n":null,"feed_prac_rank":7,"lead_laps":0,"fast_laps":9,"spd_rank":7,"pre_arp":15.9896,"date":"2024-05-24"},{"race_id":5472,"driver":"Nicholas Sanchez","start":16,"finish":1,"prac_rank":null,"prac_n":null,"feed_prac_rank":8,"lead_laps":9,"fast_laps":4,"spd_rank":10,"pre_arp":8.7013,"date":"2024-05-24"},{"race_id":5472,"driver":"Bayley Currey","start":10,"finish":27,"prac_rank":null,"prac_n":null,"feed_prac_rank":9,"lead_laps":0,"fast_laps":1,"spd_rank":24,"pre_arp":17.9133,"date":"2024-05-24"},{"race_id":5472,"driver":"Rajah Caruth","start":4,"finish":17,"prac_rank":null,"prac_n":null,"feed_prac_rank":10,"lead_laps":0,"fast_laps":5,"spd_rank":6,"pre_arp":14.5874,"date":"2024-05-24"},{"race_id":5472,"driver":"Kaden Honeycutt","start":9,"finish":8,"prac_rank":null,"prac_n":null,"feed_prac_rank":11,"lead_laps":0,"fast_laps":18,"spd_rank":2,"pre_arp":10.2183,"date":"2024-05-24"},{"race_id":5472,"driver":"Jake Garcia","start":18,"finish":7,"prac_rank":null,"prac_n":null,"feed_prac_rank":12,"lead_laps":0,"fast_laps":0,"spd_rank":23,"pre_arp":15.2552,"date":"2024-05-24"},{"race_id":5472,"driver":"Chase Purdy","start":6,"finish":14,"prac_rank":null,"prac_n":null,"feed_prac_rank":13,"lead_laps":5,"fast_laps":3,"spd_rank":3,"pre_arp":14.86,"date":"2024-05-24"},{"race_id":5472,"driver":"Matt Mills","start":15,"finish":5,"prac_rank":null,"prac_n":null,"feed_prac_rank":14,"lead_laps":0,"fast_laps":0,"spd_rank":14,"pre_arp":22.8077,"date":"2024-05-24"},{"race_id":5472,"driver":"Ben Rhodes","start":13,"finish":6,"prac_rank":null,"prac_n":null,"feed_prac_rank":15,"lead_laps":0,"fast_laps":0,"spd_rank":9,"pre_arp":11.8597,"date":"2024-05-24"},{"race_id":5472,"driver":"Taylor Gray","start":14,"finish":13,"prac_rank":null,"prac_n":null,"feed_prac_rank":16,"lead_laps":0,"fast_laps":0,"spd_rank":15,"pre_arp":9.6904,"date":"2024-05-24"},{"race_id":5472,"driver":"Grant Enfinger","start":17,"finish":4,"prac_rank":null,"prac_n":null,"feed_prac_rank":17,"lead_laps":0,"fast_laps":3,"spd_rank":11,"pre_arp":11.3777,"date":"2024-05-24"},{"race_id":5472,"driver":"Corey Heim","start":2,"finish":2,"prac_rank":null,"prac_n":null,"feed_prac_rank":18,"lead_laps":72,"fast_laps":37,"spd_rank":1,"pre_arp":6.0691,"date":"2024-05-24"},{"race_id":5472,"driver":"Stewart Friesen","start":12,"finish":3,"prac_rank":null,"prac_n":null,"feed_prac_rank":19,"lead_laps":0,"fast_laps":2,"spd_rank":12,"pre_arp":16.3359,"date":"2024-05-24"},{"race_id":5472,"driver":"Matt Crafton","start":22,"finish":32,"prac_rank":null,"prac_n":null,"feed_prac_rank":20,"lead_laps":0,"fast_laps":0,"spd_rank":33,"pre_arp":13.6098,"date":"2024-05-24"},{"race_id":5472,"driver":"Tyler Ankrum","start":34,"finish":33,"prac_rank":null,"prac_n":null,"feed_prac_rank":21,"lead_laps":0,"fast_laps":0,"spd_rank":21,"pre_arp":10.3178,"date":"2024-05-24"},{"race_id":5472,"driver":"Brett Moffitt","start":19,"finish":16,"prac_rank":null,"prac_n":null,"feed_prac_rank":22,"lead_laps":0,"fast_laps":0,"spd_rank":18,"pre_arp":7.2613,"date":"2024-05-24"},{"race_id":5472,"driver":"Conner Jones","start":25,"finish":12,"prac_rank":null,"prac_n":null,"feed_prac_rank":23,"lead_laps":0,"fast_laps":1,"spd_rank":25,"pre_arp":20.7482,"date":"2024-05-24"},{"race_id":5472,"driver":"Connor Mosack","start":7,"finish":9,"prac_rank":null,"prac_n":null,"feed_prac_rank":24,"lead_laps":0,"fast_laps":0,"spd_rank":13,"pre_arp":18.4274,"date":"2024-05-24"},{"race_id":5472,"driver":"Stefan Parsons","start":23,"finish":26,"prac_rank":null,"prac_n":null,"feed_prac_rank":25,"lead_laps":0,"fast_laps":1,"spd_rank":19,"pre_arp":18.4756,"date":"2024-05-24"},{"race_id":5472,"driver":"Ty Dillon","start":20,"finish":25,"prac_rank":null,"prac_n":null,"feed_prac_rank":26,"lead_laps":0,"fast_laps":0,"spd_rank":17,"pre_arp":18.5228,"date":"2024-05-24"},{"race_id":5472,"driver":"Lawless Alan","start":21,"finish":31,"prac_rank":null,"prac_n":null,"feed_prac_rank":27,"lead_laps":0,"fast_laps":0,"spd_rank":34,"pre_arp":23.4486,"date":"2024-05-24"},{"race_id":5472,"driver":"Bret Holmes","start":27,"finish":15,"prac_rank":null,"prac_n":null,"feed_prac_rank":28,"lead_laps":0,"fast_laps":0,"spd_rank":26,"pre_arp":21.7276,"date":"2024-05-24"},{"race_id":5472,"driver":"Mason Maggio","start":24,"finish":28,"prac_rank":null,"prac_n":null,"feed_prac_rank":29,"lead_laps":0,"fast_laps":0,"spd_rank":30,"pre_arp":28.022,"date":"2024-05-24"},{"race_id":5472,"driver":"Mason Massey","start":29,"finish":19,"prac_rank":null,"prac_n":null,"feed_prac_rank":30,"lead_laps":0,"fast_laps":0,"spd_rank":28,"pre_arp":25.0467,"date":"2024-05-24"},{"race_id":5472,"driver":"Timmy Hill","start":26,"finish":23,"prac_rank":null,"prac_n":null,"feed_prac_rank":31,"lead_laps":0,"fast_laps":0,"spd_rank":27,"pre_arp":23.8259,"date":"2024-05-24"},{"race_id":5472,"driver":"Spencer Boyd","start":30,"finish":21,"prac_rank":null,"prac_n":null,"feed_prac_rank":32,"lead_laps":0,"fast_laps":0,"spd_rank":29,"pre_arp":29.0096,"date":"2024-05-24"},{"race_id":5472,"driver":"Thad Moffitt","start":32,"finish":34,"prac_rank":null,"prac_n":null,"feed_prac_rank":33,"lead_laps":0,"fast_laps":0,"spd_rank":32,"pre_arp":28.1872,"date":"2024-05-24"},{"race_id":5472,"driver":"Memphis Villarreal","start":28,"finish":30,"prac_rank":null,"prac_n":null,"feed_prac_rank":34,"lead_laps":0,"fast_laps":0,"spd_rank":35,"pre_arp":null,"date":"2024-05-24"},{"race_id":5472,"driver":"Keith McGee","start":33,"finish":35,"prac_rank":null,"prac_n":null,"feed_prac_rank":35,"lead_laps":0,"fast_laps":0,"spd_rank":36,"pre_arp":29.8767,"date":"2024-05-24"},{"race_id":5472,"driver":"Jeffrey Earnhardt","start":31,"finish":36,"prac_rank":null,"prac_n":null,"feed_prac_rank":36,"lead_laps":0,"fast_laps":0,"spd_rank":31,"pre_arp":null,"date":"2024-05-24"},{"race_id":5495,"driver":"Corey Heim","start":3,"finish":1,"prac_rank":1,"prac_n":28,"feed_prac_rank":3,"lead_laps":98,"fast_laps":47,"spd_rank":1,"pre_arp":5.6135,"date":"2025-05-23"},{"race_id":5495,"driver":"Ty Majeski","start":11,"finish":32,"prac_rank":2,"prac_n":28,"feed_prac_rank":2,"lead_laps":0,"fast_laps":1,"spd_rank":14,"pre_arp":10.1683,"date":"2025-05-23"},{"race_id":5495,"driver":"Kyle Busch","start":12,"finish":5,"prac_rank":3,"prac_n":28,"feed_prac_rank":20,"lead_laps":0,"fast_laps":3,"spd_rank":6,"pre_arp":7.1402,"date":"2025-05-23"},{"race_id":5495,"driver":"Tanner Gray","start":2,"finish":26,"prac_rank":4,"prac_n":28,"feed_prac_rank":9,"lead_laps":0,"fast_laps":4,"spd_rank":23,"pre_arp":11.9597,"date":"2025-05-23"},{"race_id":5495,"driver":"Layne Riggs","start":7,"finish":4,"prac_rank":5,"prac_n":28,"feed_prac_rank":10,"lead_laps":0,"fast_laps":14,"spd_rank":4,"pre_arp":8.9591,"date":"2025-05-23"},{"race_id":5495,"driver":"Kaden Honeycutt","start":5,"finish":3,"prac_rank":6,"prac_n":28,"feed_prac_rank":16,"lead_laps":10,"fast_laps":5,"spd_rank":5,"pre_arp":8.3969,"date":"2025-05-23"},{"race_id":5495,"driver":"Daniel Hemric","start":6,"finish":8,"prac_rank":7,"prac_n":28,"feed_prac_rank":15,"lead_laps":0,"fast_laps":1,"spd_rank":7,"pre_arp":10.7687,"date":"2025-05-23"},{"race_id":5495,"driver":"Giovanni Ruggiero","start":1,"finish":21,"prac_rank":8,"prac_n":28,"feed_prac_rank":5,"lead_laps":2,"fast_laps":1,"spd_rank":19,"pre_arp":12.5336,"date":"2025-05-23"},{"race_id":5495,"driver":"Grant Enfinger","start":18,"finish":6,"prac_rank":9,"prac_n":28,"feed_prac_rank":22,"lead_laps":0,"fast_laps":0,"spd_rank":9,"pre_arp":9.7449,"date":"2025-05-23"},{"race_id":5495,"driver":"Rajah Caruth","start":8,"finish":9,"prac_rank":10,"prac_n":28,"feed_prac_rank":13,"lead_laps":10,"fast_laps":9,"spd_rank":10,"pre_arp":11.8892,"date":"2025-05-23"},{"race_id":5495,"driver":"Connor Mosack","start":15,"finish":23,"prac_rank":11,"prac_n":28,"feed_prac_rank":12,"lead_laps":0,"fast_laps":0,"spd_rank":28,"pre_arp":17.5888,"date":"2025-05-23"},{"race_id":5495,"driver":"Jake Garcia","start":10,"finish":11,"prac_rank":12,"prac_n":28,"feed_prac_rank":14,"lead_laps":0,"fast_laps":1,"spd_rank":12,"pre_arp":11.7733,"date":"2025-05-23"},{"race_id":5495,"driver":"Tyler Ankrum","start":23,"finish":12,"prac_rank":13,"prac_n":28,"feed_prac_rank":23,"lead_laps":0,"fast_laps":1,"spd_rank":13,"pre_arp":9.6007,"date":"2025-05-23"},{"race_id":5495,"driver":"Stewart Friesen","start":32,"finish":13,"prac_rank":14,"prac_n":28,"feed_prac_rank":27,"lead_laps":1,"fast_laps":0,"spd_rank":17,"pre_arp":11.727,"date":"2025-05-23"},{"race_id":5495,"driver":"Ross Chastain","start":4,"finish":2,"prac_rank":15,"prac_n":28,"feed_prac_rank":1,"lead_laps":11,"fast_laps":13,"spd_rank":3,"pre_arp":3.4808,"date":"2025-05-23"},{"race_id":5495,"driver":"BJ McLeod","start":19,"finish":15,"prac_rank":16,"prac_n":28,"feed_prac_rank":28,"lead_laps":0,"fast_laps":0,"spd_rank":21,"pre_arp":null,"date":"2025-05-23"},{"race_id":5495,"driver":"Matt Crafton","start":26,"finish":20,"prac_rank":17,"prac_n":28,"feed_prac_rank":11,"lead_laps":0,"fast_laps":0,"spd_rank":22,"pre_arp":16.0653,"date":"2025-05-23"},{"race_id":5495,"driver":"Luke Fenhaus","start":33,"finish":18,"prac_rank":null,"prac_n":null,"feed_prac_rank":18,"lead_laps":0,"fast_laps":1,"spd_rank":25,"pre_arp":18.3558,"date":"2025-05-23"},{"race_id":5495,"driver":"Parker Kligerman","start":24,"finish":14,"prac_rank":18,"prac_n":28,"feed_prac_rank":6,"lead_laps":0,"fast_laps":0,"spd_rank":16,"pre_arp":13.6691,"date":"2025-05-23"},{"race_id":5495,"driver":"Jack Wood","start":22,"finish":25,"prac_rank":19,"prac_n":28,"feed_prac_rank":8,"lead_laps":0,"fast_laps":0,"spd_rank":24,"pre_arp":18.8964,"date":"2025-05-23"},{"race_id":5495,"driver":"Andres Perez De Lara","start":14,"finish":16,"prac_rank":20,"prac_n":28,"feed_prac_rank":7,"lead_laps":0,"fast_laps":2,"spd_rank":18,"pre_arp":18.5908,"date":"2025-05-23"},{"race_id":5495,"driver":"Matt Mills","start":16,"finish":7,"prac_rank":21,"prac_n":28,"feed_prac_rank":19,"lead_laps":1,"fast_laps":6,"spd_rank":8,"pre_arp":20.1991,"date":"2025-05-23"},{"race_id":5495,"driver":"Stefan Parsons","start":20,"finish":22,"prac_rank":22,"prac_n":28,"feed_prac_rank":25,"lead_laps":0,"fast_laps":0,"spd_rank":26,"pre_arp":17.3251,"date":"2025-05-23"},{"race_id":5495,"driver":"Ben Rhodes","start":21,"finish":17,"prac_rank":23,"prac_n":28,"feed_prac_rank":4,"lead_laps":0,"fast_laps":0,"spd_rank":20,"pre_arp":14.4031,"date":"2025-05-23"},{"race_id":5495,"driver":"Brandon Jones","start":13,"finish":10,"prac_rank":24,"prac_n":28,"feed_prac_rank":17,"lead_laps":0,"fast_laps":1,"spd_rank":11,"pre_arp":11.5049,"date":"2025-05-23"},{"race_id":5495,"driver":"Chandler Smith","start":9,"finish":34,"prac_rank":null,"prac_n":null,"feed_prac_rank":24,"lead_laps":0,"fast_laps":0,"spd_rank":2,"pre_arp":7.1998,"date":"2025-05-23"},{"race_id":5495,"driver":"Dawson Sutton","start":17,"finish":31,"prac_rank":25,"prac_n":28,"feed_prac_rank":21,"lead_laps":0,"fast_laps":0,"spd_rank":15,"pre_arp":21.6115,"date":"2025-05-23"},{"race_id":5495,"driver":"Timmy Hill","start":27,"finish":19,"prac_rank":26,"prac_n":28,"feed_prac_rank":26,"lead_laps":1,"fast_laps":0,"spd_rank":27,"pre_arp":20.0162,"date":"2025-05-23"},{"race_id":5495,"driver":"Spencer Boyd","start":28,"finish":24,"prac_rank":27,"prac_n":28,"feed_prac_rank":31,"lead_laps":0,"fast_laps":0,"spd_rank":29,"pre_arp":25.5105,"date":"2025-05-23"},{"race_id":5495,"driver":"Toni Breidinger","start":25,"finish":30,"prac_rank":28,"prac_n":28,"feed_prac_rank":30,"lead_laps":0,"fast_laps":0,"spd_rank":30,"pre_arp":24.8871,"date":"2025-05-23"},{"race_id":5495,"driver":"Cody Dennison","start":29,"finish":29,"prac_rank":null,"prac_n":null,"feed_prac_rank":29,"lead_laps":0,"fast_laps":0,"spd_rank":33,"pre_arp":28.064,"date":"2025-05-23"},{"race_id":5495,"driver":"Justin S Carroll","start":30,"finish":33,"prac_rank":null,"prac_n":null,"feed_prac_rank":32,"lead_laps":0,"fast_laps":0,"spd_rank":34,"pre_arp":29.8636,"date":"2025-05-23"},{"race_id":5495,"driver":"Mason Maggio","start":34,"finish":28,"prac_rank":null,"prac_n":null,"feed_prac_rank":33,"lead_laps":0,"fast_laps":0,"spd_rank":32,"pre_arp":25.7609,"date":"2025-05-23"},{"race_id":5495,"driver":"Frankie Muniz","start":31,"finish":27,"prac_rank":null,"prac_n":null,"feed_prac_rank":34,"lead_laps":0,"fast_laps":0,"spd_rank":31,"pre_arp":26.1529,"date":"2025-05-23"}],"excluded":[{"race_id":5218,"date":"2022-02-18","season":2022,"track":"Daytona International Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5220,"date":"2022-03-19","season":2022,"track":"Atlanta Motor Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5221,"date":"2022-03-26","season":2022,"track":"Circuit of The Americas","reason":"road family (never mixed with ovals)"},{"race_id":5223,"date":"2022-04-16","season":2022,"track":"Bristol Motor Speedway Dirt","reason":"dirt layout"},{"race_id":5229,"date":"2022-06-11","season":2022,"track":"Sonoma Raceway","reason":"road family (never mixed with ovals)"},{"race_id":5230,"date":"2022-06-18","season":2022,"track":"Knoxville Raceway","reason":"dirt layout"},{"race_id":5232,"date":"2022-07-09","season":2022,"track":"Mid-Ohio Sports Car Course","reason":"road family (never mixed with ovals)"},{"race_id":5233,"date":"2022-07-23","season":2022,"track":"Pocono Raceway","reason":"Indianapolis/Pocono never pooled with the 1.5s (Andrew, 22 Sep)"},{"race_id":5238,"date":"2022-10-01","season":2022,"track":"Talladega Superspeedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5343,"date":"2023-02-17","season":2023,"track":"Daytona International Speedway","reason":"shortened (79 of 100 laps)"},{"race_id":5345,"date":"2023-03-18","season":2023,"track":"Atlanta Motor Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5346,"date":"2023-03-25","season":2023,"track":"Circuit of The Americas","reason":"road family (never mixed with ovals)"},{"race_id":5348,"date":"2023-04-08","season":2023,"track":"Bristol Motor Speedway Dirt","reason":"dirt layout"},{"race_id":5347,"date":"2023-04-14","season":2023,"track":"Martinsville Speedway","reason":"shortened (124 of 200 laps)"},{"race_id":5365,"date":"2023-07-08","season":2023,"track":"Mid-Ohio Sports Car Course","reason":"road family (never mixed with ovals)"},{"race_id":5366,"date":"2023-07-22","season":2023,"track":"Pocono Raceway","reason":"Indianapolis/Pocono never pooled with the 1.5s (Andrew, 22 Sep)"},{"race_id":5371,"date":"2023-09-30","season":2023,"track":"Talladega Superspeedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5462,"date":"2024-02-16","season":2024,"track":"Daytona International Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5464,"date":"2024-02-24","season":2024,"track":"Atlanta Motor Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5465,"date":"2024-03-23","season":2024,"track":"Circuit of The Americas","reason":"road family (never mixed with ovals)"},{"race_id":5476,"date":"2024-07-12","season":2024,"track":"Pocono Raceway","reason":"Indianapolis/Pocono never pooled with the 1.5s (Andrew, 22 Sep)"},{"race_id":5482,"date":"2024-10-04","season":2024,"track":"Talladega Superspeedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5485,"date":"2025-02-14","season":2025,"track":"Daytona International Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5486,"date":"2025-02-22","season":2025,"track":"Atlanta Motor Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5498,"date":"2025-06-20","season":2025,"track":"Pocono Raceway","reason":"Indianapolis/Pocono never pooled with the 1.5s (Andrew, 22 Sep)"},{"race_id":5509,"date":"2025-06-28","season":2025,"track":"Lime Rock Park","reason":"road family (never mixed with ovals)"},{"race_id":5503,"date":"2025-08-08","season":2025,"track":"Watkins Glen International","reason":"road family (never mixed with ovals)"},{"race_id":5505,"date":"2025-10-03","season":2025,"track":"Charlotte Motor Speedway Road Course","reason":"road family (never mixed with ovals); different layout of the same venue"},{"race_id":5504,"date":"2025-10-17","season":2025,"track":"Talladega Superspeedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5667,"date":"2026-02-13","season":2026,"track":"Daytona International Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5668,"date":"2026-02-21","season":2026,"track":"Atlanta Motor Speedway","reason":"drafting family (never mixed with ovals)"},{"race_id":5669,"date":"2026-02-28","season":2026,"track":"Grand Prix of St. Petersburg","reason":"road family (never mixed with ovals)"},{"race_id":5683,"date":"2026-05-08","season":2026,"track":"Watkins Glen International","reason":"road family (never mixed with ovals)"},{"race_id":5677,"date":"2026-05-22","season":2026,"track":"Charlotte Motor Speedway","reason":"shortened (110 of 134 laps)"},{"race_id":5680,"date":"2026-06-19","season":2026,"track":"San Diego Street Course","reason":"road family (never mixed with ovals)"},{"race_id":5681,"date":"2026-07-11","season":2026,"track":"Lime Rock Park","reason":"road family (never mixed with ovals)"}],"sheet":{"w_q":{"track":0.4626,"oval":0.4479,"generic":0.22,"trust":0.0001},"w_p":{"track":null,"oval":0.1788,"generic":0.07,"trust":0,"practice_races":[1,12],"note":"trust held at 0: too few archived practice sessions to estimate how much tracks differ"}}};
+const $ = s => document.querySelector(s);
+const M = D.meta, S = D.summary;
+const pct = x => x == null ? '–' : Math.round(100 * x) + '%';
+const sc = x => x == null ? '–' : Math.round(100 * x);            // correlation as a 0-100 score
+const f0 = x => x == null ? '–' : Math.round(x).toString();
+const f1 = x => x == null ? '–' : (Math.round(10 * x) / 10).toFixed(1);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const short = t => String(t || '').replace(/ (Motor )?(Speedway|Raceway|International Raceway|Superspeedway)$/, '').replace(/ International$/, '');
+const ord = n => { n = Math.round(n); const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COL = { lead: css('--c-lead'), blue: css('--c-blue'), green: css('--c-green'), orange: css('--c-orange'), rest: css('--c-rest'), surf: css('--g800'), goldDark: css('--gold-dark'), dark: css('--g600') };
+// finish-position bands for the range-of-outcomes bars: exhaustive, non-overlapping, dark text on light bands / light text on dark bands
+const BANDS = [
+  { k: 'w',  name: 'W',     c: () => COL.lead,    tc: '#111' },
+  { k: 's5',  name: '2-5',   c: () => COL.blue,    tc: '#fff' },
+  { k: 's10', name: '6-10',  c: () => COL.green,   tc: '#fff' },
+  { k: 's20', name: '11-20', c: () => COL.orange,  tc: '#fff' },
+  { k: 's30', name: '21-30', c: () => COL.goldDark, tc: '#111' },
+  { k: 's31', name: '31+',  c: () => COL.dark,    tc: '#fff' },
+];
+function outcomeBands(r) {
+  const w = r.rate_top1 ?? 0, s5 = (r.rate_top5 ?? 0) - w, s10 = (r.rate_top10 ?? 0) - (r.rate_top5 ?? 0),
+        s20 = (r.rate_top20 ?? 0) - (r.rate_top10 ?? 0), s30 = (r.rate_top30 ?? 0) - (r.rate_top20 ?? 0),
+        s31 = Math.max(0, 1 - (r.rate_top30 ?? 0));
+  return { w, s5, s10, s20, s30, s31 };
+}
+function rangeBar(v) {
+  return BANDS.map(b => { const val = Math.max(0, v[b.k] || 0); if (val < 0.003) return '';
+    const lab = val >= 0.11 ? `${b.name} ${pct(val)}` : val >= 0.05 ? pct(val) : '';
+    return `<div style="width:${(val * 100).toFixed(2)}%;background:${b.c()};color:${b.tc}" title="${b.name}: ${pct(val)}">${lab}</div>`; }).join('');
+}
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const lab = r => `${MON[+r.date.slice(5, 7) - 1]} ${r.date.slice(0, 4)}`;
+const TRK = short(M.track), SER = /truck/i.test(M.series) ? 'Truck' : /cup/i.test(M.series) ? 'Cup' : "O'Reilly";
+const V = SER === 'Truck' ? 'trucks' : 'cars', V1 = SER === 'Truck' ? 'truck' : 'car';
+const TYPE = { short_track: 'Short tracks', intermediate: 'Intermediates', superspeedway: 'Superspeedways', atlanta: 'Atlanta', road_course: 'Road courses' };
+document.querySelectorAll('.lg-trk').forEach(e => e.textContent = TRK);
+const dt = new Date(M.race_date + 'T12:00:00');
+const same = D.same, nS = same.length;
+
+// how much of this track's difference from a normal oval looks real, in words
+const real = m => { const t = S[m].trust; return t >= .75 ? 'most of it looks real' : t >= .5 ? 'more than half of it looks real' : t >= .25 ? 'some of it looks real, the rest is luck' : 'very little of it looks real, it is mostly luck'; };
+const diffWord = (m, more, less, eps) => { const d = S[m].track - S[m].oval; return Math.abs(d) < eps ? 'about the same as' : d > 0 ? more : less; };
+const trustBar = t => `<span class="trust"><i style="width:${Math.round(100 * t)}%"></i></span>${pct(t)}`;
+
+// ---- tooltip
+const tip = $('#tip');
+function showTip(e, html) { tip.innerHTML = html; tip.hidden = false; moveTip(e); }
+function moveTip(e) { const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14; if (y + h > innerHeight - 8) y = e.clientY - h - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px'; }
+function bindTips(root, fn) {
+  root.querySelectorAll('[data-i]').forEach(el => {
+    el.addEventListener('mousemove', e => showTip(e, fn(el.dataset)));
+    el.addEventListener('mouseleave', () => tip.hidden = true);
+  });
+}
+
+// ---- grouped horizontal bars: rows [{label, a, b}] with a = this track, b = all ovals
+function pairBars(el, rows, fmt, xmax, aria) {
+  const W = 560, rowH = 40, padL = 132, padR = 48, padT = 4, padB = 24, H = padT + padB + rowH * rows.length;
+  const x = v => padL + (W - padL - padR) * v / xmax;
+  let g = '';
+  for (let i = 0; i <= 4; i++) { const t = xmax * i / 4; g += `<line class="gridl" x1="${x(t)}" x2="${x(t)}" y1="${padT}" y2="${H - padB}"/><text x="${x(t)}" y="${H - padB + 16}" text-anchor="middle">${fmt(t)}</text>`; }
+  rows.forEach((r, i) => {
+    const y = padT + i * rowH;
+    g += `<text class="lab" x="${padL - 10}" y="${y + rowH / 2 + 4}" text-anchor="end">${esc(r.label)}</text>`;
+    [[r.a, COL.lead, 6], [r.b, COL.blue, 21]].forEach(([v, c, off]) => {
+      if (v == null) return;
+      const w = Math.max(1, x(v) - padL);
+      g += `<rect x="${padL}" y="${y + off}" width="${w}" height="13" rx="3" fill="${c}"/>`;
+      g += `<text class="lab" x="${padL + w + 5}" y="${y + off + 11}">${fmt(v)}</text>`;
+    });
+    g += `<rect class="hit" data-i="${i}" x="0" y="${y}" width="${W}" height="${rowH}"/>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${g}</svg>`;
+}
+
+// ---- header + short version
+$('#subline').textContent = `${M.race_name} · ${dt.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'})}`;
+const nOther = M.n_races - M.n_same;
+$('#read-lede').innerHTML = `Built from ${nS} past ${SER} races at ${TRK} and ${nOther} at other ovals since ${Math.min(...D.ovals.map(r => +r.date.slice(0, 4)))}. Recent races count more: a race from a year ago counts half as much as last week's. Next to each ${TRK} number is how much of its difference from a normal oval looks real rather than luck, judged by how much tracks really differ on that number and how much one race swings.`;
+const TL = ['Best', 'Strong', 'Middle', 'Lower', 'Backmarkers'];
+const tier = (scope, t) => D.tiers.find(s => s.scope === scope && s.tier === t);
+const tiles = [
+  { k: 'Best-tier win rate', v: `${pct(tier('track', 1).rate_top1)}`, d: `Top strength tier at ${TRK}. Normal oval: ${pct(tier('oval', 1).rate_top1)}`, a: 'var(--c-lead)' },
+  { k: 'Backmarker DNF rate', v: `${pct(tier('track', 5).rate_dnf)}`, d: `Bottom strength tier at ${TRK}. Normal oval: ${pct(tier('oval', 5).rate_dnf)}`, a: 'var(--c-orange)' },
+  { k: 'DNFs per race', v: `${f1(S.dnf_rate.track * same.reduce((a, r) => a + r.cars, 0) / nS)}`, d: `${pct(S.dnf_rate.track)} of the field. A normal oval: ${pct(S.dnf_rate.oval)}`, a: 'var(--c-green)' },
+  { k: 'Cautions per 100 laps', v: f1(S.cautions_100.track), d: `A normal oval: ${f1(S.cautions_100.oval)}`, a: 'var(--c-blue)' }
+];
+$('#read').innerHTML = tiles.map(t => `<div class="tile num" style="--accent:${t.a}"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join('');
+
+// ---- 01 range of outcomes by pre-race strength -- the axis the sheet itself ranks on.
+// what actually matters for building the sheet: not a single correlation score, but
+// what a truck of a given strength coming in actually goes on to do here.
+(function () {
+  $('#tier-legend').innerHTML = BANDS.map(b => `<span><i class="sw" style="background:${b.c()}"></i>${b.name}</span>`).join('');
+  const el = $('#chart-tier');
+  el.innerHTML = [1, 2, 3, 4, 5].map(t => {
+    const tt = tier('track', t), oo = tier('oval', t);
+    const rowT = tt ? `<div class="rbar"><span class="rtag trk">${TRK}</span><div class="rtrack">${rangeBar(outcomeBands(tt))}</div></div>` : '';
+    const rowO = oo ? `<div class="rbar"><span class="rtag ov">Oval</span><div class="rtrack">${rangeBar(outcomeBands(oo))}</div></div>` : '';
+    return `<div class="tiergroup"><div class="tiertitle">${TL[t - 1]}<span class="muted small">${tt ? `${tt.cars} ${TRK} starts, ${oo.cars} oval starts` : ''}</span></div>${rowT}${rowO}</div>`;
+  }).join('');
+  const gap = S.spd_fin.track - S.pre_fin_run.track;
+  $('#tier-lede').innerHTML = `Every ${V1} is ranked by how strong it has been this season (pre-race form), split into five even tiers. This is what actually finishes, banded the way the sheet itself bands K (win, 2nd-5th, 6th-10th, 11th-20th, 21st-30th, 31st or worse) &mdash; at ${TRK} and at a normal oval, side by side. Season form alone gets a ${V1}'s finish only to about <b class="hl">${sc(S.pre_fin_run.track)} out of 100</b>; the other <b class="hl">${sc(gap)} points</b> of how closely finish tracks speed is what happens on the day &mdash; who is actually fast, who wrecks, who breaks.`;
+  const best = tier('track', 1), bestO = tier('oval', 1), back = tier('track', 5), backO = tier('oval', 5);
+  $('#tier-facts').innerHTML = `
+    <div class="fact"><span class="big num">${pct(best.rate_top5)} top 5</span>for the best tier at ${TRK} (normal oval ${pct(bestO.rate_top5)}) &mdash; even the strongest ${V} do not always convert here; ${pct(best.rate_dnf)} of them do not finish.</div>
+    <div class="fact"><span class="big num">${pct(back.rate_dnf)} DNF</span>for backmarkers at ${TRK} (normal oval ${pct(backO.rate_dnf)}) &mdash; ${pct(back.rate_crash)} crash, ${pct(back.rate_mech)} mechanical. Only ${pct(back.rate_lead_lap)} of that group finishes on the lead lap.</div>
+    <div class="fact"><span class="big num">${real('pre_fin_run')}</span>how much of ${TRK}'s own tilt on this (track vs a normal oval) is real rather than one race swinging it, judged across every oval in the series.</div>`;
+})();
+
+// ---- 02 range of outcomes by how fast you actually ran (in-race lap-by-lap speed rank,
+// not season form). Tier above is who was expected to be fast; this is who WAS fast that
+// day, and what happened to them anyway -- the chaos layer tier cannot see coming.
+(function () {
+  $('#speed-legend').innerHTML = BANDS.map(b => `<span><i class="sw" style="background:${b.c()}"></i>${b.name}</span>`).join('');
+  const bkts = ['1-5', '6-10', '11-20', '21+'];
+  const spd = (scope, k) => D.speeds.find(s => s.scope === scope && s.sbkt === k);
+  const el = $('#chart-speed');
+  el.innerHTML = bkts.map(k => {
+    const tt = spd('track', k), oo = spd('oval', k);
+    const rowT = tt ? `<div class="rbar"><span class="rtag trk">${TRK}</span><div class="rtrack">${rangeBar(outcomeBands(tt))}</div></div>` : '';
+    const rowO = oo ? `<div class="rbar"><span class="rtag ov">Oval</span><div class="rtrack">${rangeBar(outcomeBands(oo))}</div></div>` : '';
+    return `<div class="tiergroup"><div class="tiertitle">Ran ${k} fastest<span class="muted small">${tt ? `${tt.cars} ${TRK} starts, ${oo.cars} oval starts` : ''}</span></div>${rowT}${rowO}</div>`;
+  }).join('');
+  const fast = spd('track', '1-5'), fastO = spd('oval', '1-5'), slow = spd('track', '21+'), slowO = spd('oval', '21+');
+  const w = diffWord('spd_fin', 'more closely than', 'less closely than', .03);
+  $('#speed-lede').innerHTML = `Rank every ${V1} by how fast it actually ran that race (lap-by-lap green-flag pace, restarts taken out) and band the finish the same way as above. Overall, finish follows this <b class="hl">${w}</b> at a normal oval (${sc(S.spd_fin.track)} vs ${sc(S.spd_fin.oval)} out of 100). Genuinely fast does not always mean it shows up in the finish &mdash; this is the gap tier alone cannot explain.`;
+  $('#speed-facts').innerHTML = `
+    <div class="fact"><span class="big num">${pct(fast.rate_top5)} top 5</span>for the 5 fastest ${V} at ${TRK} (normal oval ${pct(fastO.rate_top5)}) &mdash; even the genuinely fastest ${V} miss the top 5 about ${pct(1 - fast.rate_top5)} of the time; ${pct(fast.rate_dnf)} do not finish at all.</div>
+    <div class="fact"><span class="big num">${pct(slow.rate_top20)} top 20</span>for the slowest ${V} at ${TRK} that race (normal oval ${pct(slowO.rate_top20)}) &mdash; how often being slow still salvages a decent finish.</div>
+    <div class="fact"><span class="big num">${real('spd_fin')}</span>how much of ${TRK}'s own tilt on this (track vs a normal oval) is real rather than one race swinging it.</div>`;
+})();
+
+// ---- 03 what moves a driver within its tier: starting spot, practice, DNF detail
+(function () {
+  const coef = S.start_coef.track;
+  $('#mod-lede').innerHTML = `Tier sets the baseline. Starting spot barely adds to it once tier is known &mdash; ${coef <= 0.02 ? `starting further forward has not helped a ${V1} finish better at ${TRK} beyond what its speed already explains` : `starting further forward still helps a little at ${TRK}, on top of speed`}. What actually shifts a ${V1} within its tier is how it tends to fail, and what practice shows &mdash; below.`;
+  const TL2 = TL;
+  $('#dnf-body').innerHTML = [1, 2, 3, 4, 5].map(t => { const tt = tier('track', t), oo = tier('oval', t);
+    return `<tr><td class="l">${TL2[t - 1]}</td><td>${pct(tt.rate_dnf)} <span class="muted small">(${pct(oo.rate_dnf)})</span></td><td>${pct(tt.rate_crash)} <span class="muted small">(${pct(oo.rate_crash)})</span></td><td>${pct(tt.rate_mech)} <span class="muted small">(${pct(oo.rate_mech)})</span></td><td>${pct(tt.rate_lead_lap)} <span class="muted small">(${pct(oo.rate_lead_lap)})</span></td></tr>`; }).join('');
+  // driver-level: who was fastest in practice (long-run pace, and separately single-lap
+  // speed), and what did they actually do in the race. Goal of this section: decide how
+  // much practice should move the sheet, not just describe it.
+  const pd = D.practice_detail || [];
+  if (!pd.length) {
+    $('#prac-lede').innerHTML = `No practice session at ${TRK} has been archived in a form we can read, so there is nothing to say about practice here yet.`;
+    $('#prac-facts').innerHTML = ''; $('#prac-races').innerHTML = '';
+  } else {
+    const byRace = {};
+    pd.forEach(r => { (byRace[r.race_id] = byRace[r.race_id] || []).push(r); });
+    const races = Object.values(byRace).map(rows => {
+      // long-run pace (Lap Raptor) ranks first when archived; single-lap (NASCAR feed) is the fallback
+      rows.forEach(r => r._rank = r.prac_rank ?? r.feed_prac_rank);
+      rows.sort((a, b) => (a._rank ?? 999) - (b._rank ?? 999));
+      const p1 = rows.find(r => r._rank === Math.min(...rows.map(r => r._rank ?? 999)));
+      const dom = rows.reduce((a, r) => (r.lead_laps || 0) > (a ? a.lead_laps : -1) ? r : a, null);
+      const src = rows.some(r => r.prac_rank != null) ? 'long-run pace' : 'single lap only';
+      return { race_id: rows[0].race_id, date: rows[0].date, rows, p1, dom, src };
+    }).sort((a, b) => a.date.localeCompare(b.date));
+    const p1Led = races.filter(r => r.p1 && r.p1.lead_laps > 0).length;
+    const domRanks = races.filter(r => r.dom && r.dom.lead_laps > 0 && r.dom._rank != null).map(r => r.dom._rank);
+    const avgDomRank = domRanks.length ? (domRanks.reduce((a, b) => a + b, 0) / domRanks.length) : null;
+    const wp = D.sheet.w_p;
+    $('#prac-lede').innerHTML = `Archived for <b class="hl">${races.length} of the ${nS}</b> ${TRK} races &mdash; ranked by long-run pace (tyre age and session timing adjusted) where Lap Raptor has it, by single fastest lap from the NASCAR feed otherwise; each table below says which. Being fastest in practice is not the same as being the race's dominator, and this sample is too small to set a track-specific practice weight from &mdash; it is here to judge whether practice is worth watching at all, not to score it precisely.`;
+    $('#prac-facts').innerHTML = `
+      <div class="fact"><span class="big num">${p1Led} of ${races.length}</span>races where the single fastest ${V1} in practice went on to lead a lap. Practice pace alone does not reliably call the dominator.</div>
+      <div class="fact"><span class="big num">${avgDomRank != null ? f1(avgDomRank) : '–'}</span>average practice rank of the ${V1} that actually led the most laps (1 = fastest in practice). The dominator usually comes from the practice top handful, just rarely the very fastest &mdash; so practice is worth a look at the top 5-ish, not a single pick.</div>
+      <div class="fact"><span class="big num">${pct(wp.generic)} sheet weight</span>is what practice gets today, the same everywhere (generic, not ${TRK}-specific). ${wp.note || ''}</div>`;
+    $('#prac-races').innerHTML = races.map(r => {
+      const rows = r.rows.slice(0, 6);
+      const body = rows.map(row => {
+        const dominated = (row.lead_laps || 0) > 0;
+        return `<tr${dominated ? ' style="background:rgba(255,229,0,.08)"' : ''}><td class="l${dominated ? ' hlc' : ''}">${esc(row.driver)}</td><td>${row.prac_rank ?? '–'}</td><td>${row.feed_prac_rank ?? '–'}</td><td>${row.start}</td><td>${ord(row.finish)}</td><td>${row.lead_laps || 0}</td><td>${row.fast_laps || 0}</td></tr>`;
+      }).join('');
+      return `<h4 style="margin:14px 0 6px;font-size:13px;color:var(--t2);font-weight:600">${lab(r)} <span class="muted">(ranked by ${r.src})</span> &middot; fastest in practice: ${esc(r.p1 ? r.p1.driver : '–')}${r.dom && r.dom.lead_laps > 0 ? `, led most laps: ${esc(r.dom.driver)} (${r.dom.lead_laps})` : ', no one in this group led a lap'}</h4>
+        <div class="tablewrap"><table class="num"><thead><tr><th class="l">Driver</th><th>Long-run rank</th><th>Single-lap rank</th><th>Started</th><th>Finished</th><th>Laps led</th><th>Fastest laps</th></tr></thead><tbody>${body}</tbody></table></div>`;
+    }).join('');
+
+    // ---- the mismatches: full field, not just the practice top 6 -- who practice
+    // would have led us to expect one thing, and the race gave another
+    const tierOf = arp => arp == null ? null : arp <= 11 ? 1 : arp <= 15 ? 2 : arp <= 19 ? 3 : arp <= 24 ? 4 : 5;
+    const mismatches = [];
+    races.forEach(r => {
+      const n = r.rows.length;
+      r.rows.forEach(row => {
+        const t = tierOf(row.pre_arp);
+        const reasons = [];
+        if (row._rank != null && row._rank <= 5 && row.finish >= 18) reasons.push('Fast in practice, faded in the race');
+        if (row._rank != null && row._rank > n - 10 && ((row.lead_laps || 0) >= 5 || row.finish <= 3)) reasons.push('Barely showed up in practice, starred in the race');
+        if (t != null && t <= 2 && row._rank != null && row._rank > n * 0.6) reasons.push('Strong coming in, practiced poorly');
+        reasons.forEach(reason => mismatches.push({ date: r.date, label: lab(r), row, reason, t }));
+      });
+    });
+    $('#mismatch-lede').innerHTML = mismatches.length ? `Looking at every driver with a practice reading, not just the fastest few &mdash; three patterns worth knowing before trusting a practice number on the sheet.` :
+      `No clear mismatches in this sample &mdash; practice and the race lined up about as well as expected.`;
+    $('#mismatch-body').innerHTML = mismatches.sort((a, b) => a.date.localeCompare(b.date)).map(m => {
+      const row = m.row;
+      return `<tr><td class="l">${m.label}</td><td class="l hlc">${esc(row.driver)}</td><td class="l">${m.reason}</td><td>${m.t ?? '–'}</td><td>${row._rank ?? '–'}</td><td>${row.start}</td><td>${ord(row.finish)}</td><td>${row.lead_laps || 0}</td></tr>`;
+    }).join('');
+  }
+})();
+
+// ---- 03 races
+(function () {
+  $('#races-body').innerHTML = same.slice().reverse().map(r => `<tr>
+    <td class="l"><span class="tag same">${lab(r)}</span><span class="muted small" style="display:block;margin-top:3px">${esc(r.race_name.replace(/ presented by .*$/, ''))}</span></td>
+    <td class="l">${ord(r.fastest_fin)}</td>
+    <td>${r.dnf_crash + r.dnf_mech} <span class="muted small">(${r.dnf_crash} / ${r.dnf_mech})</span></td>
+    <td>${r.cautions}</td>
+    <td>${r.lead_lap} of ${r.cars}</td></tr>`).join('');
+  $('#races-lede').innerHTML = `Every past ${SER} race at ${TRK} since 2022 on this layout, plus every other oval as the comparison, feeds the tiers and DNF profile above &mdash; unweighted, every race counts the same regardless of how long ago it happened. This piece is about the track itself, not who was hot recently: ${nS} ${TRK} races here, ${nOther} at other ovals.`;
+  const ot = D.used_tracks.map(t => `${esc(short(t.track))} ${t.races}`);
+  $('#others').textContent = ot.join(' · ');
+  const plain = s => /exhibition/.test(s) ? 'Exhibition races (not points races).' : /dirt/.test(s) ? 'Dirt. A different surface, and a different race.' :
+    /road family/.test(s) ? 'Road and street courses. They reward different drivers, often the opposite of ovals.' :
+    /drafting family/.test(s) ? 'Superspeedways and Atlanta. Pack racing, where the finish is mostly who avoids the wreck.' :
+    /shortened/.test(s) ? 'Shortened by rain or darkness, so the finish is not a full race.' : esc(s);
+  const groups = {};
+  D.excluded.forEach(e => { const k = plain(e.reason); (groups[k] = groups[k] || []).push(e); });
+  $('#excl-body').innerHTML = Object.entries(groups).map(([k, es]) => `<tr><td class="l wrap">${es.map(e => `<span class="tag out" style="margin:0 4px 4px 0">${e.season} ${esc(short(e.track))}</span>`).join('')}</td><td class="l wrap">${k}</td></tr>`).join('');
+})();
+
+$('#foot').innerHTML = `<span>Golden Ticket Sims · ${esc(M.series)} · ${esc(M.race_name)} · profile locked ${esc(M.locked)} · results through ${esc(M.last_result)}</span><span>Sources: NASCAR official results and lap-by-lap timing; Lap Raptor practice sessions; NASCAR weekend practice results. Scores out of 100 are rank correlations: 100 means two orders match exactly, 0 means no link.</span>`;
+</script>

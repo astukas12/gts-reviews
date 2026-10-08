@@ -1,0 +1,485 @@
+<title>Charlotte Cup: Dominator Points</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{
+  --gold:#FFE500; --gold-dark:#D4B000; --gold-light:#FFF4B3; --black:#000;
+  --g900:#121212; --g850:#1a1a1a; --g800:#1e1e1e; --g700:#2d2d2d; --g600:#404040; --g500:#666;
+  --t1:#ffffff; --t2:#cccccc; --t3:#999999;
+  /* data: gold leads, three supporting hues, neutral for "everyone else" */
+  --c-lead:#FFE500; --c-blue:#3987e5; --c-green:#199e70; --c-orange:#d95926; --c-rest:#6b6b6b;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--g900);color:var(--t1);font-family:var(--font);font-size:15px;line-height:1.55;margin:0}
+.num{font-variant-numeric:tabular-nums}
+header.bar{background:var(--black);border-bottom:3px solid var(--gold);padding:12px 24px;display:flex;align-items:center;gap:16px}
+header.bar img{height:52px;width:auto;border-radius:4px}
+header.bar h1{margin:0;color:var(--gold);text-transform:uppercase;font-weight:700;font-size:26px;letter-spacing:.02em;text-shadow:0 0 15px rgba(255,229,0,.4);text-wrap:balance}
+header.bar .sub{color:var(--t3);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+main{max-width:1100px;margin:0 auto;padding:28px 24px 64px;display:flex;flex-direction:column;gap:44px}
+h2{font-size:22px;font-weight:700;margin:0;text-wrap:balance}
+h2 .step{color:var(--gold);margin-right:10px}
+h3{font-size:12px;font-weight:600;margin:0;text-transform:uppercase;letter-spacing:.08em;color:var(--t3)}
+p{margin:0}
+.lede{color:var(--t2);max-width:70ch}
+.muted{color:var(--t3)} .small{font-size:13px}
+b.hl{color:var(--gold-light);font-weight:600}
+section > .head{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+
+.read{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--accent,var(--gold))}
+.tile .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3)}
+.tile .v{font-size:30px;font-weight:700;line-height:1.1}
+.tile .v small{font-size:14px;font-weight:600;color:var(--t2);margin-left:4px}
+.tile .d{font-size:13px;color:var(--t2)}
+@media (max-width:860px){.read{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.read{grid-template-columns:1fr}}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.facts{display:flex;flex-direction:column;gap:12px}
+.fact{background:var(--g850);border:1px solid var(--g700);border-radius:8px;padding:12px 14px;color:var(--t2);font-size:14px}
+.fact .big{display:block;font-size:22px;font-weight:700;color:var(--t1);line-height:1.2}
+
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--t3);font-family:var(--font);font-size:11px}
+svg .lab{fill:var(--t2)} svg .lab.strong{fill:var(--t1);font-weight:600}
+svg .gridl{stroke:var(--g700)} svg .axisl{stroke:var(--g600)}
+svg .hit{fill:transparent;cursor:default}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--t2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px}
+.sw.dot{border-radius:50%}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.pick button{font:inherit;font-size:13px;background:var(--g850);color:var(--t2);border:1px solid var(--g600);border-radius:4px;padding:4px 10px;cursor:pointer}
+.pick button:hover{color:var(--t1);border-color:var(--t3)}
+.pick button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.pick button[aria-pressed="true"]{color:var(--black);background:var(--gold);border-color:var(--gold);font-weight:600}
+.tip{position:fixed;pointer-events:none;background:var(--black);border:1px solid var(--g600);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--t1);z-index:10;max-width:260px;line-height:1.45}
+.tip .muted{color:var(--t3)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--g700);border-radius:8px;background:var(--g800)}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);font-weight:600;border-bottom:1px solid var(--g600)}
+th.l,td.l{text-align:left}
+td.wrap{white-space:normal;min-width:260px}
+tbody tr{border-bottom:1px solid var(--g700)}
+tbody tr:hover{background:var(--g850)}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;letter-spacing:.02em}
+.tag.same{background:rgba(255,229,0,.14);color:var(--gold-light)}
+.tag.borrow{background:rgba(57,135,229,.18);color:#9cc3f3}
+.tag.out{background:rgba(217,89,38,.18);color:#f0a585}
+.wbar{display:inline-block;height:6px;border-radius:3px;background:var(--gold-dark);vertical-align:middle;margin-right:8px}
+
+footer{color:var(--t3);font-size:12px;border-top:1px solid var(--g700);padding-top:16px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:520px){main{padding:20px 16px 48px} header.bar{padding:10px 16px} header.bar h1{font-size:20px}}
+</style>
+
+<header class="bar">
+  <img alt="Golden Ticket Sims" src="data:image/jpeg;base64,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">
+  <div>
+    <h1>Charlotte Cup: Dominator Points</h1>
+    <div class="sub" id="subline"></div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="head">
+      <h2>The short version</h2>
+      <p class="lede" id="read-lede"></p>
+    </div>
+    <div class="read" id="read"></div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">01</span>Total dominator points</h2>
+      <p class="lede" id="pot-lede"></p>
+    </div>
+    <div class="panel">
+      <div class="legend"><span><i class="sw" style="background:var(--c-lead)"></i><span id="lg-same">Same track</span></span><span><i class="sw" style="background:var(--c-blue)"></i>Similar track</span><span><i class="sw" style="width:14px;height:2px;background:var(--t1)"></i>Weighted average</span></div>
+      <div id="chart-pot"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">02</span>How they get split</h2>
+      <p class="lede" id="split-lede"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="legend"><span><i class="sw" style="background:var(--c-lead)"></i>Top dominator</span><span><i class="sw" style="background:var(--c-blue)"></i>2nd dominator</span><span><i class="sw" style="background:var(--c-green)"></i>3rd dominator</span><span><i class="sw" style="background:var(--c-rest)"></i>Everyone else</span></div>
+        <div id="chart-split"></div>
+      </div>
+      <div class="facts" id="split-facts"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">03</span>Where dominators start and finish</h2>
+      <p class="lede" id="where-lede"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="pick" role="group" aria-label="Position shown">
+          <button type="button" data-k="st" aria-pressed="true">Starting position</button>
+          <button type="button" data-k="fin" aria-pressed="false">Finishing position</button>
+        </div>
+        <div class="legend"><span><i class="sw dot" style="background:var(--c-lead)"></i>Big score (20%+ of total)</span><span><i class="sw dot" style="background:var(--c-blue)"></i>5 to 20%</span><span><i class="sw dot" style="background:var(--c-rest)"></i>Under 5%</span></div>
+        <div id="chart-where"></div>
+      </div>
+      <div class="facts" id="where-facts"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">04</span>When in the race the points come</h2>
+      <p class="lede" id="stage-lede"></p>
+    </div>
+    <div class="panel">
+      <div class="legend"><span><i class="sw" style="background:var(--c-blue)"></i>Stage 1</span><span><i class="sw" style="background:var(--c-green)"></i>Stage 2</span><span><i class="sw" style="background:var(--c-lead)"></i>Final stage</span></div>
+      <div id="chart-stage"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <h2><span class="step">05</span>The races behind these numbers</h2>
+      <p class="lede" id="races-lede"></p>
+    </div>
+    <div class="tablewrap">
+      <table class="num">
+        <thead><tr><th class="l">Race</th><th class="l">Adjusted?</th><th>Total</th><th class="l">Top dominator</th><th>Start → finish</th><th>Points</th><th class="l">Weight</th></tr></thead>
+        <tbody id="races-body"></tbody>
+      </table>
+    </div>
+    <h3 style="margin:22px 0 10px">Races we left out</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th class="l">Race</th><th class="l">Why it's out</th></tr></thead>
+        <tbody id="excl-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const D = {"meta":{"series":"Cup","race_name":"Bank of America 400","track":"Charlotte Motor Speedway","race_date":"2026-10-11","sched_laps":267,"stages":[25,25,217],"locked":"2026-10-08 08:49","weight_rule":"weight = 1.15 if same track x 1.10 if unscaled x (1 -0.05 per season back, floor 0.80), normalised","pot_target":160.5},"summary":{"pot":160.5105,"pot_rng":[135.1,171.15],"top1":0.3353,"top1_rng":[0.2117,0.4473],"top3":0.6007,"top3_rng":[0.5368,0.6846],"top_pts_med":53.35,"top_pts_rng":[28.6,76.55],"top_pts_w":54.2269,"top3_pts_w":96.5348,"top3_pts_rng":[76.4,114.5],"two_big":2,"two_big_w":0.1502,"n_races":14,"n_bristol":4,"scorers":22.1951,"scorers_rng":[18,29],"scraps_cars":17.356,"s":[0.0995,0.0951,0.8054],"top_s3":0.886,"big_s":[0.0445,0.0632,0.8923],"origin":[0.3781,0.1947,0.2825,0.1447],"big_n":16,"big_pole":0.1136,"big_top5_start":0.3978,"big_deep_start":7,"big_deepest":37,"big_won":0.2216,"big_top5_fin":0.8638,"big_outside10_fin":2,"top_start_rng":[1,22]},"races":[{"RaceID":5610,"RaceName":"Coca-Cola 600","Season":2026,"Track":"Charlotte Motor Speedway","Weight":0.0885,"SameTrack":true,"Unscaled":false,"Scale_S1":0.25,"Scale_S2":0.25,"Scale_S3":1.085,"Note":null,"pot":135.1,"top1":0.2117,"second":0.2084,"third":0.1454,"top3":0.5655,"n_big":2,"n_mid":4,"n_scraps":18,"scorers":24,"top_pts":28.6,"second_pts":28.15,"third_pts":19.65,"top3_pts":76.4,"top_driver":"Tyler Reddick","top_start":1,"top_fin":4,"top_s3":0.7675,"s1":0.1129,"s2":0.1195,"s3":0.7676,"start_top5":0.4071,"start_6_10":0.0366,"start_11_20":0.466,"start_21":0.0903,"Date":"2026-05-24"},{"RaceID":5563,"RaceName":"Coca-Cola 600","Season":2025,"Track":"Charlotte Motor Speedway","Weight":0.0841,"SameTrack":true,"Unscaled":false,"Scale_S1":0.25,"Scale_S2":0.25,"Scale_S3":1.085,"Note":null,"pot":167.55,"top1":0.3688,"second":0.1695,"third":0.046,"top3":0.5843,"n_big":1,"n_mid":1,"n_scraps":24,"scorers":26,"top_pts":61.8,"second_pts":28.4,"third_pts":7.7,"top3_pts":97.9,"top_driver":"William Byron","top_start":3,"top_fin":2,"top_s3":0.7621,"s1":0.0964,"s2":0.0964,"s3":0.8072,"start_top5":0.4628,"start_6_10":0.1059,"start_11_20":0.2501,"start_21":0.1811,"Date":"2025-05-25"},{"RaceID":5287,"RaceName":"Coca-Cola 600","Season":2023,"Track":"Charlotte Motor Speedway","Weight":0.0753,"SameTrack":true,"Unscaled":false,"Scale_S1":0.25,"Scale_S2":0.25,"Scale_S3":1.085,"Note":null,"pot":153.6,"top1":0.4215,"second":0.1201,"third":0.0817,"top3":0.6234,"n_big":1,"n_mid":4,"n_scraps":16,"scorers":21,"top_pts":64.75,"second_pts":18.45,"third_pts":12.55,"top3_pts":95.75,"top_driver":"Ryan Blaney","top_start":8,"top_fin":1,"top_s3":0.9135,"s1":0.1051,"s2":0.0876,"s3":0.8073,"start_top5":0.2871,"start_6_10":0.4831,"start_11_20":0.1735,"start_21":0.0563,"Date":"2023-05-29"},{"RaceID":5161,"RaceName":"Coca-Cola 600","Season":2022,"Track":"Charlotte Motor Speedway","Weight":0.0708,"SameTrack":true,"Unscaled":false,"Scale_S1":0.25,"Scale_S2":0.25,"Scale_S3":1.085,"Note":null,"pot":165.65,"top1":0.3278,"second":0.1467,"third":0.1404,"top3":0.6149,"n_big":1,"n_mid":6,"n_scraps":12,"scorers":19,"top_pts":54.3,"second_pts":24.3,"third_pts":23.25,"top3_pts":101.85,"top_driver":"Ross Chastain","top_start":22,"top_fin":15,"top_s3":0.8831,"s1":0.0893,"s2":0.0812,"s3":0.8295,"start_top5":0.1174,"start_6_10":0.1023,"start_11_20":0.2689,"start_21":0.5113,"Date":"2022-05-29"},{"RaceID":5606,"RaceName":"Wurth 400 presented by LIQUI MOLY","Season":2026,"Track":"Texas Motor Speedway","Weight":0.077,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":167.1,"top1":0.4007,"second":0.0975,"third":0.0844,"top3":0.5826,"n_big":1,"n_mid":5,"n_scraps":15,"scorers":21,"top_pts":66.95,"second_pts":16.3,"third_pts":14.1,"top3_pts":97.35,"top_driver":"Chase Elliott","top_start":14,"top_fin":1,"top_s3":0.9686,"s1":0.0966,"s2":0.0859,"s3":0.8175,"start_top5":0.2864,"start_6_10":0.1074,"start_11_20":0.5096,"start_21":0.0966,"Date":"2026-05-03"},{"RaceID":5582,"RaceName":"South Point 400","Season":2025,"Track":"Las Vegas Motor Speedway","Weight":0.0731,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":162.15,"top1":0.2908,"second":0.1403,"third":0.1172,"top3":0.5483,"n_big":1,"n_mid":4,"n_scraps":17,"scorers":22,"top_pts":47.15,"second_pts":22.75,"third_pts":19,"top3_pts":88.9,"top_driver":"Kyle Larson","top_start":6,"top_fin":2,"top_s3":0.8123,"s1":0.1024,"s2":0.1024,"s3":0.7953,"start_top5":0.4739,"start_6_10":0.3595,"start_11_20":0.05,"start_21":0.1166,"Date":"2025-10-12"},{"RaceID":5426,"RaceName":"Straight Talk Wireless 400","Season":2024,"Track":"Homestead-Miami Speedway","Weight":0.0693,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":165.3,"top1":0.2435,"second":0.1993,"third":0.1467,"top3":0.5895,"n_big":1,"n_mid":3,"n_scraps":22,"scorers":26,"top_pts":40.25,"second_pts":32.95,"third_pts":24.25,"top3_pts":97.45,"top_driver":"Ryan Blaney","top_start":20,"top_fin":2,"top_s3":0.9652,"s1":0.0977,"s2":0.1004,"s3":0.8019,"start_top5":0.376,"start_6_10":0.2027,"start_11_20":0.3261,"start_21":0.0953,"Date":"2024-10-27"},{"RaceID":5425,"RaceName":"South Point 400","Season":2024,"Track":"Las Vegas Motor Speedway","Weight":0.0693,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":171.15,"top1":0.4473,"second":0.1134,"third":0.0923,"top3":0.6529,"n_big":1,"n_mid":3,"n_scraps":17,"scorers":21,"top_pts":76.55,"second_pts":19.4,"third_pts":15.8,"top3_pts":111.75,"top_driver":"Christopher Bell","top_start":1,"top_fin":2,"top_s3":0.8321,"s1":0.0944,"s2":0.0917,"s3":0.8139,"start_top5":0.5925,"start_6_10":0.203,"start_11_20":0.0397,"start_21":0.1648,"Date":"2024-10-20"},{"RaceID":5387,"RaceName":"Pennzoil 400 presented by Jiffy Lube","Season":2024,"Track":"Las Vegas Motor Speedway","Weight":0.0693,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":170.25,"top1":0.4458,"second":0.1374,"third":0.0476,"top3":0.6308,"n_big":1,"n_mid":1,"n_scraps":27,"scorers":29,"top_pts":75.9,"second_pts":23.4,"third_pts":8.1,"top3_pts":107.4,"top_driver":"Kyle Larson","top_start":2,"top_fin":1,"top_s3":0.8663,"s1":0.0896,"s2":0.0922,"s3":0.8182,"start_top5":0.4931,"start_6_10":0.0981,"start_11_20":0.2822,"start_21":0.1266,"Date":"2024-03-03"},{"RaceID":5307,"RaceName":"4EVER 400 Presented by Mobil 1","Season":2023,"Track":"Homestead-Miami Speedway","Weight":0.0654,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":155.85,"top1":0.2782,"second":0.172,"third":0.1591,"top3":0.6092,"n_big":1,"n_mid":4,"n_scraps":16,"scorers":21,"top_pts":43.35,"second_pts":26.8,"third_pts":24.8,"top3_pts":94.95,"top_driver":"Ryan Blaney","top_start":10,"top_fin":2,"top_s3":0.9735,"s1":0.1065,"s2":0.1094,"s3":0.7841,"start_top5":0.2172,"start_6_10":0.4129,"start_11_20":0.3093,"start_21":0.0606,"Date":"2023-10-22"},{"RaceID":5301,"RaceName":"Hollywood Casino 400","Season":2023,"Track":"Kansas Speedway","Weight":0.0654,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":166.25,"top1":0.3152,"second":0.1209,"third":0.1008,"top3":0.5368,"n_big":1,"n_mid":6,"n_scraps":11,"scorers":18,"top_pts":52.4,"second_pts":20.1,"third_pts":16.75,"top3_pts":89.25,"top_driver":"Denny Hamlin","top_start":14,"top_fin":2,"top_s3":0.9656,"s1":0.0944,"s2":0.0863,"s3":0.8192,"start_top5":0.329,"start_6_10":0.1179,"start_11_20":0.4893,"start_21":0.0638,"Date":"2023-09-10"},{"RaceID":5284,"RaceName":"AdventHealth 400","Season":2023,"Track":"Kansas Speedway","Weight":0.0654,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":153.6,"top1":0.3721,"second":0.1709,"third":0.1097,"top3":0.6527,"n_big":1,"n_mid":4,"n_scraps":13,"scorers":18,"top_pts":57.15,"second_pts":26.25,"third_pts":16.85,"top3_pts":100.25,"top_driver":"Kyle Larson","top_start":2,"top_fin":2,"top_s3":0.951,"s1":0.1081,"s2":0.0846,"s3":0.8073,"start_top5":0.6149,"start_6_10":0.2008,"start_11_20":0.0592,"start_21":0.125,"Date":"2023-05-07"},{"RaceID":5283,"RaceName":"Goodyear 400","Season":2023,"Track":"Darlington Raceway","Weight":0.0654,"SameTrack":false,"Unscaled":false,"Scale_S1":0.2778,"Scale_S2":0.2632,"Scale_S3":2.0093,"Note":null,"pot":151.45,"top1":0.2942,"second":0.1433,"third":0.1195,"top3":0.5569,"n_big":1,"n_mid":4,"n_scraps":18,"scorers":23,"top_pts":44.55,"second_pts":21.7,"third_pts":18.1,"top3_pts":84.35,"top_driver":"Ross Chastain","top_start":5,"top_fin":29,"top_s3":0.8889,"s1":0.1096,"s2":0.1066,"s3":0.7838,"start_top5":0.5233,"start_6_10":0.2562,"start_11_20":0.1552,"start_21":0.0654,"Date":"2023-05-14"},{"RaceID":5148,"RaceName":"Pennzoil 400 presented by Jiffy Lube","Season":2022,"Track":"Las Vegas Motor Speedway","Weight":0.0617,"SameTrack":false,"Unscaled":false,"Scale_S1":0.3125,"Scale_S2":0.2941,"Scale_S3":2.1275,"Note":null,"pot":167.25,"top1":0.2819,"second":0.2625,"third":0.1402,"top3":0.6846,"n_big":2,"n_mid":3,"n_scraps":15,"scorers":20,"top_pts":47.15,"second_pts":43.9,"third_pts":23.45,"top3_pts":114.5,"top_driver":"Ross Chastain","top_start":18,"top_fin":3,"top_s3":0.9236,"s1":0.0858,"s2":0.0804,"s3":0.8338,"start_top5":0.0822,"start_6_10":0.078,"start_11_20":0.5525,"start_21":0.2873,"Date":"2022-03-06"}],"lines":[{"r":5148,"d":"Ross Chastain","t":"Trackhouse Racing","st":18,"fin":3,"pts":47.15,"sh":0.2819,"ll":122,"fl":37,"s1":0,"s2":3.6,"s3":43.55},{"r":5148,"d":"Kyle Busch","t":"Joe Gibbs Racing","st":37,"fin":4,"pts":43.9,"sh":0.2625,"ll":91,"fl":47,"s1":0.45,"s2":0.95,"s3":42.5},{"r":5148,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":12,"fin":8,"pts":23.45,"sh":0.1402,"ll":2,"fl":51,"s1":1.35,"s2":0.45,"s3":21.65},{"r":5148,"d":"Alex Bowman","t":"Hendrick Motorsports","st":13,"fin":1,"pts":12.85,"sh":0.0768,"ll":10,"fl":23,"s1":2.1,"s2":0.7,"s3":10.05},{"r":5148,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":2,"pts":9.45,"sh":0.0565,"ll":18,"fl":11,"s1":0,"s2":2.65,"s3":6.8},{"r":5148,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":8,"fin":32,"pts":5.85,"sh":0.035,"ll":9,"fl":8,"s1":2.6,"s2":2.35,"s3":0.9},{"r":5148,"d":"William Byron","t":"Hendrick Motorsports","st":14,"fin":5,"pts":5.7,"sh":0.0341,"ll":3,"fl":11,"s1":1.65,"s2":0.9,"s3":3.15},{"r":5148,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":1,"fin":10,"pts":3.85,"sh":0.023,"ll":10,"fl":3,"s1":3.4,"s2":0.45,"s3":0},{"r":5148,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":9,"fin":21,"pts":2.25,"sh":0.0135,"ll":9,"fl":0,"s1":0,"s2":0,"s3":2.25},{"r":5148,"d":"Ryan Blaney","t":"Team Penske","st":11,"fin":36,"pts":2.1,"sh":0.0126,"ll":3,"fl":3,"s1":2.1,"s2":0,"s3":0},{"r":5148,"d":"Austin Dillon","t":"Richard Childress Racing","st":10,"fin":11,"pts":1.8,"sh":0.0108,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5148,"d":"Tyler Reddick","t":"Richard Childress Racing","st":7,"fin":7,"pts":1.8,"sh":0.0108,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5148,"d":"Justin Haley","t":"Kaulig Racing","st":28,"fin":17,"pts":1.8,"sh":0.0108,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5148,"d":"Joey Logano","t":"Team Penske","st":6,"fin":14,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.45,"s2":0,"s3":0.9},{"r":5148,"d":"Kurt Busch","t":"23XI Racing","st":31,"fin":13,"pts":1.15,"sh":0.0069,"ll":1,"fl":2,"s1":0.25,"s2":0,"s3":0.9},{"r":5148,"d":"Brad Keselowski","t":"RFK Racing","st":15,"fin":24,"pts":1.15,"sh":0.0069,"ll":1,"fl":2,"s1":0,"s2":0.25,"s3":0.9},{"r":5148,"d":"Ty Dillon","t":"Legacy Motor Club","st":32,"fin":20,"pts":0.5,"sh":0.003,"ll":2,"fl":0,"s1":0,"s2":0,"s3":0.5},{"r":5148,"d":"Erik Jones","t":"Legacy Motor Club","st":23,"fin":31,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5148,"d":"Chase Elliott","t":"Hendrick Motorsports","st":5,"fin":9,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5148,"d":"Michael McDowell","t":"Front Row Motorsports","st":22,"fin":27,"pts":0.25,"sh":0.0015,"ll":1,"fl":0,"s1":0,"s2":0.25,"s3":0},{"r":5161,"d":"Ross Chastain","t":"Trackhouse Racing","st":22,"fin":15,"pts":54.3,"sh":0.3278,"ll":129,"fl":49,"s1":0.9,"s2":5.45,"s3":47.95},{"r":5161,"d":"Kyle Larson","t":"Hendrick Motorsports","st":36,"fin":9,"pts":24.3,"sh":0.1467,"ll":54,"fl":24,"s1":0,"s2":0,"s3":24.3},{"r":5161,"d":"Daniel Suarez","t":"Trackhouse Racing","st":12,"fin":25,"pts":23.25,"sh":0.1404,"ll":21,"fl":40,"s1":2.35,"s2":0.7,"s3":20.2},{"r":5161,"d":"Chase Briscoe","t":"Stewart-Haas Racing","st":15,"fin":4,"pts":9.95,"sh":0.0601,"ll":2,"fl":21,"s1":0,"s2":0,"s3":9.95},{"r":5161,"d":"Tyler Reddick","t":"Richard Childress Racing","st":8,"fin":6,"pts":9.75,"sh":0.0589,"ll":21,"fl":10,"s1":1.35,"s2":0,"s3":8.4},{"r":5161,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":3,"fin":5,"pts":8.55,"sh":0.0516,"ll":0,"fl":19,"s1":0.9,"s2":0,"s3":7.65},{"r":5161,"d":"Chase Elliott","t":"Hendrick Motorsports","st":13,"fin":33,"pts":8.4,"sh":0.0507,"ll":21,"fl":7,"s1":3.15,"s2":5.25,"s3":0},{"r":5161,"d":"Alex Bowman","t":"Hendrick Motorsports","st":9,"fin":10,"pts":5.85,"sh":0.0353,"ll":0,"fl":13,"s1":0.45,"s2":0,"s3":5.4},{"r":5161,"d":"Kyle Busch","t":"Joe Gibbs Racing","st":4,"fin":2,"pts":5.65,"sh":0.0341,"ll":10,"fl":7,"s1":3.6,"s2":0,"s3":2.05},{"r":5161,"d":"Joey Logano","t":"Team Penske","st":23,"fin":20,"pts":3.4,"sh":0.0205,"ll":10,"fl":2,"s1":0,"s2":0,"s3":3.4},{"r":5161,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":1,"fin":1,"pts":3.2,"sh":0.0193,"ll":11,"fl":1,"s1":0.5,"s2":0,"s3":2.7},{"r":5161,"d":"Chris Buescher","t":"RFK Racing","st":19,"fin":26,"pts":2.7,"sh":0.0163,"ll":0,"fl":6,"s1":0,"s2":0,"s3":2.7},{"r":5161,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":29,"fin":7,"pts":1.8,"sh":0.0109,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5161,"d":"Bubba Wallace","t":"23XI Racing","st":7,"fin":28,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.9,"s2":0.45,"s3":0},{"r":5161,"d":"Kurt Busch","t":"23XI Racing","st":2,"fin":31,"pts":1.15,"sh":0.0069,"ll":1,"fl":2,"s1":0.25,"s2":0.9,"s3":0},{"r":5161,"d":"William Byron","t":"Hendrick Motorsports","st":5,"fin":32,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0.45,"s2":0.45,"s3":0},{"r":5161,"d":"Corey LaJoie","t":"Spire Motorsports","st":37,"fin":35,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5161,"d":"Cole Custer","t":"Stewart-Haas Racing","st":21,"fin":21,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5161,"d":"Ryan Blaney","t":"Team Penske","st":11,"fin":29,"pts":0.25,"sh":0.0015,"ll":1,"fl":0,"s1":0,"s2":0.25,"s3":0},{"r":5283,"d":"Ross Chastain","t":"Trackhouse Racing","st":5,"fin":29,"pts":44.55,"sh":0.2942,"ll":126,"fl":29,"s1":1.35,"s2":3.6,"s3":39.6},{"r":5283,"d":"Kyle Larson","t":"Hendrick Motorsports","st":7,"fin":20,"pts":21.7,"sh":0.1433,"ll":58,"fl":16,"s1":0.45,"s2":1.35,"s3":19.9},{"r":5283,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":1,"fin":31,"pts":18.1,"sh":0.1195,"ll":40,"fl":18,"s1":11.2,"s2":6.9,"s3":0},{"r":5283,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":8,"fin":12,"pts":13.5,"sh":0.0891,"ll":18,"fl":20,"s1":0,"s2":0,"s3":13.5},{"r":5283,"d":"William Byron","t":"Hendrick Motorsports","st":4,"fin":1,"pts":12.5,"sh":0.0825,"ll":14,"fl":20,"s1":1.35,"s2":0.45,"s3":10.7},{"r":5283,"d":"Kevin Harvick","t":"Stewart-Haas Racing","st":20,"fin":2,"pts":6.55,"sh":0.0432,"ll":10,"fl":9,"s1":0.45,"s2":0,"s3":6.1},{"r":5283,"d":"Kyle Busch","t":"Richard Childress Racing","st":12,"fin":7,"pts":4.5,"sh":0.0297,"ll":0,"fl":10,"s1":0.45,"s2":0.45,"s3":3.6},{"r":5283,"d":"Ryan Blaney","t":"Team Penske","st":11,"fin":9,"pts":4.35,"sh":0.0287,"ll":3,"fl":8,"s1":0,"s2":2.05,"s3":2.3},{"r":5283,"d":"Bubba Wallace","t":"23XI Racing","st":2,"fin":5,"pts":4.1,"sh":0.0271,"ll":2,"fl":8,"s1":1.35,"s2":0.45,"s3":2.3},{"r":5283,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":16,"fin":14,"pts":3.6,"sh":0.0238,"ll":0,"fl":8,"s1":0,"s2":0,"s3":3.6},{"r":5283,"d":"Noah Gragson","t":"Legacy Motor Club","st":29,"fin":26,"pts":2.7,"sh":0.0178,"ll":0,"fl":6,"s1":0,"s2":0,"s3":2.7},{"r":5283,"d":"Brad Keselowski","t":"RFK Racing","st":10,"fin":4,"pts":2.25,"sh":0.0149,"ll":0,"fl":5,"s1":0,"s2":0.45,"s3":1.8},{"r":5283,"d":"Joey Logano","t":"Team Penske","st":15,"fin":18,"pts":1.8,"sh":0.0119,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5283,"d":"Erik Jones","t":"Legacy Motor Club","st":28,"fin":25,"pts":1.8,"sh":0.0119,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5283,"d":"Harrison Burton","t":"Wood Brothers Racing","st":14,"fin":6,"pts":1.8,"sh":0.0119,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5283,"d":"Todd Gilliland","t":"Front Row Motorsports","st":24,"fin":11,"pts":1.8,"sh":0.0119,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5283,"d":"AJ Allmendinger","t":"Kaulig Racing","st":30,"fin":23,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Chase Elliott","t":"Hendrick Motorsports","st":21,"fin":3,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Tyler Reddick","t":"23XI Racing","st":9,"fin":22,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Ryan Preece","t":"Stewart-Haas Racing","st":32,"fin":15,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Corey LaJoie","t":"Spire Motorsports","st":34,"fin":24,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":13,"fin":16,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5283,"d":"Daniel Suarez","t":"Trackhouse Racing","st":6,"fin":34,"pts":0.45,"sh":0.003,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5284,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":2,"pts":57.15,"sh":0.3721,"ll":153,"fl":42,"s1":0.9,"s2":1.9,"s3":54.35},{"r":5284,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":8,"fin":1,"pts":26.25,"sh":0.1709,"ll":15,"fl":50,"s1":2.55,"s2":2.85,"s3":20.85},{"r":5284,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":4,"fin":8,"pts":16.85,"sh":0.1097,"ll":44,"fl":13,"s1":5,"s2":4.3,"s3":7.55},{"r":5284,"d":"Chase Elliott","t":"Hendrick Motorsports","st":21,"fin":7,"pts":11.75,"sh":0.0765,"ll":11,"fl":20,"s1":0.45,"s2":0,"s3":11.3},{"r":5284,"d":"William Byron","t":"Hendrick Motorsports","st":1,"fin":3,"pts":11.25,"sh":0.0732,"ll":18,"fl":15,"s1":1.15,"s2":0.9,"s3":9.2},{"r":5284,"d":"Tyler Reddick","t":"23XI Racing","st":5,"fin":9,"pts":6.7,"sh":0.0436,"ll":7,"fl":11,"s1":2.65,"s2":0,"s3":4.05},{"r":5284,"d":"Bubba Wallace","t":"23XI Racing","st":17,"fin":4,"pts":6.15,"sh":0.04,"ll":3,"fl":12,"s1":0,"s2":2.1,"s3":4.05},{"r":5284,"d":"Joey Logano","t":"Team Penske","st":6,"fin":6,"pts":3.7,"sh":0.0241,"ll":4,"fl":6,"s1":0,"s2":0.5,"s3":3.2},{"r":5284,"d":"Harrison Burton","t":"Wood Brothers Racing","st":25,"fin":30,"pts":2.7,"sh":0.0176,"ll":0,"fl":6,"s1":0,"s2":0,"s3":2.7},{"r":5284,"d":"Ross Chastain","t":"Trackhouse Racing","st":3,"fin":5,"pts":2.5,"sh":0.0163,"ll":1,"fl":5,"s1":0.7,"s2":0,"s3":1.8},{"r":5284,"d":"Corey LaJoie","t":"Spire Motorsports","st":24,"fin":20,"pts":2.5,"sh":0.0163,"ll":10,"fl":0,"s1":0.25,"s2":0,"s3":2.25},{"r":5284,"d":"Aric Almirola","t":"Stewart-Haas Racing","st":18,"fin":13,"pts":1.35,"sh":0.0088,"ll":0,"fl":3,"s1":0.45,"s2":0,"s3":0.9},{"r":5284,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":12,"fin":36,"pts":1.15,"sh":0.0075,"ll":1,"fl":2,"s1":1.15,"s2":0,"s3":0},{"r":5284,"d":"JJ Yeley","t":"Rick Ware Racing","st":35,"fin":23,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5284,"d":"Michael McDowell","t":"Front Row Motorsports","st":23,"fin":26,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5284,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":7,"fin":34,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0.9,"s2":0,"s3":0},{"r":5284,"d":"Brad Keselowski","t":"RFK Racing","st":20,"fin":19,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5284,"d":"Justin Haley","t":"Kaulig Racing","st":30,"fin":18,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5287,"d":"Ryan Blaney","t":"Team Penske","st":8,"fin":1,"pts":64.75,"sh":0.4215,"ll":151,"fl":60,"s1":3.5,"s2":2.1,"s3":59.15},{"r":5287,"d":"William Byron","t":"Hendrick Motorsports","st":1,"fin":2,"pts":18.45,"sh":0.1201,"ll":54,"fl":11,"s1":3.2,"s2":0.75,"s3":14.5},{"r":5287,"d":"Tyler Reddick","t":"23XI Racing","st":15,"fin":5,"pts":12.55,"sh":0.0817,"ll":7,"fl":24,"s1":0.9,"s2":2.65,"s3":9},{"r":5287,"d":"Kevin Harvick","t":"Stewart-Haas Racing","st":2,"fin":11,"pts":10.2,"sh":0.0664,"ll":21,"fl":11,"s1":0,"s2":0.45,"s3":9.75},{"r":5287,"d":"Brad Keselowski","t":"RFK Racing","st":3,"fin":19,"pts":9.45,"sh":0.0615,"ll":0,"fl":21,"s1":1.35,"s2":0.9,"s3":7.2},{"r":5287,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":18,"fin":3,"pts":7.2,"sh":0.0469,"ll":0,"fl":16,"s1":0.9,"s2":0.45,"s3":5.85},{"r":5287,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":9,"fin":24,"pts":6.15,"sh":0.04,"ll":12,"fl":7,"s1":3.25,"s2":2.9,"s3":0},{"r":5287,"d":"Aric Almirola","t":"Stewart-Haas Racing","st":23,"fin":25,"pts":4.95,"sh":0.0322,"ll":0,"fl":11,"s1":0,"s2":0,"s3":4.95},{"r":5287,"d":"Kyle Busch","t":"Richard Childress Racing","st":5,"fin":6,"pts":3.85,"sh":0.0251,"ll":1,"fl":8,"s1":0.45,"s2":0,"s3":3.4},{"r":5287,"d":"Kyle Larson","t":"Hendrick Motorsports","st":12,"fin":30,"pts":2.95,"sh":0.0192,"ll":1,"fl":6,"s1":0.45,"s2":0,"s3":2.5},{"r":5287,"d":"Michael McDowell","t":"Front Row Motorsports","st":30,"fin":28,"pts":2.5,"sh":0.0163,"ll":1,"fl":5,"s1":0,"s2":1.6,"s3":0.9},{"r":5287,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":4,"fin":35,"pts":2.15,"sh":0.014,"ll":5,"fl":2,"s1":2.15,"s2":0,"s3":0},{"r":5287,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":10,"fin":7,"pts":1.7,"sh":0.0111,"ll":5,"fl":1,"s1":0,"s2":0,"s3":1.7},{"r":5287,"d":"Chris Buescher","t":"RFK Racing","st":11,"fin":8,"pts":1.7,"sh":0.0111,"ll":5,"fl":1,"s1":0,"s2":0.95,"s3":0.75},{"r":5287,"d":"Bubba Wallace","t":"23XI Racing","st":7,"fin":4,"pts":1.35,"sh":0.0088,"ll":0,"fl":3,"s1":0,"s2":0,"s3":1.35},{"r":5287,"d":"Joey Logano","t":"Team Penske","st":17,"fin":21,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5287,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":19,"fin":26,"pts":0.9,"sh":0.0059,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5287,"d":"Zane Smith","t":"Front Row Motorsports","st":29,"fin":10,"pts":0.75,"sh":0.0049,"ll":3,"fl":0,"s1":0,"s2":0,"s3":0.75},{"r":5287,"d":"Alex Bowman","t":"Hendrick Motorsports","st":31,"fin":12,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5287,"d":"Justin Haley","t":"Kaulig Racing","st":16,"fin":15,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5287,"d":"Chase Elliott","t":"Hendrick Motorsports","st":6,"fin":34,"pts":0.25,"sh":0.0016,"ll":1,"fl":0,"s1":0,"s2":0.25,"s3":0},{"r":5301,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":14,"fin":2,"pts":52.4,"sh":0.3152,"ll":134,"fl":42,"s1":0.45,"s2":1.35,"s3":50.6},{"r":5301,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":4,"pts":20.1,"sh":0.1209,"ll":30,"fl":28,"s1":8.6,"s2":4.75,"s3":6.75},{"r":5301,"d":"Tyler Reddick","t":"23XI Racing","st":5,"fin":1,"pts":16.75,"sh":0.1008,"ll":4,"fl":35,"s1":0.45,"s2":0,"s3":16.3},{"r":5301,"d":"Brad Keselowski","t":"RFK Racing","st":12,"fin":9,"pts":15.05,"sh":0.0905,"ll":44,"fl":9,"s1":0,"s2":1.15,"s3":13.9},{"r":5301,"d":"Bubba Wallace","t":"23XI Racing","st":10,"fin":32,"pts":11.95,"sh":0.0719,"ll":1,"fl":26,"s1":2.5,"s2":0.9,"s3":8.55},{"r":5301,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":1,"fin":8,"pts":11.2,"sh":0.0674,"ll":16,"fl":16,"s1":1.2,"s2":0,"s3":10},{"r":5301,"d":"Daniel Suarez","t":"Trackhouse Racing","st":15,"fin":16,"pts":9.4,"sh":0.0565,"ll":25,"fl":7,"s1":0,"s2":0,"s3":9.4},{"r":5301,"d":"AJ Allmendinger","t":"Kaulig Racing","st":22,"fin":30,"pts":8.1,"sh":0.0487,"ll":0,"fl":18,"s1":0.45,"s2":0,"s3":7.65},{"r":5301,"d":"Michael McDowell","t":"Front Row Motorsports","st":7,"fin":26,"pts":6.75,"sh":0.0406,"ll":0,"fl":15,"s1":0,"s2":0,"s3":6.75},{"r":5301,"d":"Chase Elliott","t":"Hendrick Motorsports","st":4,"fin":6,"pts":6.65,"sh":0.04,"ll":14,"fl":7,"s1":0,"s2":4.85,"s3":1.8},{"r":5301,"d":"Ryan Blaney","t":"Team Penske","st":17,"fin":12,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.45,"s2":0,"s3":0.9},{"r":5301,"d":"Erik Jones","t":"Legacy Motor Club","st":19,"fin":3,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.9,"s2":0.45,"s3":0},{"r":5301,"d":"Kyle Busch","t":"Richard Childress Racing","st":35,"fin":7,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5301,"d":"Kevin Harvick","t":"Stewart-Haas Racing","st":20,"fin":11,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0.9,"s3":0},{"r":5301,"d":"Chris Buescher","t":"RFK Racing","st":13,"fin":27,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5301,"d":"Ross Chastain","t":"Trackhouse Racing","st":6,"fin":13,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5301,"d":"Todd Gilliland","t":"Front Row Motorsports","st":32,"fin":25,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5301,"d":"Aric Almirola","t":"Stewart-Haas Racing","st":25,"fin":17,"pts":0.7,"sh":0.0042,"ll":1,"fl":1,"s1":0.7,"s2":0,"s3":0},{"r":5307,"d":"Ryan Blaney","t":"Team Penske","st":10,"fin":2,"pts":43.35,"sh":0.2782,"ll":105,"fl":38,"s1":0.45,"s2":0.7,"s3":42.2},{"r":5307,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":13,"fin":1,"pts":26.8,"sh":0.172,"ll":55,"fl":29,"s1":0.45,"s2":0,"s3":26.35},{"r":5307,"d":"Kyle Larson","t":"Hendrick Motorsports","st":5,"fin":34,"pts":24.8,"sh":0.1591,"ll":29,"fl":39,"s1":3.15,"s2":7.25,"s3":14.4},{"r":5307,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":11,"fin":30,"pts":19.6,"sh":0.1258,"ll":37,"fl":23,"s1":2.75,"s2":3.9,"s3":12.95},{"r":5307,"d":"William Byron","t":"Hendrick Motorsports","st":7,"fin":4,"pts":16.05,"sh":0.103,"ll":30,"fl":19,"s1":1.9,"s2":0.9,"s3":13.25},{"r":5307,"d":"Brad Keselowski","t":"RFK Racing","st":4,"fin":28,"pts":3.5,"sh":0.0225,"ll":5,"fl":5,"s1":2.35,"s2":1.15,"s3":0},{"r":5307,"d":"Austin Dillon","t":"Richard Childress Racing","st":6,"fin":10,"pts":3.15,"sh":0.0202,"ll":0,"fl":7,"s1":0,"s2":0,"s3":3.15},{"r":5307,"d":"Chase Briscoe","t":"Stewart-Haas Racing","st":21,"fin":17,"pts":2.7,"sh":0.0173,"ll":0,"fl":6,"s1":0,"s2":0,"s3":2.7},{"r":5307,"d":"Tyler Reddick","t":"23XI Racing","st":3,"fin":3,"pts":2.25,"sh":0.0144,"ll":0,"fl":5,"s1":0.45,"s2":0,"s3":1.8},{"r":5307,"d":"AJ Allmendinger","t":"Kaulig Racing","st":25,"fin":5,"pts":1.8,"sh":0.0115,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5307,"d":"Chris Buescher","t":"RFK Racing","st":17,"fin":21,"pts":1.8,"sh":0.0115,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5307,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":9,"fin":7,"pts":1.8,"sh":0.0115,"ll":0,"fl":4,"s1":1.35,"s2":0.45,"s3":0},{"r":5307,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":1,"fin":29,"pts":1.65,"sh":0.0106,"ll":3,"fl":2,"s1":1.2,"s2":0.45,"s3":0},{"r":5307,"d":"Bubba Wallace","t":"23XI Racing","st":2,"fin":6,"pts":1.65,"sh":0.0106,"ll":3,"fl":2,"s1":1.2,"s2":0.45,"s3":0},{"r":5307,"d":"Aric Almirola","t":"Stewart-Haas Racing","st":30,"fin":9,"pts":0.9,"sh":0.0058,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5307,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":23,"fin":27,"pts":0.9,"sh":0.0058,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5307,"d":"Ty Dillon","t":"Spire Motorsports","st":33,"fin":24,"pts":0.9,"sh":0.0058,"ll":0,"fl":2,"s1":0.9,"s2":0,"s3":0},{"r":5307,"d":"John H. Nemechek","t":"Legacy Motor Club","st":24,"fin":32,"pts":0.9,"sh":0.0058,"ll":0,"fl":2,"s1":0,"s2":0.9,"s3":0},{"r":5307,"d":"Kevin Harvick","t":"Stewart-Haas Racing","st":22,"fin":11,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5307,"d":"Joey Logano","t":"Team Penske","st":36,"fin":8,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5307,"d":"Austin Cindric","t":"Team Penske","st":26,"fin":12,"pts":0.45,"sh":0.0029,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5387,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":1,"pts":75.9,"sh":0.4458,"ll":219,"fl":47,"s1":4.3,"s2":5.85,"s3":65.75},{"r":5387,"d":"Tyler Reddick","t":"23XI Racing","st":18,"fin":2,"pts":23.4,"sh":0.1374,"ll":0,"fl":52,"s1":0.9,"s2":1.35,"s3":21.15},{"r":5387,"d":"Michael McDowell","t":"Front Row Motorsports","st":12,"fin":25,"pts":8.1,"sh":0.0476,"ll":9,"fl":13,"s1":0,"s2":0,"s3":8.1},{"r":5387,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":7,"fin":7,"pts":7.45,"sh":0.0438,"ll":1,"fl":16,"s1":0.45,"s2":1.15,"s3":5.85},{"r":5387,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":8,"fin":5,"pts":7.2,"sh":0.0423,"ll":0,"fl":16,"s1":0.9,"s2":0.45,"s3":5.85},{"r":5387,"d":"Daniel Suarez","t":"Trackhouse Racing","st":16,"fin":11,"pts":6.6,"sh":0.0388,"ll":12,"fl":8,"s1":1.2,"s2":0,"s3":5.4},{"r":5387,"d":"Zane Smith","t":"Spire Motorsports","st":24,"fin":36,"pts":4.5,"sh":0.0264,"ll":0,"fl":10,"s1":0.45,"s2":0.9,"s3":3.15},{"r":5387,"d":"Bubba Wallace","t":"23XI Racing","st":5,"fin":35,"pts":4.05,"sh":0.0238,"ll":0,"fl":9,"s1":0,"s2":0,"s3":4.05},{"r":5387,"d":"William Byron","t":"Hendrick Motorsports","st":4,"fin":10,"pts":3.75,"sh":0.022,"ll":6,"fl":5,"s1":2.35,"s2":0,"s3":1.4},{"r":5387,"d":"Kyle Busch","t":"Richard Childress Racing","st":21,"fin":26,"pts":3.3,"sh":0.0194,"ll":6,"fl":4,"s1":2.4,"s2":0.9,"s3":0},{"r":5387,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":28,"fin":8,"pts":3.05,"sh":0.0179,"ll":5,"fl":4,"s1":0.45,"s2":1.7,"s3":0.9},{"r":5387,"d":"Carson Hocevar","t":"Spire Motorsports","st":14,"fin":15,"pts":2.7,"sh":0.0159,"ll":0,"fl":6,"s1":0.45,"s2":0.45,"s3":1.8},{"r":5387,"d":"Ross Chastain","t":"Trackhouse Racing","st":20,"fin":4,"pts":2.3,"sh":0.0135,"ll":2,"fl":4,"s1":0.45,"s2":1.35,"s3":0.5},{"r":5387,"d":"Derek Kraus","t":"Kaulig Racing","st":33,"fin":28,"pts":1.9,"sh":0.0112,"ll":4,"fl":2,"s1":0,"s2":0,"s3":1.9},{"r":5387,"d":"Corey LaJoie","t":"Spire Motorsports","st":17,"fin":32,"pts":1.8,"sh":0.0106,"ll":0,"fl":4,"s1":0.45,"s2":0.45,"s3":0.9},{"r":5387,"d":"Josh Berry","t":"Stewart-Haas Racing","st":26,"fin":20,"pts":1.8,"sh":0.0106,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5387,"d":"Justin Haley","t":"Rick Ware Racing","st":35,"fin":27,"pts":1.8,"sh":0.0106,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5387,"d":"Noah Gragson","t":"Stewart-Haas Racing","st":30,"fin":6,"pts":1.8,"sh":0.0106,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5387,"d":"Ryan Blaney","t":"Team Penske","st":15,"fin":3,"pts":1.35,"sh":0.0079,"ll":0,"fl":3,"s1":0,"s2":0.45,"s3":0.9},{"r":5387,"d":"Alex Bowman","t":"Hendrick Motorsports","st":23,"fin":18,"pts":1.15,"sh":0.0068,"ll":1,"fl":2,"s1":0,"s2":0.25,"s3":0.9},{"r":5387,"d":"Brad Keselowski","t":"RFK Racing","st":25,"fin":13,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Austin Dillon","t":"Richard Childress Racing","st":19,"fin":16,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Chase Elliott","t":"Hendrick Motorsports","st":11,"fin":12,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Daniel Hemric","t":"Kaulig Racing","st":34,"fin":19,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":10,"fin":33,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Chase Briscoe","t":"Stewart-Haas Racing","st":6,"fin":21,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5387,"d":"Kaz Grala","t":"Rick Ware Racing","st":32,"fin":31,"pts":0.45,"sh":0.0026,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5387,"d":"Joey Logano","t":"Team Penske","st":1,"fin":9,"pts":0.25,"sh":0.0015,"ll":1,"fl":0,"s1":0.25,"s2":0,"s3":0},{"r":5387,"d":"Chris Buescher","t":"RFK Racing","st":9,"fin":37,"pts":0.25,"sh":0.0015,"ll":1,"fl":0,"s1":0.25,"s2":0,"s3":0},{"r":5425,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":1,"fin":2,"pts":76.55,"sh":0.4473,"ll":164,"fl":79,"s1":9.05,"s2":3.8,"s3":63.7},{"r":5425,"d":"Daniel Suarez","t":"Trackhouse Racing","st":23,"fin":3,"pts":19.4,"sh":0.1134,"ll":74,"fl":2,"s1":0,"s2":2,"s3":17.4},{"r":5425,"d":"William Byron","t":"Hendrick Motorsports","st":9,"fin":4,"pts":15.8,"sh":0.0923,"ll":2,"fl":34,"s1":0,"s2":0.9,"s3":14.9},{"r":5425,"d":"Alex Bowman","t":"Hendrick Motorsports","st":3,"fin":5,"pts":13.95,"sh":0.0815,"ll":0,"fl":31,"s1":0,"s2":0.45,"s3":13.5},{"r":5425,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":8,"fin":30,"pts":8.05,"sh":0.047,"ll":7,"fl":14,"s1":0,"s2":3.1,"s3":4.95},{"r":5425,"d":"Kyle Larson","t":"Hendrick Motorsports","st":5,"fin":11,"pts":6.75,"sh":0.0394,"ll":0,"fl":15,"s1":0,"s2":0.9,"s3":5.85},{"r":5425,"d":"Ross Chastain","t":"Trackhouse Racing","st":7,"fin":7,"pts":6.3,"sh":0.0368,"ll":0,"fl":14,"s1":0,"s2":0.45,"s3":5.85},{"r":5425,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":12,"fin":6,"pts":4.55,"sh":0.0266,"ll":2,"fl":9,"s1":0.5,"s2":0.45,"s3":3.6},{"r":5425,"d":"Joey Logano","t":"Team Penske","st":10,"fin":1,"pts":3.7,"sh":0.0216,"ll":13,"fl":1,"s1":0,"s2":0.45,"s3":3.25},{"r":5425,"d":"Tyler Reddick","t":"23XI Racing","st":2,"fin":35,"pts":3.45,"sh":0.0202,"ll":3,"fl":6,"s1":3.2,"s2":0.25,"s3":0},{"r":5425,"d":"Chris Buescher","t":"RFK Racing","st":22,"fin":10,"pts":2.25,"sh":0.0131,"ll":0,"fl":5,"s1":0.45,"s2":0,"s3":1.8},{"r":5425,"d":"Chase Briscoe","t":"Stewart-Haas Racing","st":24,"fin":26,"pts":2.25,"sh":0.0131,"ll":0,"fl":5,"s1":0.45,"s2":0,"s3":1.8},{"r":5425,"d":"Ryan Blaney","t":"Team Penske","st":37,"fin":32,"pts":1.6,"sh":0.0093,"ll":1,"fl":3,"s1":1.6,"s2":0,"s3":0},{"r":5425,"d":"Bubba Wallace","t":"23XI Racing","st":19,"fin":12,"pts":1.35,"sh":0.0079,"ll":0,"fl":3,"s1":0,"s2":0.45,"s3":0.9},{"r":5425,"d":"Ryan Preece","t":"Stewart-Haas Racing","st":32,"fin":22,"pts":1.35,"sh":0.0079,"ll":0,"fl":3,"s1":0,"s2":1.35,"s3":0},{"r":5425,"d":"Harrison Burton","t":"Wood Brothers Racing","st":31,"fin":15,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5425,"d":"Carson Hocevar","t":"Spire Motorsports","st":6,"fin":23,"pts":0.9,"sh":0.0053,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5425,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":4,"fin":8,"pts":0.7,"sh":0.0041,"ll":1,"fl":1,"s1":0,"s2":0.7,"s3":0},{"r":5425,"d":"Brad Keselowski","t":"RFK Racing","st":17,"fin":36,"pts":0.45,"sh":0.0026,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5425,"d":"Justin Haley","t":"Spire Motorsports","st":16,"fin":17,"pts":0.45,"sh":0.0026,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5425,"d":"Noah Gragson","t":"Stewart-Haas Racing","st":21,"fin":18,"pts":0.45,"sh":0.0026,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5426,"d":"Ryan Blaney","t":"Team Penske","st":20,"fin":2,"pts":40.25,"sh":0.2435,"ll":89,"fl":40,"s1":0.45,"s2":0.95,"s3":38.85},{"r":5426,"d":"Tyler Reddick","t":"23XI Racing","st":1,"fin":1,"pts":32.95,"sh":0.1993,"ll":94,"fl":21,"s1":8.1,"s2":1.15,"s3":23.7},{"r":5426,"d":"Chase Elliott","t":"Hendrick Motorsports","st":7,"fin":5,"pts":24.25,"sh":0.1467,"ll":52,"fl":25,"s1":1.85,"s2":5.85,"s3":16.55},{"r":5426,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":4,"fin":3,"pts":16.5,"sh":0.0998,"ll":21,"fl":25,"s1":0,"s2":1.9,"s3":14.6},{"r":5426,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":3,"fin":4,"pts":6.85,"sh":0.0414,"ll":4,"fl":13,"s1":0.45,"s2":0.45,"s3":5.95},{"r":5426,"d":"Martin Truex Jr.","t":"Joe Gibbs Racing","st":6,"fin":23,"pts":6.3,"sh":0.0381,"ll":0,"fl":14,"s1":0.45,"s2":0.9,"s3":4.95},{"r":5426,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":13,"pts":5.85,"sh":0.0354,"ll":0,"fl":13,"s1":0.45,"s2":0.45,"s3":4.95},{"r":5426,"d":"AJ Allmendinger","t":"Kaulig Racing","st":32,"fin":8,"pts":4.95,"sh":0.0299,"ll":0,"fl":11,"s1":0.45,"s2":0.45,"s3":4.05},{"r":5426,"d":"Alex Bowman","t":"Hendrick Motorsports","st":11,"fin":7,"pts":4.95,"sh":0.0299,"ll":0,"fl":11,"s1":0,"s2":0,"s3":4.95},{"r":5426,"d":"William Byron","t":"Hendrick Motorsports","st":25,"fin":6,"pts":3.15,"sh":0.0191,"ll":0,"fl":7,"s1":0,"s2":0.45,"s3":2.7},{"r":5426,"d":"Bubba Wallace","t":"23XI Racing","st":8,"fin":18,"pts":2.5,"sh":0.0151,"ll":1,"fl":5,"s1":1.6,"s2":0,"s3":0.9},{"r":5426,"d":"Chase Briscoe","t":"Stewart-Haas Racing","st":13,"fin":12,"pts":2.25,"sh":0.0136,"ll":0,"fl":5,"s1":0.45,"s2":0,"s3":1.8},{"r":5426,"d":"Chris Buescher","t":"RFK Racing","st":21,"fin":15,"pts":1.8,"sh":0.0109,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5426,"d":"Todd Gilliland","t":"Front Row Motorsports","st":31,"fin":20,"pts":1.8,"sh":0.0109,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5426,"d":"Carson Hocevar","t":"Spire Motorsports","st":15,"fin":9,"pts":1.8,"sh":0.0109,"ll":0,"fl":4,"s1":0,"s2":0.9,"s3":0.9},{"r":5426,"d":"Michael McDowell","t":"Front Row Motorsports","st":24,"fin":14,"pts":1.35,"sh":0.0082,"ll":0,"fl":3,"s1":0,"s2":0.45,"s3":0.9},{"r":5426,"d":"Brad Keselowski","t":"RFK Racing","st":18,"fin":17,"pts":1.2,"sh":0.0073,"ll":3,"fl":1,"s1":0.75,"s2":0.45,"s3":0},{"r":5426,"d":"Austin Dillon","t":"Richard Childress Racing","st":30,"fin":25,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5426,"d":"Erik Jones","t":"Legacy Motor Club","st":28,"fin":22,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5426,"d":"John H. Nemechek","t":"Legacy Motor Club","st":29,"fin":26,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5426,"d":"Noah Gragson","t":"Stewart-Haas Racing","st":16,"fin":19,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0.9,"s3":0},{"r":5426,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":14,"fin":36,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0.45,"s2":0.45,"s3":0},{"r":5426,"d":"Kyle Busch","t":"Richard Childress Racing","st":17,"fin":31,"pts":0.75,"sh":0.0045,"ll":3,"fl":0,"s1":0.25,"s2":0,"s3":0.5},{"r":5426,"d":"Josh Berry","t":"Stewart-Haas Racing","st":12,"fin":11,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5426,"d":"Justin Haley","t":"Spire Motorsports","st":10,"fin":34,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5426,"d":"Zane Smith","t":"Spire Motorsports","st":19,"fin":30,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5563,"d":"William Byron","t":"Hendrick Motorsports","st":3,"fin":2,"pts":61.8,"sh":0.3688,"ll":177,"fl":39,"s1":6.7,"s2":8,"s3":47.1},{"r":5563,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":20,"fin":16,"pts":28.4,"sh":0.1695,"ll":56,"fl":32,"s1":0,"s2":0.9,"s3":27.5},{"r":5563,"d":"Chase Elliott","t":"Hendrick Motorsports","st":22,"fin":6,"pts":7.7,"sh":0.046,"ll":2,"fl":16,"s1":0,"s2":0,"s3":7.7},{"r":5563,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":7,"fin":24,"pts":7.6,"sh":0.0454,"ll":7,"fl":13,"s1":0,"s2":1.35,"s3":6.25},{"r":5563,"d":"Tyler Reddick","t":"23XI Racing","st":12,"fin":26,"pts":6.75,"sh":0.0403,"ll":0,"fl":15,"s1":2.25,"s2":0.9,"s3":3.6},{"r":5563,"d":"Brad Keselowski","t":"RFK Racing","st":35,"fin":5,"pts":5.3,"sh":0.0316,"ll":5,"fl":9,"s1":0,"s2":0.45,"s3":4.85},{"r":5563,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":10,"fin":8,"pts":5.2,"sh":0.031,"ll":1,"fl":11,"s1":1.35,"s2":0.25,"s3":3.6},{"r":5563,"d":"Kyle Larson","t":"Hendrick Motorsports","st":2,"fin":37,"pts":4.95,"sh":0.0295,"ll":9,"fl":6,"s1":4.05,"s2":0.9,"s3":0},{"r":5563,"d":"Chase Briscoe","t":"Joe Gibbs Racing","st":1,"fin":3,"pts":4.95,"sh":0.0295,"ll":0,"fl":11,"s1":0,"s2":0,"s3":4.95},{"r":5563,"d":"AJ Allmendinger","t":"Kaulig Racing","st":5,"fin":4,"pts":4.5,"sh":0.0269,"ll":0,"fl":10,"s1":0.45,"s2":0,"s3":4.05},{"r":5563,"d":"Ross Chastain","t":"Trackhouse Racing","st":40,"fin":1,"pts":4.5,"sh":0.0269,"ll":9,"fl":5,"s1":0,"s2":0,"s3":4.5},{"r":5563,"d":"Alex Bowman","t":"Hendrick Motorsports","st":9,"fin":29,"pts":4.5,"sh":0.0269,"ll":0,"fl":10,"s1":0.45,"s2":0.45,"s3":3.6},{"r":5563,"d":"Carson Hocevar","t":"Spire Motorsports","st":39,"fin":34,"pts":3.85,"sh":0.023,"ll":1,"fl":8,"s1":0,"s2":0.7,"s3":3.15},{"r":5563,"d":"Austin Dillon","t":"Richard Childress Racing","st":26,"fin":20,"pts":3.6,"sh":0.0215,"ll":0,"fl":8,"s1":0,"s2":0,"s3":3.6},{"r":5563,"d":"Austin Cindric","t":"Team Penske","st":14,"fin":31,"pts":3.6,"sh":0.0215,"ll":0,"fl":8,"s1":0,"s2":0,"s3":3.6},{"r":5563,"d":"Michael McDowell","t":"Spire Motorsports","st":15,"fin":7,"pts":2.7,"sh":0.0161,"ll":0,"fl":6,"s1":0,"s2":0.45,"s3":2.25},{"r":5563,"d":"Chris Buescher","t":"RFK Racing","st":4,"fin":22,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.45,"s2":0,"s3":0.9},{"r":5563,"d":"Ryan Preece","t":"RFK Racing","st":28,"fin":9,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.45,"s2":0.45,"s3":0.45},{"r":5563,"d":"Riley Herbst","t":"23XI Racing","st":31,"fin":28,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0,"s2":0,"s3":1.35},{"r":5563,"d":"Todd Gilliland","t":"Front Row Motorsports","st":34,"fin":18,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0.45,"s3":0.45},{"r":5563,"d":"Ty Dillon","t":"Kaulig Racing","st":19,"fin":19,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5563,"d":"Erik Jones","t":"Legacy Motor Club","st":27,"fin":13,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5563,"d":"Cole Custer","t":"Haas Factory Team","st":29,"fin":21,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5563,"d":"Cody Ware","t":"Rick Ware Racing","st":36,"fin":25,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5563,"d":"Noah Gragson","t":"Front Row Motorsports","st":8,"fin":10,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5563,"d":"Shane Van Gisbergen","t":"Trackhouse Racing","st":30,"fin":14,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5582,"d":"Kyle Larson","t":"Hendrick Motorsports","st":6,"fin":2,"pts":47.15,"sh":0.2908,"ll":140,"fl":27,"s1":0.9,"s2":7.95,"s3":38.3},{"r":5582,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":1,"fin":1,"pts":22.75,"sh":0.1403,"ll":19,"fl":40,"s1":0.9,"s2":0,"s3":21.85},{"r":5582,"d":"Chase Briscoe","t":"Joe Gibbs Racing","st":2,"fin":4,"pts":19,"sh":0.1172,"ll":58,"fl":10,"s1":5,"s2":0.45,"s3":13.55},{"r":5582,"d":"William Byron","t":"Hendrick Motorsports","st":5,"fin":36,"pts":16.65,"sh":0.1027,"ll":36,"fl":17,"s1":3.9,"s2":1.4,"s3":11.35},{"r":5582,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":3,"fin":3,"pts":12.6,"sh":0.0777,"ll":0,"fl":28,"s1":0.45,"s2":0.45,"s3":11.7},{"r":5582,"d":"Carson Hocevar","t":"Spire Motorsports","st":22,"fin":32,"pts":7.1,"sh":0.0438,"ll":5,"fl":13,"s1":0.7,"s2":0.45,"s3":5.95},{"r":5582,"d":"Chase Elliott","t":"Hendrick Motorsports","st":4,"fin":18,"pts":5.85,"sh":0.0361,"ll":0,"fl":13,"s1":0.45,"s2":0.45,"s3":4.95},{"r":5582,"d":"Tyler Reddick","t":"23XI Racing","st":8,"fin":5,"pts":5.65,"sh":0.0348,"ll":1,"fl":12,"s1":0.7,"s2":0.9,"s3":4.05},{"r":5582,"d":"Bubba Wallace","t":"23XI Racing","st":7,"fin":22,"pts":4.55,"sh":0.0281,"ll":2,"fl":9,"s1":0.9,"s2":2.75,"s3":0.9},{"r":5582,"d":"Ty Dillon","t":"Kaulig Racing","st":35,"fin":37,"pts":4.05,"sh":0.025,"ll":0,"fl":9,"s1":0,"s2":0,"s3":4.05},{"r":5582,"d":"Justin Haley","t":"Spire Motorsports","st":27,"fin":27,"pts":3.6,"sh":0.0222,"ll":0,"fl":8,"s1":0,"s2":0,"s3":3.6},{"r":5582,"d":"Ross Chastain","t":"Trackhouse Racing","st":15,"fin":23,"pts":3.15,"sh":0.0194,"ll":0,"fl":7,"s1":0,"s2":0.45,"s3":2.7},{"r":5582,"d":"Alex Bowman","t":"Hendrick Motorsports","st":12,"fin":7,"pts":2.25,"sh":0.0139,"ll":0,"fl":5,"s1":0.9,"s2":0.45,"s3":0.9},{"r":5582,"d":"Ryan Preece","t":"RFK Racing","st":16,"fin":9,"pts":1.8,"sh":0.0111,"ll":0,"fl":4,"s1":0.45,"s2":0.45,"s3":0.9},{"r":5582,"d":"Brad Keselowski","t":"RFK Racing","st":34,"fin":10,"pts":1.45,"sh":0.0089,"ll":4,"fl":1,"s1":0,"s2":0.45,"s3":1},{"r":5582,"d":"Austin Dillon","t":"Richard Childress Racing","st":25,"fin":25,"pts":0.9,"sh":0.0056,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5582,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":24,"fin":14,"pts":0.9,"sh":0.0056,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5582,"d":"Chris Buescher","t":"RFK Racing","st":11,"fin":12,"pts":0.9,"sh":0.0056,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5582,"d":"Joey Logano","t":"Team Penske","st":9,"fin":6,"pts":0.5,"sh":0.0031,"ll":2,"fl":0,"s1":0,"s2":0,"s3":0.5},{"r":5582,"d":"John H. Nemechek","t":"Legacy Motor Club","st":26,"fin":29,"pts":0.45,"sh":0.0028,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5582,"d":"Josh Berry","t":"Wood Brothers Racing","st":29,"fin":26,"pts":0.45,"sh":0.0028,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5582,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":10,"fin":34,"pts":0.45,"sh":0.0028,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5606,"d":"Chase Elliott","t":"Hendrick Motorsports","st":14,"fin":1,"pts":66.95,"sh":0.4007,"ll":167,"fl":56,"s1":0,"s2":2.1,"s3":64.85},{"r":5606,"d":"Carson Hocevar","t":"Spire Motorsports","st":1,"fin":7,"pts":16.3,"sh":0.0975,"ll":22,"fl":24,"s1":3.8,"s2":1.2,"s3":11.3},{"r":5606,"d":"Corey Heim","t":"23XI Racing","st":17,"fin":31,"pts":14.1,"sh":0.0844,"ll":42,"fl":8,"s1":0,"s2":7.85,"s3":6.25},{"r":5606,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":4,"fin":2,"pts":13.75,"sh":0.0823,"ll":10,"fl":25,"s1":2.4,"s2":1.8,"s3":9.55},{"r":5606,"d":"Ryan Blaney","t":"Team Penske","st":31,"fin":10,"pts":10.85,"sh":0.0649,"ll":11,"fl":18,"s1":0.45,"s2":0,"s3":10.4},{"r":5606,"d":"Tyler Reddick","t":"23XI Racing","st":8,"fin":4,"pts":9,"sh":0.0539,"ll":0,"fl":20,"s1":0.9,"s2":0.45,"s3":7.65},{"r":5606,"d":"Chase Briscoe","t":"Joe Gibbs Racing","st":5,"fin":23,"pts":8.35,"sh":0.05,"ll":1,"fl":18,"s1":0.7,"s2":0,"s3":7.65},{"r":5606,"d":"Chris Buescher","t":"RFK Racing","st":3,"fin":5,"pts":6.3,"sh":0.0377,"ll":0,"fl":14,"s1":0.45,"s2":0,"s3":5.85},{"r":5606,"d":"Daniel Suarez","t":"Spire Motorsports","st":2,"fin":6,"pts":3.15,"sh":0.0189,"ll":0,"fl":7,"s1":0,"s2":0,"s3":3.15},{"r":5606,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":7,"fin":38,"pts":3.1,"sh":0.0186,"ll":7,"fl":3,"s1":3.1,"s2":0,"s3":0},{"r":5606,"d":"Riley Herbst","t":"23XI Racing","st":18,"fin":11,"pts":2.3,"sh":0.0138,"ll":2,"fl":4,"s1":0,"s2":0,"s3":2.3},{"r":5606,"d":"Kyle Busch","t":"Richard Childress Racing","st":6,"fin":20,"pts":2.25,"sh":0.0135,"ll":0,"fl":5,"s1":0,"s2":0,"s3":2.25},{"r":5606,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":10,"fin":36,"pts":2.25,"sh":0.0135,"ll":0,"fl":5,"s1":2.25,"s2":0,"s3":0},{"r":5606,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":22,"fin":19,"pts":1.8,"sh":0.0108,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5606,"d":"Michael McDowell","t":"Spire Motorsports","st":19,"fin":27,"pts":1.8,"sh":0.0108,"ll":0,"fl":4,"s1":0,"s2":0,"s3":1.8},{"r":5606,"d":"Erik Jones","t":"Legacy Motor Club","st":21,"fin":12,"pts":1.45,"sh":0.0087,"ll":4,"fl":1,"s1":1.2,"s2":0.25,"s3":0},{"r":5606,"d":"Alex Bowman","t":"Hendrick Motorsports","st":9,"fin":3,"pts":1.35,"sh":0.0081,"ll":0,"fl":3,"s1":0.45,"s2":0,"s3":0.9},{"r":5606,"d":"Noah Gragson","t":"Front Row Motorsports","st":28,"fin":28,"pts":0.9,"sh":0.0054,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5606,"d":"Zane Smith","t":"Front Row Motorsports","st":34,"fin":22,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5606,"d":"Joey Logano","t":"Team Penske","st":23,"fin":37,"pts":0.45,"sh":0.0027,"ll":0,"fl":1,"s1":0.45,"s2":0,"s3":0},{"r":5606,"d":"Brad Keselowski","t":"RFK Racing","st":25,"fin":13,"pts":0.25,"sh":0.0015,"ll":1,"fl":0,"s1":0,"s2":0.25,"s3":0},{"r":5610,"d":"Tyler Reddick","t":"23XI Racing","st":1,"fin":4,"pts":28.6,"sh":0.2117,"ll":82,"fl":18,"s1":6.2,"s2":0.45,"s3":21.95},{"r":5610,"d":"Christopher Bell","t":"Joe Gibbs Racing","st":17,"fin":2,"pts":28.15,"sh":0.2084,"ll":46,"fl":37,"s1":0,"s2":1.6,"s3":26.55},{"r":5610,"d":"Denny Hamlin","t":"Joe Gibbs Racing","st":11,"fin":3,"pts":19.65,"sh":0.1454,"ll":39,"fl":22,"s1":0.9,"s2":4.6,"s3":14.15},{"r":5610,"d":"Ty Gibbs","t":"Joe Gibbs Racing","st":2,"fin":6,"pts":10.55,"sh":0.0781,"ll":17,"fl":14,"s1":1.8,"s2":0.9,"s3":7.85},{"r":5610,"d":"Daniel Suarez","t":"Spire Motorsports","st":14,"fin":1,"pts":8.35,"sh":0.0618,"ll":19,"fl":8,"s1":0.45,"s2":2.25,"s3":5.65},{"r":5610,"d":"Chase Briscoe","t":"Joe Gibbs Racing","st":5,"fin":34,"pts":8.1,"sh":0.06,"ll":9,"fl":13,"s1":0.45,"s2":3.35,"s3":4.3},{"r":5610,"d":"Brad Keselowski","t":"RFK Racing","st":26,"fin":15,"pts":6.75,"sh":0.05,"ll":0,"fl":15,"s1":0,"s2":0,"s3":6.75},{"r":5610,"d":"Shane Van Gisbergen","t":"Trackhouse Racing","st":3,"fin":11,"pts":5.7,"sh":0.0422,"ll":12,"fl":6,"s1":0,"s2":0,"s3":5.7},{"r":5610,"d":"Austin Dillon","t":"Richard Childress Racing","st":9,"fin":32,"pts":3.6,"sh":0.0266,"ll":0,"fl":8,"s1":0,"s2":0,"s3":3.6},{"r":5610,"d":"Kyle Larson","t":"Hendrick Motorsports","st":18,"fin":5,"pts":3,"sh":0.0222,"ll":3,"fl":5,"s1":0.7,"s2":0.95,"s3":1.35},{"r":5610,"d":"Zane Smith","t":"Front Row Motorsports","st":19,"fin":10,"pts":2.9,"sh":0.0215,"ll":8,"fl":2,"s1":2.9,"s2":0,"s3":0},{"r":5610,"d":"Michael McDowell","t":"Spire Motorsports","st":4,"fin":14,"pts":2.05,"sh":0.0152,"ll":1,"fl":4,"s1":0.25,"s2":0,"s3":1.8},{"r":5610,"d":"Carson Hocevar","t":"Spire Motorsports","st":23,"fin":23,"pts":1.6,"sh":0.0118,"ll":1,"fl":3,"s1":0.45,"s2":0.7,"s3":0.45},{"r":5610,"d":"Ryan Blaney","t":"Team Penske","st":6,"fin":7,"pts":0.9,"sh":0.0067,"ll":0,"fl":2,"s1":0.45,"s2":0.45,"s3":0},{"r":5610,"d":"Bubba Wallace","t":"23XI Racing","st":24,"fin":22,"pts":0.9,"sh":0.0067,"ll":0,"fl":2,"s1":0.45,"s2":0,"s3":0.45},{"r":5610,"d":"Austin Hill","t":"Richard Childress Racing","st":13,"fin":27,"pts":0.9,"sh":0.0067,"ll":0,"fl":2,"s1":0,"s2":0,"s3":0.9},{"r":5610,"d":"Joey Logano","t":"Team Penske","st":33,"fin":8,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5610,"d":"William Byron","t":"Hendrick Motorsports","st":31,"fin":9,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5610,"d":"Ricky Stenhouse Jr","t":"HYAK Motorsports","st":32,"fin":12,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5610,"d":"Erik Jones","t":"Legacy Motor Club","st":21,"fin":13,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5610,"d":"Ty Dillon","t":"Kaulig Racing","st":35,"fin":25,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5610,"d":"Cody Ware","t":"Rick Ware Racing","st":38,"fin":28,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0,"s3":0.45},{"r":5610,"d":"Chris Buescher","t":"RFK Racing","st":7,"fin":30,"pts":0.45,"sh":0.0033,"ll":0,"fl":1,"s1":0,"s2":0.45,"s3":0},{"r":5610,"d":"Ross Chastain","t":"Trackhouse Racing","st":27,"fin":35,"pts":0.25,"sh":0.0019,"ll":1,"fl":0,"s1":0.25,"s2":0,"s3":0}],"excluded":[{"race_id":5154,"decision":"excluded","reason":"[excluded] Bristol Dirt 2022: dirt short track, not comparable to a 1.5-mile oval (weekly prep, 8 Oct)","season":2022,"track":"Bristol Motor Speedway Dirt"},{"race_id":5157,"decision":"excluded","reason":"[excluded] Darlington Raceway, 293 laps: fails shape test on concentration (2.36 sd)","season":2022,"track":"Darlington Raceway"},{"race_id":5158,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on spread (2.08 sd)","season":2022,"track":"Kansas Speedway"},{"race_id":5166,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on concentration (3.71 sd)","season":2022,"track":"Atlanta Motor Speedway"},{"race_id":5175,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2022,"track":"Kansas Speedway"},{"race_id":5179,"decision":"excluded","reason":"[excluded] different surface/layout (Charlotte Motor Speedway Road Course, road_course)","season":2022,"track":"Charlotte Motor Speedway Road Course"},{"race_id":5180,"decision":"excluded","reason":"[excluded] Las Vegas Motor Speedway, 267 laps: fails shape test on concentration (2.37 sd)","season":2022,"track":"Las Vegas Motor Speedway"},{"race_id":5181,"decision":"excluded","reason":"[excluded] Homestead-Miami Speedway, 267 laps: fails shape test on concentration (4.67 sd)","season":2022,"track":"Homestead-Miami Speedway"},{"race_id":5270,"decision":"excluded","reason":"[excluded] Las Vegas Motor Speedway, 267 laps: fails shape test on concentration (2.16 sd)","season":2023,"track":"Las Vegas Motor Speedway"},{"race_id":5272,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on spread (4.45 sd)","season":2023,"track":"Atlanta Motor Speedway"},{"race_id":5280,"decision":"excluded","reason":"[excluded] Bristol Motor Speedway Dirt, 250 laps: fails shape test on concentration (2.81 sd)","season":2023,"track":"Bristol Motor Speedway Dirt"},{"race_id":5292,"decision":"excluded","reason":"[excluded] rain-shortened (ran < 90% of scheduled laps)","season":2023,"track":"Atlanta Motor Speedway"},{"race_id":5303,"decision":"excluded","reason":"[excluded] Texas Motor Speedway, 267 laps: fails shape test on concentration (3.22 sd)","season":2023,"track":"Texas Motor Speedway"},{"race_id":5305,"decision":"excluded","reason":"[excluded] different surface/layout (Charlotte Motor Speedway Road Course, road_course)","season":2023,"track":"Charlotte Motor Speedway Road Course"},{"race_id":5306,"decision":"excluded","reason":"[excluded] Las Vegas Motor Speedway, 267 laps: fails shape test on concentration (2.20 sd)","season":2023,"track":"Las Vegas Motor Speedway"},{"race_id":5389,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on concentration (5.17 sd)","season":2024,"track":"Atlanta Motor Speedway"},{"race_id":5400,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on concentration (2.15 sd)","season":2024,"track":"Kansas Speedway"},{"race_id":5401,"decision":"excluded","reason":"[excluded] Darlington Raceway, 293 laps: fails shape test on origin (2.21 sd)","season":2024,"track":"Darlington Raceway"},{"race_id":5406,"decision":"excluded","reason":"[excluded] rain-shortened (ran < 90% of scheduled laps)","season":2024,"track":"Charlotte Motor Speedway"},{"race_id":5411,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on concentration (4.46 sd)","season":2024,"track":"Atlanta Motor Speedway"},{"race_id":5420,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2024,"track":"Kansas Speedway"},{"race_id":5422,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2024,"track":"Texas Motor Speedway"},{"race_id":5424,"decision":"excluded","reason":"[excluded] different surface/layout (Charlotte Motor Speedway Road Course, road_course)","season":2024,"track":"Charlotte Motor Speedway Road Course"},{"race_id":5547,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on spread (4.38 sd)","season":2025,"track":"Atlanta Motor Speedway"},{"race_id":5548,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2025,"track":"Las Vegas Motor Speedway"},{"race_id":5554,"decision":"excluded","reason":"[excluded] Texas Motor Speedway, 267 laps: fails shape test on concentration (2.05 sd)","season":2025,"track":"Texas Motor Speedway"},{"race_id":5557,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on concentration (2.39 sd)","season":2025,"track":"Kansas Speedway"},{"race_id":5558,"decision":"excluded","reason":"[excluded] Darlington Raceway, 293 laps: fails shape test on concentration (4.59 sd)","season":2025,"track":"Darlington Raceway"},{"race_id":5562,"decision":"excluded","reason":"[excluded] North Wilkesboro Speedway, 250 laps: fails shape test on concentration (2.90 sd)","season":2025,"track":"North Wilkesboro Speedway"},{"race_id":5576,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on concentration (4.84 sd)","season":2025,"track":"Atlanta Motor Speedway"},{"race_id":5579,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on origin (2.30 sd)","season":2025,"track":"Kansas Speedway"},{"race_id":5581,"decision":"excluded","reason":"[excluded] different surface/layout (Charlotte Motor Speedway Road Course, road_course)","season":2025,"track":"Charlotte Motor Speedway Road Course"},{"race_id":5583,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2025,"track":"Homestead-Miami Speedway"},{"race_id":5597,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on concentration (4.97 sd)","season":2026,"track":"Atlanta Motor Speedway"},{"race_id":5600,"decision":"excluded","reason":"[excluded] Las Vegas Motor Speedway, 267 laps: fails shape test on volume (2.31 sd)","season":2026,"track":"Las Vegas Motor Speedway"},{"race_id":5603,"decision":"excluded","reason":"[excluded] Darlington Raceway, 293 laps: fails shape test on volume (2.08 sd)","season":2026,"track":"Darlington Raceway"},{"race_id":5607,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on volume (2.89 sd)","season":2026,"track":"Kansas Speedway"},{"race_id":5615,"decision":"excluded","reason":"[excluded] Atlanta Motor Speedway, 260 laps: fails shape test on spread (3.20 sd)","season":2026,"track":"Atlanta Motor Speedway"},{"race_id":5616,"decision":"excluded","reason":"[excluded] fails the shape test after scaling to 267 laps (lock check, 8 Oct)","season":2026,"track":"Chicagoland Speedway"},{"race_id":5628,"decision":"excluded","reason":"[excluded] Kansas Speedway, 267 laps: fails shape test on concentration (4.18 sd)","season":2026,"track":"Kansas Speedway"},{"race_id":5630,"decision":"excluded","reason":"[excluded] Las Vegas Motor Speedway, 267 laps: fails shape test on volume (2.15 sd)","season":2026,"track":"Las Vegas Motor Speedway"}]};
+const $ = s => document.querySelector(s);
+const S = D.summary, M = D.meta;
+const pct = x => Math.round(100 * x) + '%';
+const f0 = x => Math.round(x).toString();
+const f1 = x => (Math.round(10 * x) / 10).toFixed(1);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ABBR = { 'North Wilkesboro': 'NWB' };
+const short = t => { const x = String(t || '').replace(/ (Motor )?(Speedway|Raceway|International Raceway|Superspeedway)( Dirt)?$/, (m, a, b, dirt) => dirt ? ' dirt' : ''); return Object.keys(ABBR).reduce((y, k) => y.replace(k, ABBR[k]), x); };
+const ord = n => { n = Math.round(n); const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COL = { lead: css('--c-lead'), blue: css('--c-blue'), green: css('--c-green'), orange: css('--c-orange'), rest: css('--c-rest'), surf: css('--g800') };
+const races = D.races, lines = D.lines;
+const raceById = Object.fromEntries(races.map(r => [r.RaceID, r]));
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const label = r => r.Date ? `${MON[+r.Date.slice(5, 7) - 1]} ${r.Season} ${short(r.Track)}` : `${r.Season} ${short(r.Track)}`;
+const andList = a => a.length < 3 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+const dt = new Date(M.race_date + 'T12:00:00');
+const nBorrow = S.n_races - S.n_bristol;
+const TRK = short(M.track), SER = /truck/i.test(M.series) ? 'Truck' : /cup/i.test(M.series) ? 'Cup' : "O'Reilly";
+const V = SER === 'Truck' ? 'trucks' : 'cars', V1 = SER === 'Truck' ? 'truck' : 'car';
+document.getElementById('lg-same').textContent = TRK;
+
+// ---- tooltip
+const tip = $('#tip');
+function showTip(e, html) { tip.innerHTML = html; tip.hidden = false; moveTip(e); }
+function moveTip(e) { const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14; if (y + h > innerHeight - 8) y = e.clientY - h - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px'; }
+function bindTips(root, fn) {
+  root.querySelectorAll('[data-i]').forEach(el => {
+    el.addEventListener('mousemove', e => showTip(e, fn(el.dataset)));
+    el.addEventListener('mouseleave', () => tip.hidden = true);
+  });
+}
+
+// ---- header + intro
+$('#subline').textContent = `${M.race_name} · ${dt.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'})} · ${M.sched_laps} laps (stages ${M.stages.join(' / ')})`;
+
+// ---- read tiles
+$('#read-lede').textContent = `${S.n_races} real races${nBorrow ? `: ${S.n_bristol} at ${TRK} and ${nBorrow} at similar tracks` : ` at ${TRK}`}, ${races.every(r => r.Unscaled) ? 'all run at this week\'s length' : 'each shown at this week\'s length'}. Averages are weighted: ${nBorrow ? (() => { const sw = races.filter(r => r.SameTrack), bw = races.filter(r => !r.SameTrack);
+      const ratio = (sw.reduce((a, r) => a + r.Weight, 0) / sw.length) / (bw.reduce((a, r) => a + r.Weight, 0) / bw.length);
+      return `${TRK} races count ${ratio >= 1.7 ? 'about twice as much as' : 'a little more than'} similar tracks, and recent races a little more than old ones`; })() : 'recent races count a little more than old ones'}. Ranges run from the lowest race to the highest.`;
+const tiles = [
+  { k: 'Total dominator points', v: f0(S.pot) + '<small>pts</small>', d: `From ${f0(S.pot_rng[0])} to ${f0(S.pot_rng[1])} across the ${S.n_races} races`, a: 'var(--c-lead)' },
+  { k: 'Top dominator takes', v: pct(S.top1), d: `From ${pct(S.top1_rng[0])} to ${pct(S.top1_rng[1])}. A typical top score is ${f0(S.top_pts_med)} pts`, a: 'var(--c-orange)' },
+  { k: 'Top 3 dominators take', v: pct(S.top3), d: `From ${pct(S.top3_rng[0])} to ${pct(S.top3_rng[1])} of total dominator points`, a: 'var(--c-blue)' },
+  { k: 'Two big scores', v: `${S.two_big}<small>of ${S.n_races}</small>`, d: `Races where two ${V} each took 20%+ of total dominator points`, a: 'var(--c-green)' }
+];
+$('#read').innerHTML = tiles.map(t => `<div class="tile num" style="--accent:${t.a}"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join('');
+
+// ---- 01 pot bars
+(function () {
+  const W = 760, rowH = 28, padL = 150, padR = 56, padT = 8, padB = 28, H = padT + padB + rowH * races.length;
+  const xmax = Math.ceil(Math.max(...races.map(r => r.pot)) / 20) * 20;
+  const x = v => padL + (W - padL - padR) * v / xmax;
+  let g = '';
+  for (let t = 0; t <= xmax; t += 20) g += `<line class="gridl" x1="${x(t)}" x2="${x(t)}" y1="${padT}" y2="${H - padB}"/><text x="${x(t)}" y="${H - padB + 16}" text-anchor="middle">${t}</text>`;
+  g += `<line x1="${x(S.pot)}" x2="${x(S.pot)}" y1="${padT - 4}" y2="${H - padB}" stroke="${css('--t1')}" stroke-width="2" stroke-dasharray="4 3" opacity=".8"/>`;
+  races.forEach((r, i) => {
+    const y = padT + i * rowH, c = r.SameTrack ? COL.lead : COL.blue, w = x(r.pot) - padL;
+    g += `<text class="lab" x="${padL - 10}" y="${y + rowH / 2 + 4}" text-anchor="end">${esc(label(r))}</text>`;
+    g += `<path d="M${padL},${y + 6} h${w - 4} a4,4 0 0 1 4,4 v${rowH - 20} a4,4 0 0 1 -4,4 h${-(w - 4)} z" fill="${c}"/>`;
+    g += `<text class="lab" x="${x(r.pot) + 6}" y="${y + rowH / 2 + 4}" style="paint-order:stroke;stroke:${COL.surf};stroke-width:4px">${f0(r.pot)}</text>`;
+    g += `<rect class="hit" data-i="${i}" x="0" y="${y}" width="${W}" height="${rowH}"/>`;
+  });
+  g += `<text class="lab strong" x="${x(S.pot)}" y="${H - 2}" text-anchor="middle">average ${f0(S.pot)}</text>`;
+  const el = $('#chart-pot'); el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Total dominator points by race">${g}</svg>`;
+  bindTips(el, d => { const r = races[+d.i]; return `<b>${esc(r.RaceName)}</b><br>${r.Season} · ${esc(r.Track)}<br>Total <b>${f1(r.pot)}</b> dominator pts<br><span class="muted">${r.scorers} ${V} scored</span>`; });
+  const lo = races.reduce((a, b) => a.pot < b.pot ? a : b), hi = races.reduce((a, b) => a.pot > b.pot ? a : b);
+  $('#pot-lede').innerHTML = `A ${TRK} ${SER} race at ${M.sched_laps} laps hands out about <b class="hl">${f0(S.pot)} dominator points</b> in total. The lowest was ${f0(lo.pot)} (${label(lo)}) and the highest ${f0(hi.pot)} (${label(hi)}). A lap led pays whether the race is green or under caution, so that half is fixed by the distance. What moves the total is fastest laps, which only come under green: fewer cautions, more dominator points.`;
+})();
+
+// ---- 02 split (raw points)
+(function () {
+  const W = 560, rowH = 26, padL = 128, padR = 34, padT = 4, padB = 26, H = padT + padB + rowH * races.length;
+  const xmax = Math.ceil(Math.max(...races.map(r => r.pot)) / 20) * 20;
+  const x = v => padL + (W - padL - padR) * v / xmax;
+  let g = '';
+  for (let t = 0; t <= xmax; t += 40) g += `<line class="gridl" x1="${x(t)}" x2="${x(t)}" y1="${padT}" y2="${H - padB}"/><text x="${x(t)}" y="${H - padB + 16}" text-anchor="middle">${t}</text>`;
+  races.forEach((r, i) => {
+    const y = padT + i * rowH + 5, h = rowH - 10;
+    const parts = [[r.top_pts, COL.lead], [r.second_pts, COL.blue], [r.third_pts, COL.green], [r.pot - r.top3_pts, COL.rest]];
+    let cx = 0;
+    g += `<text class="lab" x="${padL - 10}" y="${y + h / 2 + 4}" text-anchor="end">${esc(label(r))}</text>`;
+    parts.forEach((p, k) => {
+      const x0 = x(cx) + (k ? 1 : 0), x1 = x(cx + p[0]) - (k < 3 ? 1 : 0);
+      g += `<rect x="${x0}" y="${y}" width="${Math.max(0, x1 - x0)}" height="${h}" rx="${k === 0 || k === 3 ? 3 : 0}" fill="${p[1]}"/>`;
+      // every segment carries its points when there is room for the digits
+      if (x1 - x0 >= 18) g += `<text x="${(x0 + x1) / 2}" y="${y + h / 2 + 4}" text-anchor="middle" style="fill:${k === 0 ? '#000' : '#fff'};font-weight:600;font-size:10.5px">${f0(p[0])}</text>`;
+      cx += p[0];
+    });
+    g += `<text class="lab" x="${x(r.pot) + 5}" y="${y + h / 2 + 4}">${f0(r.pot)}</text>`;
+    g += `<rect class="hit" data-i="${i}" x="0" y="${y - 5}" width="${W}" height="${rowH}"/>`;
+  });
+  const el = $('#chart-split'); el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Dominator points by dominator rank">${g}</svg>`;
+  bindTips(el, d => { const r = races[+d.i];
+    return `<b>${label(r)}</b><br>Top dominator: ${esc(r.top_driver)} <b>${f1(r.top_pts)}</b> pts<br>2nd dominator ${f1(r.second_pts)} · 3rd dominator ${f1(r.third_pts)}<br>Everyone else ${f1(r.pot - r.top3_pts)}, shared by ${r.scorers - 3} ${V}<br><span class="muted">Total ${f1(r.pot)}</span>`; });
+  $('#split-lede').innerHTML = `The top dominator scores about <b class="hl">${f0(S.top_pts_w)} points</b>, and the top 3 dominators about <b class="hl">${f0(S.top3_pts_w)}</b> between them. What's left gets spread thin across the rest of the field.`;
+  $('#split-facts').innerHTML = `
+    <div class="fact"><span class="big num">${f1(S.top_pts_rng[0])} to ${f1(S.top_pts_rng[1])} pts</span>is the range for the top dominator. The top 3 dominators combined ran from ${f0(S.top3_pts_rng[0])} to ${f0(S.top3_pts_rng[1])}. A <b>big score</b> here is about ${f0(.2 * S.pot)} points or more (20% of the total).</div>
+    <div class="fact"><span class="big num">${S.two_big} of ${S.n_races}</span>races had <b>two</b> big scores. In the other ${S.n_races - S.two_big}, one ${V1} controlled the race and nobody else reached ${f0(.2 * S.pot)}.</div>
+    <div class="fact"><span class="big num">${f0(S.scorers)} ${V}</span>score at least something in a typical race. About ${f0(S.scraps_cars)} of them get under ${f0(.05 * S.pot)} points each, usually a fastest lap or two, or a few laps led off pit strategy.</div>`;
+})();
+
+// ---- 03 where
+(function () {
+  const W = 560, H = 360, padL = 44, padR = 12, padT = 12, padB = 40;
+  const maxPos = Math.max(36, ...lines.map(l => Math.max(l.st, l.fin)));
+  const ymax = Math.ceil(Math.max(...lines.map(l => l.pts)) / 10) * 10;
+  const x = v => padL + (W - padL - padR) * (v - 0.5) / maxPos;
+  const y = v => padT + (H - padT - padB) * (1 - v / ymax);
+  function draw(key) {
+    let g = '';
+    for (let t = 0; t <= ymax; t += 10) g += `<line class="gridl" x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}"/><text x="${padL - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
+    [1, 5, 10, 15, 20, 25, 30, 35].filter(t => t <= maxPos).forEach(t => g += `<text x="${x(t)}" y="${H - padB + 16}" text-anchor="middle">${t}</text>`);
+    g += `<text x="${(padL + W) / 2}" y="${H - 4}" text-anchor="middle" class="lab">${key === 'st' ? 'Starting position' : 'Finishing position'}</text>`;
+    g += `<text x="${padL - 36}" y="${padT - 2}" class="lab">pts</text>`;
+    const order = lines.map((l, i) => i).sort((a, b) => lines[a].sh - lines[b].sh);
+    order.forEach(i => { const l = lines[i];
+      const c = l.sh >= .2 ? COL.lead : l.sh >= .05 ? COL.blue : COL.rest, r = l.sh >= .2 ? 6 : l.sh >= .05 ? 4.5 : 3.5;
+      g += `<circle cx="${x(l[key])}" cy="${y(l.pts)}" r="${r}" fill="${c}" stroke="${COL.surf}" stroke-width="2" ${l.sh < .05 ? 'opacity=".75"' : ''}/>`;
+      g += `<circle class="hit" data-i="${i}" cx="${x(l[key])}" cy="${y(l.pts)}" r="${Math.max(r + 4, 8)}"/>`;
+    });
+    const el = $('#chart-where'); el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Dominator points by ${key === 'st' ? 'starting' : 'finishing'} position">${g}</svg>`;
+    bindTips(el, d => { const l = lines[+d.i], r = raceById[l.r];
+      return `<b>${esc(l.d)}</b> <span class="muted">${label(r)}</span><br>Started ${ord(l.st)}, finished ${ord(l.fin)}<br><b>${f1(l.pts)}</b> pts, ${pct(l.sh)} of total<br><span class="muted">${l.ll} laps led · ${l.fl} fastest laps</span>`; });
+  }
+  draw('st');
+  document.querySelectorAll('.pick button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.pick button').forEach(o => o.setAttribute('aria-pressed', o === b)); draw(b.dataset.k); }));
+  const deep = lines.filter(l => l.sh >= .2 && l.st > 10).sort((a, b) => b.st - a.st);
+  const deepTxt = deep.length ? deep.slice(0, 3).map(l => `${esc(l.d)} from ${ord(l.st)} (${label(raceById[l.r])})`).join(', ') : '';
+  $('#where-lede').innerHTML = `${pct(S.origin[0])} of dominator points go to ${V} that started in the top five. ${S.big_deep_start ? `${S.big_deep_start} of the ${S.big_n} big scores started outside the top ten.` : `None of the ${S.big_n} big scores started outside the top ten.`}`;
+  $('#where-facts').innerHTML = `
+    <div class="fact"><span class="big num">${pct(S.origin[0])}</span>of dominator points go to the top-five starters. Starters 6th to 10th get ${pct(S.origin[1])}, 11th to 20th ${pct(S.origin[2])}, and 21st or worse just ${pct(S.origin[3])}.</div>
+    <div class="fact"><span class="big num">${S.big_n} big scores</span>in ${S.n_races} races. ${pct(S.big_top5_start)} started in the top five and ${pct(S.big_pole)} started on pole. ${S.big_deep_start ? `${S.big_deep_start} started outside the top ten${deepTxt ? ': ' + deepTxt : ''}.` : 'None started outside the top ten.'}</div>
+    <div class="fact"><span class="big num">${pct(S.big_won)}</span>of big scores came with the win, and ${pct(S.big_top5_fin)} with a top-five finish. Leading laps doesn't guarantee the finish: ${S.big_outside10_fin} big score${S.big_outside10_fin === 1 ? '' : 's'} ended outside the top ten.</div>`;
+})();
+
+// ---- 04 stages
+(function () {
+  const rows = [
+    { k: 'All dominator points', s: S.s, n: 'Every dominator point handed out' },
+    { k: 'Big scores', s: S.big_s, n: `${V[0].toUpperCase() + V.slice(1)} that took 20%+ of total` }
+  ].concat(races.map(r => ({ k: label(r), s: [r.s1, r.s2, r.s3], n: `All dominator points, ${esc(r.RaceName)}`, small: true })));
+  const W = 760, padL = 150, padR = 12, padT = 4, padB = 26;
+  const hs = rows.map(r => r.small ? 22 : 34), gap = 14;
+  const H = padT + padB + hs.reduce((a, b) => a + b, 0) + gap;
+  const x = v => padL + (W - padL - padR) * v;
+  let g = '', yy = padT;
+  rows.forEach((r, i) => {
+    if (i === 2) { g += `<line class="axisl" x1="0" x2="${W}" y1="${yy + gap / 2 - 2}" y2="${yy + gap / 2 - 2}"/>`; yy += gap; }
+    const h = hs[i] - (r.small ? 8 : 10), y = yy + (hs[i] - h) / 2; let cx = 0;
+    g += `<text class="lab ${r.small ? '' : 'strong'}" x="${padL - 10}" y="${y + h / 2 + 4}" text-anchor="end">${esc(r.k)}</text>`;
+    [COL.blue, COL.green, COL.lead].forEach((c, k) => {
+      const x0 = x(cx) + (k ? 1 : 0), x1 = x(cx + r.s[k]) - (k < 2 ? 1 : 0);
+      g += `<rect x="${x0}" y="${y}" width="${Math.max(0, x1 - x0)}" height="${h}" rx="${k !== 1 ? 3 : 0}" fill="${c}"/>`;
+      if (!r.small) g += `<text x="${(x0 + x1) / 2}" y="${y + h / 2 + 4}" text-anchor="middle" style="fill:${k === 2 ? '#000' : '#fff'};font-weight:600">${pct(r.s[k])}</text>`;
+      cx += r.s[k];
+    });
+    g += `<rect class="hit" data-i="${i}" x="0" y="${yy}" width="${W}" height="${hs[i]}"/>`;
+    yy += hs[i];
+  });
+  [0, .25, .5, .75, 1].forEach(t => g += `<text x="${x(t)}" y="${H - 6}" text-anchor="middle">${pct(t)}</text>`);
+  const el = $('#chart-stage'); el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of dominator points by stage">${g}</svg>`;
+  bindTips(el, d => { const r = rows[+d.i]; return `<b>${esc(r.k)}</b><br><span class="muted">${r.n}</span><br>Stage 1 ${pct(r.s[0])} · Stage 2 ${pct(r.s[1])} · Final ${pct(r.s[2])}`; });
+  const L = M.stages, tot = L[0] + L[1] + L[2];
+  const early = races.filter(r => r.top_s3 < .35);
+  $('#stage-lede').innerHTML = `This week's stages are ${L[0]}, ${L[1]} and ${L[2]} laps. The final stage is ${pct(L[2] / tot)} of the race and pays <b class="hl">${pct(S.s[2])}</b> of dominator points. ${
+    S.big_s[2] - S.s[2] > .02 ? `Big scores lean harder on it: <b class="hl">${pct(S.big_s[2])}</b> of their points come in the final stage.`
+    : S.s[2] - S.big_s[2] > .02 ? `Big scores lean on it less: <b class="hl">${pct(S.big_s[2])}</b> of their points come in the final stage.`
+    : `Big scores are no different: <b class="hl">${pct(S.big_s[2])}</b> of their points come in the final stage.`} ${
+    !early.length ? '' : early.length <= 3
+      ? andList(early.map(r => `${esc(r.top_driver)} (${label(r)})`)) + ` topped ${early.length === 1 ? 'a race' : 'their races'} by scoring most of ${early.length === 1 ? 'the' : 'their'} points in the first two stages.`
+      : `In ${early.length} of the ${S.n_races} races the top dominator scored most of their points in the first two stages, including ${andList(early.slice(0, 3).map(r => `${esc(r.top_driver)} (${label(r)})`))}.`}`;
+})();
+
+// ---- 05 races
+(function () {
+  const maxW = Math.max(...races.map(r => r.Weight));
+  const adj = r => r.Unscaled ? '<span class="muted">No, same length</span>' :
+    (Math.abs(r.Scale_S1 - 1) < .08 && Math.abs(r.Scale_S2 - 1) < .08 && Math.abs(r.Scale_S3 - 1) < .08)
+      ? `No, same length<span class="muted small" style="display:block">stage breaks ${M.stages.map((L, k) => Math.round(L / [r.Scale_S1, r.Scale_S2, r.Scale_S3][k])).join('/')}, this week ${M.stages.join('/')}</span>`
+      : `Stretched to ${M.sched_laps} laps<span class="muted small" style="display:block">stages ×${(+r.Scale_S1).toFixed(2)} / ×${(+r.Scale_S2).toFixed(2)} / ×${(+r.Scale_S3).toFixed(2)}</span>`;
+  $('#races-body').innerHTML = races.map(r => `<tr>
+    <td class="l"><span class="tag ${r.SameTrack ? 'same' : 'borrow'}">${esc(label(r))}</span><span class="muted small" style="display:block;margin-top:3px">${esc(r.RaceName.replace(/ presented by .*$/, ''))}</span>${r.Note ? `<span class="small" style="display:block;margin-top:2px;color:var(--gold-light)">${esc(r.Note)}</span>` : ''}</td>
+    <td class="l">${adj(r)}</td>
+    <td>${f1(r.pot)}</td>
+    <td class="l">${esc(r.top_driver)}</td>
+    <td>${ord(r.top_start)} → ${ord(r.top_fin)}</td>
+    <td>${f1(r.top_pts)}</td>
+    <td class="l"><span class="wbar" style="width:${Math.round(60 * r.Weight / maxW)}px"></span>${pct(r.Weight)}</td></tr>`).join('');
+  $('#races-lede').innerHTML = !nBorrow && races.every(r => r.Unscaled)
+    ? `Every past ${SER} race at ${TRK} from ${Math.min(...races.map(r => r.Season))} on, all at this week's distance. No other tracks, and nothing stretched.`
+    : `We start with every past ${SER} race at ${TRK}. A similar track is added only if its dominator points behave like ${TRK}'s: the total, how concentrated it is, how many ${V} score, and where the leaders start.${nBorrow ? ` ${nBorrow} passed, from ${andList([...new Set(races.filter(r => !r.SameTrack).map(r => short(r.Track)))])}.` : ''} Races run at a different stage length are stretched stage by stage to this week's lengths.`;
+  const plain = e => {
+    const s = e.reason || '';
+    if (/surface|dirt/i.test(s)) return 'Dirt surface. A different track in every way that matters here.';
+    if (/identical laps|held out/i.test(s)) return 'The lap-by-lap data has a problem we are still checking. Held out until it is fixed.';
+    if (/not needed/i.test(s)) return `Passed the test, but we already had enough races.`;
+    if (/stretched too far/i.test(s)) return `Passed the test, but its stages would need stretching almost twice as long. Left out.`;
+    if (/rain|shortened/i.test(s)) return 'Shortened by rain.';
+    if (/no lap-leader data/i.test(s)) return 'No lap-leader data.';
+    if (/data broken/i.test(s)) return 'The race data has errors (lap counts don’t add up). Held out.';
+    if (/spread/i.test(s) && /Martinsville|Phoenix/i.test(s)) return `Points get spread across many more ${V} than at ${TRK}.`;
+    if (/on spread/i.test(s)) return `Dominator points were spread across a very different number of ${V} than at ${TRK}.`;
+    if (/on concentration/i.test(s)) return `The top ${V} took a very different share than at ${TRK}.`;
+    if (/on volume/i.test(s)) return `Total dominator points per lap were very different from ${TRK}.`;
+    if (/on origin/i.test(s)) return `Dominators started from very different spots than at ${TRK}.`;
+    if (/spread|concentration/i.test(s)) return `Dominator points were shared out very differently from ${TRK} (too many or too few ${V} scoring).`;
+    return esc(s);
+  };
+  const ex = D.excluded.slice().sort((a, b) => (a.season || 9999) - (b.season || 9999));
+  $('#excl-body').innerHTML = !ex.length ? `<tr><td class="l muted" colspan="2">None. Every ${SER} race at ${TRK} is used, and no other tracks were added.</td></tr>` : ex.map(e => `<tr><td class="l"><span class="tag out">${e.race_id ? (e.season + ' ' + esc(short(e.track))) : esc((e.reason.match(/^[^:]+/) || [''])[0])}</span></td><td class="l wrap">${plain(e)}</td></tr>`).join('');
+})();
+
+// ---- footer
+$('#foot').innerHTML = `<span>Golden Ticket Sims · ${esc(M.series)} · ${esc(M.race_name)} · pool locked ${esc(M.locked)}</span><span>Sources: NASCAR official results and lap-by-lap timing; Lap Raptor stage counters for 2025 on. DraftKings scoring: 0.25 per lap led, 0.45 per fastest lap.</span>`;
+</script>
