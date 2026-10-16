@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phoenix Trucks Practice Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#FFE500;--bg:#121212;--surf:#1e1e1e;--rule:#2d2d2d;--rule2:#404040;--t1:#ffffff;--t2:#cccccc;--t3:#999999;--up:#4caf50;--down:#f44336}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t1);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.55}
+header{background:#000;border-bottom:3px solid var(--gold);padding:14px 16px;display:flex;align-items:center;gap:14px}
+header img{height:52px}header h1{margin:0;color:var(--gold);text-transform:uppercase;font-weight:700;font-size:26px;text-shadow:0 0 15px rgba(255,229,0,.4);line-height:1.15}
+header .sub{color:var(--t2);font-size:13px}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h2{font-size:19px;font-weight:600;margin:36px 0 6px}h3{font-size:15px;font-weight:600;margin:0 0 2px}
+p{margin:0 0 10px;color:var(--t2)}.lede{color:var(--t2)}
+.take{background:var(--surf);border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:8px;padding:12px 18px;margin:16px 0}
+.take li{margin:7px 0;color:var(--t2)}.take b{color:var(--t1)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+.tile{background:var(--surf);border:1px solid var(--rule);border-radius:8px;padding:12px 14px}
+.big{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}.lbl{font-weight:600;font-size:13px;color:var(--t1)}.ex{font-size:12.5px;color:var(--t3);margin-top:4px}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surf)}
+th{text-align:left;font-weight:600;color:var(--t2);padding:9px 10px;border-bottom:1px solid var(--rule2);white-space:nowrap;font-size:12px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;user-select:none}
+td{padding:6px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}td.tm{color:var(--t3);font-size:13px}
+.n{text-align:right;font-variant-numeric:tabular-nums}.unc{color:var(--t3);font-size:12px}.up{color:var(--up)}.down{color:var(--down)}
+table.sm th{cursor:default}
+dl{margin:10px 0 0;display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px;color:var(--t3)}dt{color:var(--t2);font-weight:500}dd{margin:0}
+.co{margin:18px 0}
+figure{margin:18px 0;background:var(--surf);border:1px solid var(--rule);border-radius:8px;padding:14px 14px 8px}
+figcaption{color:var(--t2);font-size:13.5px;margin-bottom:8px}figcaption b{color:var(--t1)}
+svg{width:100%;height:auto;display:block;font-family:Inter,system-ui,sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--t2);margin:0 0 6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+footer{color:var(--t3);font-size:12px;margin-top:36px;border-top:1px solid var(--rule);padding-top:12px}
+@media (max-width:600px){header h1{font-size:20px}header img{height:40px}td.tm{display:none}}
+</style>
+
+</head><body><a href="../" style="position:fixed;top:10px;right:14px;z-index:9;background:#000;color:#FFE500;border:1px solid #FFE500;border-radius:6px;padding:4px 10px;font:600 13px Inter,sans-serif;text-decoration:none">&larr; Back</a>
+<header><img src="data:image/jpeg;base64,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" alt="Golden Ticket Sims"><div><h1>Phoenix Trucks &middot; Practice</h1><div class="sub">Zero Carbon Bioethanol 150 · Friday 16 October · practice 3:30 PM ET</div></div></header>
+<style>table.t{border-collapse:collapse;width:100%;margin:10px 0 18px}table.t th,table.t td{border-bottom:1px solid #2d2d2d;padding:7px 8px;text-align:left;font-size:14px}table.t th{color:#FFE500;font-weight:600}.lede b{color:#FFE500}h2.s{color:#FFE500;font-size:17px;margin:22px 16px 4px}.lede{margin-left:16px;margin-right:16px}table.t{margin-left:16px;width:calc(100% - 32px)}</style>
+<p class='lede'>Before practice: how much has practice told us about the race, using the same readings we will use today. This page is the baseline; when the session is locked, the practice report replaces it at this address.</p>
+<p class='lede'>Data: 17 Truck races since 2024 with full lap-by-lap practice from Lap Raptor (long-run windows are the best 5 or 10 consecutive green laps on one run). Only 1 of them is at Phoenix Raceway itself. Scores are rank correlations with the race's average running position (1 = perfect order); a car that ran well all day scores well.</p>
+<h2 class='s'>How well each reading ordered the race (vs average running position)</h2><table class='t'><tr><th>Reading</th><th>All 17 races</th><th>2026 (8)</th><th>Phoenix (1)</th></tr><tr><td>Pre-race form</td><td>0.78</td><td>0.79</td><td>0.81</td></tr><tr><td>Fastest single lap</td><td>0.63</td><td>0.62</td><td>0.81</td></tr><tr><td>Best 5-lap average</td><td>0.68</td><td>0.70</td><td>0.76</td></tr><tr><td>Best 10-lap average</td><td>0.57</td><td>0.65</td><td>&ndash;</td></tr><tr><td>Practice composite</td><td>0.70</td><td>0.72</td><td>0.80</td></tr><tr><td>Starting spot (grid)</td><td>0.76</td><td>0.76</td><td>0.84</td></tr></table>
+<h2 class='s'>Same, vs finishing position</h2><table class='t'><tr><th>Reading</th><th>All 17 races</th><th>2026 (8)</th><th>Phoenix (1)</th></tr><tr><td>Pre-race form</td><td>0.58</td><td>0.55</td><td>0.40</td></tr><tr><td>Fastest single lap</td><td>0.43</td><td>0.35</td><td>0.37</td></tr><tr><td>Best 5-lap average</td><td>0.48</td><td>0.49</td><td>0.35</td></tr><tr><td>Best 10-lap average</td><td>0.44</td><td>0.51</td><td>&ndash;</td></tr><tr><td>Practice composite</td><td>0.47</td><td>0.43</td><td>0.32</td></tr><tr><td>Starting spot (grid)</td><td>0.42</td><td>0.35</td><td>0.33</td></tr></table>
+<h2 class='s'>What practice adds</h2>
+<p class='lede'>On top of our pre-race form, practice explains about <b>0.12</b> of what form missed in the finish (rank partial correlation, 539 cars). Once the grid is known too, that drops to <b>0.09</b>: practice and qualifying overlap.</p>
+<p class='lede'>Blending practice onto form at weight w (score vs average running position): 0%: 0.781 &middot; 10%: 0.786 &middot; 20%: 0.793 &middot; 30%: 0.797 &middot; 40%: 0.801 &middot; 50%: 0.793.</p>
+<p class='lede'>The same vs finishing position: 0%: 0.580 &middot; 10%: 0.581 &middot; 20%: 0.583 &middot; 30%: 0.576 &middot; 40%: 0.571 &middot; 50%: 0.556.</p>
+<p class='lede'>Read: practice helps most for how a car runs all day, and little for the finish, which wrecks and strategy scramble. Against how a car ran all day the best blend is 30&ndash;40% practice; against the finish it is 10&ndash;20%. Single-lap speed is the weakest of the three readings for the finish, and a 10-lap window needs a long enough run to exist, so half the field has none.</p>
+<p class='lede'>Golden Ticket Sims &middot; Phoenix Trucks. Source: practice backtest over 17 races.</p>
+<footer>Golden Ticket Sims. Preview published 16 October 2026.</footer>
+</body></html>
