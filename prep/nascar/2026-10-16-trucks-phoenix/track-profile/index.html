@@ -238,18 +238,6 @@ xuGOn51I0pVXjNapVqszmfCPzunMEJSlKp09KUpQhf/Z">
         <tbody id="dnf-body"></tbody>
       </table>
     </div>
-    <h3 style="margin:20px 0 4px">Practice: how much should it move the sheet?</h3>
-    <p class="lede small muted" id="prac-lede"></p>
-    <div class="facts" id="prac-facts" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px"></div>
-    <div id="prac-races"></div>
-    <h4 style="margin:18px 0 4px;font-size:13px;color:var(--t2);font-weight:600">The mismatches: who practice got wrong</h4>
-    <p class="small muted" id="mismatch-lede" style="margin-bottom:10px"></p>
-    <div class="tablewrap">
-      <table class="num">
-        <thead><tr><th class="l">Race</th><th class="l">Driver</th><th class="l">Why it stands out</th><th>Tier coming in</th><th>Practice rank</th><th>Started</th><th>Finished</th><th>Laps led</th></tr></thead>
-        <tbody id="mismatch-body"></tbody>
-      </table>
-    </div>
   </section>
 
   <section>
@@ -417,73 +405,13 @@ $('#read').innerHTML = tiles.map(t => `<div class="tile num" style="--accent:${t
     <div class="fact"><span class="big num">${real('spd_fin')}</span>how much of ${TRK}'s own tilt on this (track vs a normal oval) is real rather than one race swinging it.</div>`;
 })();
 
-// ---- 03 what moves a driver within its tier: starting spot, practice, DNF detail
+// ---- 03 what moves a driver within its tier: starting spot, DNF detail
 (function () {
   const coef = S.start_coef.track;
-  $('#mod-lede').innerHTML = `Tier sets the baseline. Starting spot barely adds to it once tier is known &mdash; ${coef <= 0.02 ? `starting further forward has not helped a ${V1} finish better at ${TRK} beyond what its speed already explains` : `starting further forward still helps a little at ${TRK}, on top of speed`}. What actually shifts a ${V1} within its tier is how it tends to fail, and what practice shows &mdash; below.`;
+  $('#mod-lede').innerHTML = `Tier sets the baseline. Starting spot barely adds to it once tier is known &mdash; ${coef <= 0.02 ? `starting further forward has not helped a ${V1} finish better at ${TRK} beyond what its speed already explains` : `starting further forward still helps a little at ${TRK}, on top of speed`}. What actually shifts a ${V1} within its tier is how it tends to fail.`;
   const TL2 = TL;
   $('#dnf-body').innerHTML = [1, 2, 3, 4, 5].map(t => { const tt = tier('track', t), oo = tier('oval', t);
     return `<tr><td class="l">${TL2[t - 1]}</td><td>${pct(tt.rate_dnf)} <span class="muted small">(${pct(oo.rate_dnf)})</span></td><td>${pct(tt.rate_crash)} <span class="muted small">(${pct(oo.rate_crash)})</span></td><td>${pct(tt.rate_mech)} <span class="muted small">(${pct(oo.rate_mech)})</span></td><td>${pct(tt.rate_lead_lap)} <span class="muted small">(${pct(oo.rate_lead_lap)})</span></td></tr>`; }).join('');
-  // driver-level: who was fastest in practice (long-run pace, and separately single-lap
-  // speed), and what did they actually do in the race. Goal of this section: decide how
-  // much practice should move the sheet, not just describe it.
-  const pd = D.practice_detail || [];
-  if (!pd.length) {
-    $('#prac-lede').innerHTML = `No practice session at ${TRK} has been archived in a form we can read, so there is nothing to say about practice here yet.`;
-    $('#prac-facts').innerHTML = ''; $('#prac-races').innerHTML = '';
-  } else {
-    const byRace = {};
-    pd.forEach(r => { (byRace[r.race_id] = byRace[r.race_id] || []).push(r); });
-    const races = Object.values(byRace).map(rows => {
-      // long-run pace (Lap Raptor) ranks first when archived; single-lap (NASCAR feed) is the fallback
-      rows.forEach(r => r._rank = r.prac_rank ?? r.feed_prac_rank);
-      rows.sort((a, b) => (a._rank ?? 999) - (b._rank ?? 999));
-      const p1 = rows.find(r => r._rank === Math.min(...rows.map(r => r._rank ?? 999)));
-      const dom = rows.reduce((a, r) => (r.lead_laps || 0) > (a ? a.lead_laps : -1) ? r : a, null);
-      const src = rows.some(r => r.prac_rank != null) ? 'long-run pace' : 'single lap only';
-      return { race_id: rows[0].race_id, date: rows[0].date, rows, p1, dom, src };
-    }).sort((a, b) => a.date.localeCompare(b.date));
-    const p1Led = races.filter(r => r.p1 && r.p1.lead_laps > 0).length;
-    const domRanks = races.filter(r => r.dom && r.dom.lead_laps > 0 && r.dom._rank != null).map(r => r.dom._rank);
-    const avgDomRank = domRanks.length ? (domRanks.reduce((a, b) => a + b, 0) / domRanks.length) : null;
-    const wp = D.sheet.w_p;
-    $('#prac-lede').innerHTML = `Archived for <b class="hl">${races.length} of the ${nS}</b> ${TRK} races &mdash; ranked by long-run pace (tyre age and session timing adjusted) where Lap Raptor has it, by single fastest lap from the NASCAR feed otherwise; each table below says which. Being fastest in practice is not the same as being the race's dominator, and this sample is too small to set a track-specific practice weight from &mdash; it is here to judge whether practice is worth watching at all, not to score it precisely.`;
-    $('#prac-facts').innerHTML = `
-      <div class="fact"><span class="big num">${p1Led} of ${races.length}</span>races where the single fastest ${V1} in practice went on to lead a lap. Practice pace alone does not reliably call the dominator.</div>
-      <div class="fact"><span class="big num">${avgDomRank != null ? f1(avgDomRank) : '–'}</span>average practice rank of the ${V1} that actually led the most laps (1 = fastest in practice). The dominator usually comes from the practice top handful, just rarely the very fastest &mdash; so practice is worth a look at the top 5-ish, not a single pick.</div>
-      <div class="fact"><span class="big num">${pct(wp.generic)} sheet weight</span>is what practice gets today, the same everywhere (generic, not ${TRK}-specific). ${wp.note || ''}</div>`;
-    $('#prac-races').innerHTML = races.map(r => {
-      const rows = r.rows.slice(0, 6);
-      const body = rows.map(row => {
-        const dominated = (row.lead_laps || 0) > 0;
-        return `<tr${dominated ? ' style="background:rgba(255,229,0,.08)"' : ''}><td class="l${dominated ? ' hlc' : ''}">${esc(row.driver)}</td><td>${row.prac_rank ?? '–'}</td><td>${row.feed_prac_rank ?? '–'}</td><td>${row.start}</td><td>${ord(row.finish)}</td><td>${row.lead_laps || 0}</td><td>${row.fast_laps || 0}</td></tr>`;
-      }).join('');
-      return `<h4 style="margin:14px 0 6px;font-size:13px;color:var(--t2);font-weight:600">${lab(r)} <span class="muted">(ranked by ${r.src})</span> &middot; fastest in practice: ${esc(r.p1 ? r.p1.driver : '–')}${r.dom && r.dom.lead_laps > 0 ? `, led most laps: ${esc(r.dom.driver)} (${r.dom.lead_laps})` : ', no one in this group led a lap'}</h4>
-        <div class="tablewrap"><table class="num"><thead><tr><th class="l">Driver</th><th>Long-run rank</th><th>Single-lap rank</th><th>Started</th><th>Finished</th><th>Laps led</th><th>Fastest laps</th></tr></thead><tbody>${body}</tbody></table></div>`;
-    }).join('');
-
-    // ---- the mismatches: full field, not just the practice top 6 -- who practice
-    // would have led us to expect one thing, and the race gave another
-    const tierOf = arp => arp == null ? null : arp <= 11 ? 1 : arp <= 15 ? 2 : arp <= 19 ? 3 : arp <= 24 ? 4 : 5;
-    const mismatches = [];
-    races.forEach(r => {
-      const n = r.rows.length;
-      r.rows.forEach(row => {
-        const t = tierOf(row.pre_arp);
-        const reasons = [];
-        if (row._rank != null && row._rank <= 5 && row.finish >= 18) reasons.push('Fast in practice, faded in the race');
-        if (row._rank != null && row._rank > n - 10 && ((row.lead_laps || 0) >= 5 || row.finish <= 3)) reasons.push('Barely showed up in practice, starred in the race');
-        if (t != null && t <= 2 && row._rank != null && row._rank > n * 0.6) reasons.push('Strong coming in, practiced poorly');
-        reasons.forEach(reason => mismatches.push({ date: r.date, label: lab(r), row, reason, t }));
-      });
-    });
-    $('#mismatch-lede').innerHTML = mismatches.length ? `Looking at every driver with a practice reading, not just the fastest few &mdash; three patterns worth knowing before trusting a practice number on the sheet.` :
-      `No clear mismatches in this sample &mdash; practice and the race lined up about as well as expected.`;
-    $('#mismatch-body').innerHTML = mismatches.sort((a, b) => a.date.localeCompare(b.date)).map(m => {
-      const row = m.row;
-      return `<tr><td class="l">${m.label}</td><td class="l hlc">${esc(row.driver)}</td><td class="l">${m.reason}</td><td>${m.t ?? '–'}</td><td>${row._rank ?? '–'}</td><td>${row.start}</td><td>${ord(row.finish)}</td><td>${row.lead_laps || 0}</td></tr>`;
-    }).join('');
-  }
 })();
 
 // ---- 03 races
@@ -506,5 +434,5 @@ $('#read').innerHTML = tiles.map(t => `<div class="tile num" style="--accent:${t
   $('#excl-body').innerHTML = Object.entries(groups).map(([k, es]) => `<tr><td class="l wrap">${es.map(e => `<span class="tag out" style="margin:0 4px 4px 0">${e.season} ${esc(short(e.track))}</span>`).join('')}</td><td class="l wrap">${k}</td></tr>`).join('');
 })();
 
-$('#foot').innerHTML = `<span>Golden Ticket Sims · ${esc(M.series)} · ${esc(M.race_name)} · profile locked ${esc(M.locked)} · results through ${esc(M.last_result)}</span><span>Sources: NASCAR official results and lap-by-lap timing; Lap Raptor practice sessions; NASCAR weekend practice results. Scores out of 100 are rank correlations: 100 means two orders match exactly, 0 means no link.</span>`;
+$('#foot').innerHTML = `<span>Golden Ticket Sims · ${esc(M.series)} · ${esc(M.race_name)} · profile locked ${esc(M.locked)} · results through ${esc(M.last_result)}</span><span>Sources: NASCAR official results and lap-by-lap timing. Scores out of 100 are rank correlations: 100 means two orders match exactly, 0 means no link.</span>`;
 </script>
