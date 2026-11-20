@@ -156,7 +156,7 @@ function fights(){
   var fh="",nxt=-1;M0().fights.forEach(function(f){if(nxt<0&&f.status==="pre")nxt=f.k});
   M0().fights.forEach(function(f){var done=f.status==="locked",ml=function(o){return o>0?"+"+o:o},
     tg=f.status==="live"?"Live":f.status==="settling"?"Final, scoring":done?"Final":f.k===nxt?"Next":"Upcoming",cl=done?"done":(f.status==="live"||f.k===nxt)?"next":"";
-    var sub=done?winnerName(f)+" "+Math.max(f.pts_a,f.pts_b).toFixed(1)+" / "+Math.min(f.pts_a,f.pts_b).toFixed(1)+" DK pts":f.status==="settling"?winnerName(f)+" by "+(f.method||"")+" &middot; exact stats pending":"Pre-lock odds "+ml(f.odds_a)+" / "+ml(f.odds_b);
+    var sub=done?winnerName(f)+" "+Math.max(f.pts_a,f.pts_b).toFixed(1)+" / "+Math.min(f.pts_a,f.pts_b).toFixed(1)+" DK pts":f.status==="settling"?winnerName(f)+" by "+(f.method||"")+" &middot; exact stats pending":(f.now_a!=null?"Odds moved to "+ml(f.now_a)+" / "+ml(f.now_b)+" (was "+ml(f.odds_a)+" / "+ml(f.odds_b)+")":"Pre-lock odds "+ml(f.odds_a)+" / "+ml(f.odds_b));
     fh+="<button class='fight' data-k='"+f.k+"' aria-pressed='"+(gsel===f.k)+"'"+(done?" disabled":"")+"><b>"+f.a+" vs "+f.b+"</b><span class='tag "+cl+"'>"+tg+"</span><span class='odds'>"+sub+"</span></button>"});
   el("fights").innerHTML=fh;
   Array.prototype.forEach.call(el("fights").querySelectorAll("button"),function(b){b.onclick=function(){gsel=+b.dataset.k;draw()}});
