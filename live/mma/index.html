@@ -6,7 +6,7 @@
 :root{--bg:#121212;--panel:#1e1e1e;--fg:#fff;--mute:#999;--line:#404040;--accent:#FFE500;--good:#4caf50;--warn:#ff9800;--bad:#f44336;--chip:#2d2d2d;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 Inter,system-ui,Arial,sans-serif;padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1180px;margin:0 auto}
+.wrap{max-width:1400px;margin:0 auto}
 header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:14px 0 12px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}.brand img{height:44px;width:auto;border-radius:6px}
 h1{font:700 22px/1.1 Inter,sans-serif;margin:0;color:var(--accent)}.sub{color:var(--mute);font-size:13px;margin-top:4px}
@@ -17,7 +17,7 @@ select{font:inherit;background:var(--panel);color:var(--fg);border:1px solid var
 button{font:inherit;font-weight:600;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer}
 button:disabled{opacity:.4;cursor:default}
 .vbtn[aria-pressed=true]{background:var(--accent);color:#000;border-color:var(--accent)}
-#pick[hidden]{display:none!important}
+#pick[hidden],#fpick[hidden]{display:none!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .stepper{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
 .stepper .row1{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
@@ -28,7 +28,7 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:12px 0 0}
 .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
 .tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
 .tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px}
-.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:18px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
 section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0;box-shadow:0 4px 8px rgba(0,0,0,.4)}
 section+section{margin-top:16px}
@@ -49,6 +49,30 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
 .root{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.side{border:1px solid var(--line);border-radius:6px;padding:10px}
 .side h3{margin:0 0 6px;font-size:14px}.big{font-weight:700;font-size:20px}.row{display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-variant-numeric:tabular-nums}
 .note{color:var(--mute);font-size:12px;margin-top:8px}
+.chip{padding:3px 10px;font-size:12px;border-radius:999px;margin:2px}.deadrow td{opacity:.55}
+/*visual2*/
+.tiles{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.tile{padding:12px 14px}.tile .v{font-size:22px;line-height:1.15}
+table{font-size:13.5px}
+th{position:sticky;top:0;background:var(--panel);z-index:1;padding:9px 10px;font-size:10.5px}
+td{padding:10px 10px;vertical-align:middle}
+tbody tr:nth-child(even) td,table tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+tr.sel td{background:rgba(255,229,0,.12)!important}
+td.lu{min-width:260px;white-space:normal}
+.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-start}
+.fc{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;line-height:1.35;background:#2a2a2a;border:1px solid #444;color:#ddd;white-space:nowrap}
+.fc.w{border-color:#3f8f43;color:#a5e6a8;background:rgba(76,175,80,.12)}
+.fc.l{border-color:#7a2c28;color:#d98b86;background:rgba(244,67,54,.10);text-decoration:line-through;text-decoration-color:rgba(244,67,54,.6)}
+.fc.live{border-color:#FFE500;color:#FFE500;background:rgba(255,229,0,.10)}
+.fc.c{box-shadow:inset 0 0 0 1px #FFE500}.fc.c::before{content:"C ";color:#FFE500;font-weight:700}
+.fight{padding:9px 11px;margin-bottom:6px}.fight b{font-size:13.5px}.odds{font-size:11.5px}
+section{padding:16px}h2{margin-bottom:14px}
+select,input{font-size:13.5px}
+#ftable td:nth-child(2),#ftable th:nth-child(2),#xtable td:nth-child(2),#xtable th:nth-child(2),#aheadtable td:nth-child(2),#aheadtable th:nth-child(2),#witable td:nth-child(2),#witable th:nth-child(2){text-align:left}
+#ftable td:nth-child(1),#xtable td:nth-child(1),#aheadtable td:nth-child(1){color:var(--mute);font-variant-numeric:tabular-nums}
+#lineups td.lu{min-width:170px;font-size:11.5px}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr)}}
+.rs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:8px}.rs-grid div{background:#262626;border:1px solid var(--line);border-radius:8px;padding:7px 10px}.rs-grid span{display:block;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}.rs-grid b{font-size:16px;font-variant-numeric:tabular-nums}
 </style>
 <div class="wrap">
  <header>
@@ -56,8 +80,9 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
   <span class="pill">Pre-lock odds · updates after every fight</span>
  </header>
  <div class="bar">
-  <div role="group" aria-label="View" style="display:flex;gap:6px"><button class="vbtn" data-v="all" aria-pressed="true">All contests</button><button class="vbtn" data-v="one" aria-pressed="false">One contest</button></div>
+  <div role="group" aria-label="View" style="display:flex;gap:6px"><button class="vbtn" data-v="field" aria-pressed="true">Browse a contest</button><button class="vbtn" data-v="all" aria-pressed="false">My contests</button><button class="vbtn" data-v="one" aria-pressed="false">My entries in one contest</button><button class="vbtn" data-v="tbl" aria-pressed="false">Standings</button><button class="vbtn" data-v="expo" aria-pressed="false">Exposure</button><button class="vbtn" data-v="combo" aria-pressed="false">Combos</button><button class="vbtn" data-v="dupe" aria-pressed="false">Dupes</button></div>
   <div><label for="user">DK username</label><input id="user" list="ulist" autocomplete="off" style="font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:220px"><datalist id="ulist"></datalist></div>
+  <div id="fpick" hidden style="display:flex;gap:10px;flex-wrap:wrap"><div><label for="fcontest">Contest</label><select id="fcontest"></select></div><div><label for="fsort">Rank by</label><select id="fsort"><option value="ev">Expected payout</option><option value="score">Current score</option></select></div></div>
   <div id="pick" hidden style="display:flex;gap:10px;flex-wrap:wrap"><div><label for="contest">Contest</label><select id="contest"></select></div><div><label for="entry">Chart entry</label><select id="entry"></select></div></div>
  </div>
  <div id="status" class="note" style="margin:0 0 8px;min-height:1em"></div>
@@ -69,14 +94,19 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
  <div class="tiles" id="tiles"></div>
  <div class="grid">
   <div>
-   <div id="v-all"><section><h2>Every contest</h2><div class="tw"><table id="ctable"></table></div>
+   <div id="v-field" hidden><section><h2>Contest leaders</h2><div class="tw" style="max-height:70vh;overflow-y:auto"><table id="ftable"></table></div><p class="note" id="fnote"></p></section>
+    <section><h2>Field ownership</h2><div class="tw"><table id="otable"></table></div></section></div>
+   <div id="v-extra" hidden><section><h2 id="xtitle">Exposure</h2><p class="note" id="xwho" style="margin:0 0 8px"></p><div id="xextra"></div><div class="tw" style="max-height:70vh;overflow-y:auto"><table id="xtable"></table></div><p class="note" id="xnote"></p></section></div>
+   <div id="v-all"><section><h2>Every contest</h2><div id="prange" style="margin-bottom:12px"></div><div class="tw"><table id="ctable"></table></div>
     <p class="note">Click a contest to open all of its entries. Totals above add every contest at the step you are viewing.</p></section></div>
    <div id="v-one" hidden>
-    <section><h2 id="ltitle">Entries</h2><div class="tw" style="max-height:420px;overflow-y:auto"><table id="lineups"></table></div>
+    <section><h2 id="ltitle">Entries</h2><div id="crange" style="margin-bottom:12px"></div><div class="tw" style="max-height:70vh;overflow-y:auto"><table id="lineups"></table></div>
      <p class="note">Every entry in this contest, best expected payout first. Click one to chart it.</p></section>
     <section><h2 id="ctitle">Selected entry over the card</h2>
      <svg id="chart" viewBox="0 0 640 250" role="img" aria-label="Chance by fights finished" style="width:100%;height:auto"></svg>
      <p class="note"><span style="color:var(--accent)">&#9632;</span> Win chance (left axis) &nbsp; <span style="color:#4da3ff">&#9632;</span> Cash chance (right axis).</p></section>
+    <section id="pathsec" hidden><h2 id="pathtitle">Win paths</h2><div class="tw"><table id="pathtable"></table></div><p class="note" id="pathnote"></p></section>
+    <section id="aheadsec" hidden><h2 id="aheadtitle">Who's ahead</h2><div class="tw"><table id="aheadtable"></table></div><p class="note" id="aheadnote"></p></section>
    </div>
    <section><h2>Expected payout over the card</h2>
     <svg id="pchart" viewBox="0 0 640 220" role="img" aria-label="Expected payout" style="width:100%;height:auto"></svg></section>
@@ -84,17 +114,32 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
   <div>
    <section><h2>Fight board</h2><div id="fights"></div></section>
    <section><h2>Rooting guide</h2><div id="guide"></div></section>
+   <section id="wi" hidden><h2>What it takes</h2><div id="wihead"></div><div class="tw" style="max-height:50vh;overflow-y:auto"><table id="witable"></table></div><p class="note" id="winote"></p></section>
   </div>
  </div>
 </div>
 <script>
-var CONTESTS=[], DEFAULT_USER="", FEATURED=[], REFRESH_MS=60000, last_upd="";
+var fcid=null,fsort="ev",CONTESTS=[], DEFAULT_USER="", FEATURED=[], REFRESH_MS=60000, last_upd="";
 var BASE=(location.protocol==="file:")?"data/":"https://astukas12.github.io/gts-reviews/live-data/mma/live/";
 var cache={}, UX={}, MM={}, usr=null, PU=[], cur=0, k=0, sel=0, gsel=null, view="all", NFIGHTS=13;
 function el(i){return document.getElementById(i)}
 function $(n){return Math.round(n).toLocaleString()}
 function money(v){return (v<0?"-$":"$")+Math.abs(Math.round(v)).toLocaleString()}
-function getj(p,fresh){if(!fresh&&cache[p])return Promise.resolve(cache[p]);return fetch(BASE+p+(fresh?"?t="+Date.now():"")).then(function(r){if(!r.ok)throw new Error(p);return r.json()}).then(function(j){cache[p]=j;return j})}
+function getj(p,fresh,v){var key=p+(v||"");if(!fresh&&cache[key])return Promise.resolve(cache[key]);return fetch(BASE+p+(fresh?"?t="+Date.now():(v?"?v="+encodeURIComponent(v):""))).then(function(r){if(!r.ok)throw new Error(p);return r.json()}).then(function(j){cache[key]=j;return j})}
+function S_(e,k){for(var i=k;i>=0;i--)if(e.s[i])return e.s[i];return [0,0,0,0,0]}
+function EV_(u,k){for(var i=k;i>=0;i--)if(u.ev[i]!=null)return u.ev[i];return 0}
+var PF=null;
+function rangeHtml(title,q,fees){ // q = [p5,p25,p50,p75,p95, chance of profit %, average profit] of NET profit
+  var avg=q[6],lo=Math.min(q[0],0,avg==null?0:avg),hi=Math.max(q[4],0,avg==null?0:avg),pad=(hi-lo)*.04||1;lo-=pad;hi+=pad;var W=640,X=function(v){return 14+(v-lo)/(hi-lo)*(W-28)},cl=function(v){return v<0?"var(--bad)":"var(--good)"};
+  var o="<svg viewBox='0 0 640 64' style='width:100%;height:auto;display:block'>"
+   +"<rect x='"+X(q[0])+"' y='27' width='"+Math.max(2,X(q[4])-X(q[0]))+"' height='10' rx='5' fill='#4a4a4a'/>"
+   +"<rect x='"+X(q[1])+"' y='19' width='"+Math.max(3,X(q[3])-X(q[1]))+"' height='26' rx='6' fill='#FFE500' fill-opacity='.9'/>"
+   +"<line x1='"+X(q[2])+"' x2='"+X(q[2])+"' y1='15' y2='49' stroke='#000' stroke-width='3'/>"
+   +"<line x1='"+X(0)+"' x2='"+X(0)+"' y1='8' y2='58' stroke='#fff' stroke-dasharray='3 3'/><text x='"+X(0)+"' y='7' text-anchor='middle' font-size='10' fill='#bbb'>break even</text>"
+   +(avg!=null?"<polygon points='"+X(avg)+",23 "+(X(avg)+6)+",32 "+X(avg)+",41 "+(X(avg)-6)+",32' fill='#4da3ff' stroke='#fff' stroke-width='1.5'/>":"")+"</svg>";
+  var st=[["Worst case (5%)",q[0],1],["25%",q[1],1],["Median",q[2],1],avg!=null?["Average",avg,2]:null,["75%",q[3],1],["Best case (95%)",q[4],1]].filter(Boolean).map(function(x){return "<div><span>"+x[0]+"</span><b style='color:"+(x[2]===2?"#4da3ff":cl(x[1]))+"'>"+money(x[1])+"</b></div>"}).join("");
+  return "<h3 style='margin:0 0 6px;font-size:14px'>"+title+"</h3>"+o+"<div class='rs-grid'>"+st+"<div><span>Chance of profit</span><b>"+q[5].toFixed(0)+"%</b></div></div>"
+   +"<p class='note' style='margin:6px 0 0'>Profit after fees. Dark bar: the middle 90% of outcomes. Yellow: the middle 50%. Black line: median. Blue diamond: the average (expected) profit, the same number as the table; it can sit above the median because a few big payouts pull the average up.</p>"}
 function have(s){return PU.length&&PU[cur].UD.e[0].s[s]!=null}
 function curStep(){return MM[PU[cur].c.id].current_step}
 function status(t){el("status").textContent=t}
@@ -113,19 +158,25 @@ function init(){
   el("entry").onchange=function(){sel=+this.value;draw()};
   el("contest").onchange=function(){cur=+this.value;sel=bestEntry();setupEntries();draw()};
   Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.onclick=function(){view=b.dataset.v;draw()}});
-  getj("contests.json",true).then(function(c){CONTESTS=c.contests||[];FEATURED=c.featured||[];DEFAULT_USER=c.default_user||(FEATURED[0]||"");el("ulist").innerHTML=FEATURED.map(function(u){return "<option value='"+u+"'>"}).join("");if(!CONTESTS.length){status("No contests loaded yet. They appear here at lock.");return}if(DEFAULT_USER)loadUser(DEFAULT_USER);else status("Type a DK username above.")}).catch(function(){status("No live contests are loaded yet. This page fills in at lock.")});
+  el("fcontest").onchange=function(){fcid=this.value;draw()};el("fsort").onchange=function(){fsort=this.value;draw()};
+  getj("contests.json",true).then(function(c){CONTESTS=c.contests||[];FEATURED=c.featured||[];DEFAULT_USER=c.default_user||"";fcid=CONTESTS.length?CONTESTS[0].id:null;
+    el("ulist").innerHTML=FEATURED.map(function(u){return "<option value='"+u+"'>"}).join("");
+    el("fcontest").innerHTML=CONTESTS.map(function(x){return "<option value='"+x.id+"'>"+cname(x)+" ("+x.entries.toLocaleString()+" entries)</option>"}).join("");
+    if(!CONTESTS.length){status("No contests loaded yet. They appear here at lock.");return}
+    return getj(CONTESTS[0].id+"/meta.json",true).then(function(m){MM[CONTESTS[0].id]=m;last_upd=m.updated_at;NFIGHTS=m.fights.length;
+      if(DEFAULT_USER)loadUser(DEFAULT_USER);else{view="field";draw()}})}).catch(function(){status("No live contests are loaded yet. This page fills in at lock.")});
   setInterval(refresh,REFRESH_MS);
 }
-function refresh(){if(!CONTESTS.length||!usr)return;getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;var wasCur=(k>=curStep());cache={};loadUser(usr,true,wasCur)}).catch(function(){})}
+function refresh(){if(!CONTESTS.length)return;if(!usr){getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;last_upd=m.updated_at;MM[CONTESTS[0].id]=m;delete cache[fcid+"/top.json"];delete cache[fcid+"/meta.json"];if(view==="field")draw()}).catch(function(){});return}getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;var wasCur=(k>=curStep());cache={};loadUser(usr,true,wasCur)}).catch(function(){})}
 function loadUser(name,quiet,keepFollow){
-  if(!name)return;if(!quiet)status("Looking up "+name+" in every contest...");
-  Promise.all(CONTESTS.map(function(c){return Promise.all([getj(c.id+"/meta.json",quiet),getj(c.id+"/users.json",quiet)]).then(function(r){MM[c.id]=r[0];UX[c.id]=r[1]})})).then(function(){
+  if(!name)return;if(!quiet&&view==="field")view="all";if(!quiet)status("Looking up "+name+" in every contest...");
+  Promise.all(CONTESTS.map(function(c){return getj(c.id+"/meta.json",true).then(function(m){MM[c.id]=m;return getj(c.id+"/users.json",false,m.updated_at)}).then(function(u){UX[c.id]=u})})).then(function(){
     var hits=[];CONTESTS.forEach(function(c){var row=UX[c.id].filter(function(r){return r[0].toLowerCase()===name.toLowerCase()})[0];if(row)hits.push({c:c,row:row})});
     if(!hits.length){status("No user named "+name+" in the contests loaded here.");return}
     status("Loading "+hits[0].row[0]+" ("+hits.length+" contests)...");
-    return Promise.all(hits.map(function(h){return getj(h.c.id+"/s"+h.row[1]+".json",quiet).then(function(sh){h.UD=sh[h.row[0]];h.user=h.row[0];return h})})).then(function(list){
-      list.sort(function(a,b){return b.UD.fees-a.UD.fees});
-      var prevSel=sel,prevPick=PU.length?PU[cur].c.id:null;PU=list;usr=list[0].user;NFIGHTS=M0().fights.length;last_upd=M0().updated_at;
+    return Promise.all(hits.map(function(h){return getj(h.c.id+"/s"+h.row[1]+".json",false,MM[h.c.id].updated_at).then(function(sh){h.UD=sh[h.row[0]];h.user=h.row[0];return h})})).then(function(list){
+      list=list.filter(function(h){return h.UD});if(!list.length){status("Still loading "+name+"'s contests; try again in a moment.");return}list.sort(function(a,b){return b.UD.fees-a.UD.fees});
+      var prevSel=sel,prevPick=PU.length?PU[cur].c.id:null;PU=list;usr=list[0].user;getj("portfolio.json",true).then(function(p){PF=p;if(view==="all")draw()}).catch(function(){PF=null});NFIGHTS=M0().fights.length;last_upd=M0().updated_at;
       if(quiet){cur=Math.max(0,PU.map(function(p){return p.c.id}).indexOf(prevPick));sel=Math.min(prevSel,PU[cur].UD.e.length-1)}else{cur=0;gsel=null;sel=bestEntry()}
       if(!quiet||keepFollow||k>curStep())k=curStep();
       el("user").value=usr;el("slider").max=NFIGHTS;
@@ -139,6 +190,9 @@ function UD(){return PU[cur].UD}
 function MC(){return MM[PU[cur].c.id]}
 function bestEntry(){var u=PU[cur].UD,b=0,c=curStep();u.e.forEach(function(e,i){if(e.s[c]&&e.s[c][0]>u.e[b].s[c][0])b=i});return b}
 function setupEntries(){el("entry").innerHTML=UD().e.map(function(e,i){return "<option value='"+i+"'>"+label(e)+"</option>"}).join("");el("entry").value=sel}
+function fstat(){var s={};M0().fights.forEach(function(f){if((f.status==="locked"||f.status==="settling")&&f.winner){s[f.winner]="w";s[f.winner===f.a?f.b:f.a]="l"}else if(f.status==="live"){s[f.a]="live";s[f.b]="live"}});return s}
+function chipsN(names,sd){var s=fstat();return "<div class='chips'>"+names.map(function(n,i){var p=n.split(" "),sn=p.length>1?p.slice(1).join(" "):n;return "<span class='fc "+(s[n]||"")+(sd&&i===0?" c":"")+"' title='"+n+"'>"+sn+"</span>"}).join("")+"</div>"}
+function chips(m,f,sd){return chipsN(f.map(function(i){return m.fighters[i]}),sd)}
 function lineup(e){var m=MC();return e.f.map(function(i){return m.fighters[i]})}
 function caption(){
   var m=M0(),c=curStep(),tag=(k===c?" (latest)":"");
@@ -147,10 +201,13 @@ function caption(){
   el("cap").textContent=(f?"After "+f.a+" vs "+f.b+" ("+k+" of "+NFIGHTS+" final): "+winnerName(f)+" scored "+Math.max(f.pts_a,f.pts_b).toFixed(1)+", "+(winnerName(f)===f.a?f.b:f.a)+" "+Math.min(f.pts_a,f.pts_b).toFixed(1):"After "+k+" of "+NFIGHTS+" fights final")+tag}
 function tile(k_,v,cl){return "<div class='tile'><div class='k'>"+k_+"</div><div class='v "+(cl||"")+"'>"+v+"</div></div>"}
 function draw(){
-  if(!PU.length)return;while(k>0&&!have(k))k--;el("slider").value=k;el("slider").max=NFIGHTS;el("prev").disabled=k===0;el("next").disabled=k>=curStep();caption();
+  if(view==="field"){drawField();return}
+  if(view==="tbl"){drawTbl();return}
+  if(view==="expo"||view==="combo"||view==="dupe"){drawExtra();return}
+  if(!PU.length){el("v-field").hidden=true;el("fpick").hidden=true;status("Type your DK username above to see your own contests.");return}document.querySelector(".stepper").hidden=false;el("v-field").hidden=true;el("v-extra").hidden=true;el("fpick").hidden=true;while(k>0&&!have(k))k--;el("slider").value=k;el("slider").max=NFIGHTS;el("prev").disabled=k===0;el("next").disabled=k>=curStep();caption();
   Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
   el("v-all").hidden=view!=="all";el("v-one").hidden=view!=="one";el("pick").hidden=view!=="one";
-  fights();if(view==="all")drawAll();else drawOne();
+  fights();if(view==="all")drawAll();else drawOne();wiPanel();
 }
 function fights(){
   var fh="",nxt=-1;M0().fights.forEach(function(f){if(nxt<0&&f.status==="pre")nxt=f.k});
@@ -173,9 +230,9 @@ function drawAll(){
   var t=totals(k);
   el("tiles").innerHTML=tile("Contests",PU.length)+tile("Entries",$(t.ent))+tile("Entry fees",money(t.fees))+tile("Expected payout",money(t.ev))+tile("Expected profit",money(t.ev-t.fees),t.ev-t.fees<0?"bad":"good")+tile("Avg cash chance",t.cash.toFixed(1)+"%");
   var h="<tr><th>Contest</th><th>Type</th><th>Entries</th><th>Fees</th><th>Exp. payout</th><th>Exp. profit</th><th>Avg cash</th><th>Best entry win</th></tr>";
-  PU.forEach(function(p,i){var u=p.UD,ev=u.ev[k],ac=u.e.reduce(function(a,e){return a+e.s[k][2]},0)/u.e.length,bw=Math.max.apply(null,u.e.map(function(e){return e.s[k][1]}));
+  PU.forEach(function(p,i){var u=p.UD,ev=EV_(u,k),ac=u.e.reduce(function(a,e){return a+S_(e,k)[2]},0)/u.e.length,bw=Math.max.apply(null,u.e.map(function(e){return S_(e,k)[1]}));
     h+="<tr data-i='"+i+"'><td>"+cname(p.c)+"</td><td>"+(p.c.game_type==="Classic"?"Classic":"Showdown")+"</td><td>"+u.e.length+"</td><td>"+money(u.fees)+"</td><td>"+money(ev)+"</td><td class='"+(ev-u.fees<0?"bad":"good")+"'>"+money(ev-u.fees)+"</td><td>"+ac.toFixed(1)+"%</td><td>"+bw.toFixed(1)+"%</td></tr>"});
-  el("ctable").innerHTML=h;
+  el("ctable").innerHTML=h;var pf=PF&&PF[(usr||"").toLowerCase()];el("prange").innerHTML=pf?rangeHtml("Your portfolio: range of outcomes",[pf[2],pf[3],pf[4],pf[5],pf[6],pf[7],pf[1]],pf[0]):"";
   Array.prototype.forEach.call(el("ctable").querySelectorAll("tr[data-i]"),function(tr){tr.onclick=function(){cur=+tr.dataset.i;el("contest").value=cur;sel=bestEntry();setupEntries();view="one";draw()}});
   // portfolio rooting guide: sum over contests
   var by={};PU.forEach(function(p){(p.UD.g[k]||[]).forEach(function(r){var b=by[r[0]]||(by[r[0]]=[r[0],0,0,0,0,0]);var n=p.UD.e.length;b[1]+=r[2];b[2]+=r[3];b[3]+=(r[4]||0)*n;b[4]+=(r[5]||0)*n;b[5]+=n})});
@@ -184,16 +241,16 @@ function drawAll(){
   var ev=[];for(var s=0;s<=NFIGHTS;s++)ev.push(PU.every(function(p){return p.UD.ev[s]!=null})?totals(s).ev:null);pchart(ev,t.fees);
 }
 function drawOne(){
-  var u=UD(),m=MC(),e=u.e,ent=e.length,ev=u.ev[k],avgc=e.reduce(function(a,r){return a+r.s[k][2]},0)/ent,bw=Math.max.apply(null,e.map(function(r){return r.s[k][1]}));
+  var u=UD(),m=MC(),e=u.e,ent=e.length,ev=EV_(u,k),avgc=e.reduce(function(a,r){return a+S_(r,k)[2]},0)/ent,bw=Math.max.apply(null,e.map(function(r){return S_(r,k)[1]}));
   el("tiles").innerHTML=tile("Entries",ent)+tile("Entry fees",money(u.fees))+tile("Expected payout",money(ev))+tile("Expected profit",money(ev-u.fees),ev-u.fees<0?"bad":"good")+tile("Avg cash chance",avgc.toFixed(1)+"%")+tile("Best entry win chance",bw.toFixed(1)+"%");
-  el("ltitle").textContent=cname(PU[cur].c)+": all "+ent+" "+(ent===1?"entry":"entries");
-  var h="<tr><th>Entry</th><th>Score</th><th>Exp. rank</th><th>Win</th><th>Cash</th><th>Exp. payout</th><th style='text-align:left'>Lineup</th></tr>";
-  var ord=e.map(function(r,i){return i}).sort(function(a,b){return e[b].s[k][0]-e[a].s[k][0]});
-  ord.forEach(function(i){var r=e[i],s=r.s[k];h+="<tr data-i='"+i+"' class='"+(i===sel?"sel":"")+"'><td>"+label(r)+"</td><td>"+s[4].toFixed(1)+"</td><td>"+$(s[3])+"</td><td>"+s[1].toFixed(1)+"%</td><td class='"+(s[2]>=60?"good":s[2]<25?"bad":"warn")+"'>"+s[2].toFixed(1)+"%</td><td>"+money(s[0])+"</td><td class='lu'>"+lineup(r).join(", ")+"</td></tr>"});
+  var uq=u.q;el("crange").innerHTML=uq?rangeHtml("This contest: range of outcomes",uq,u.fees):"";el("ltitle").textContent=cname(PU[cur].c)+": all "+ent+" "+(ent===1?"entry":"entries");
+  var h="<tr><th>Entry</th><th>So far</th><th>Rank now</th><th>Exp. final</th><th>Exp. rank</th><th>Win</th><th>Cash</th><th>Exp. payout</th><th style='text-align:left'>Best path</th></tr>";
+  var ord=e.map(function(r,i){return i}).sort(function(a,b){return S_(e[b],k)[0]-S_(e[a],k)[0]});
+  ord.forEach(function(i){var r=e[i],s=S_(r,k);h+="<tr data-i='"+i+"' class='"+(i===sel?"sel":"")+"'><td style='text-align:left;min-width:230px'><b>"+label(r)+"</b>"+chips(m,r.f,m.slots.indexOf("CPT")>=0)+"</td><td>"+(r.ps==null?"":r.ps.toFixed(1))+"</td><td>"+(r.rn==null?"":$(r.rn))+"</td><td>"+s[4].toFixed(1)+"</td><td>"+$(s[3])+"</td><td>"+s[1].toFixed(1)+"%</td><td class='"+(s[2]>=60?"good":s[2]<25?"bad":"warn")+"'>"+s[2].toFixed(1)+"%</td><td>"+money(s[0])+"</td><td class='lu'>"+pathShort(r,m)+"</td></tr>"});
   el("lineups").innerHTML=h;
   Array.prototype.forEach.call(el("lineups").querySelectorAll("tr[data-i]"),function(tr){tr.onclick=function(){sel=+tr.dataset.i;el("entry").value=sel;draw()}});
   el("guide").innerHTML=guideHtml(u.g[k]||[],"this contest");
-  entryChart(e[sel]);pchart(u.ev,u.fees);
+  entryChart(e[sel]);pchart(u.ev,u.fees);pathPanel(e[sel],m);aheadPanel(e[sel],m);
 }
 function entryChart(e){
   var n=NFIGHTS+1,W=640,H=250,L0=48,R=48,T=10,B=28;
@@ -216,6 +273,165 @@ function pchart(ev,fe){
   q+="<line x1='"+X(k)+"' x2='"+X(k)+"' y1='"+T+"' y2='"+(H-B)+"' stroke='#fff' stroke-dasharray='3 3'/><polyline fill='none' stroke='#FFE500' stroke-width='2.5' points='"+ev.map(function(v,i){return v==null?null:X(i)+","+YE(v)}).filter(Boolean).join(" ")+"'/>";
   ev.forEach(function(v,i){if(v==null)return;q+="<circle cx='"+X(i)+"' cy='"+YE(v)+"' r='"+(i===k?5:3)+"' fill='#FFE500'/>"});
   el("pchart").innerHTML=q;
+}
+
+function drawField(){
+  document.querySelector(".stepper").hidden=true;el("v-all").hidden=true;el("v-one").hidden=true;el("pick").hidden=true;el("v-field").hidden=false;el("v-extra").hidden=true;el("fpick").hidden=false;
+  Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
+  if(!CONTESTS.length||!M0())return;el("fcontest").value=fcid;
+  var c=CONTESTS.filter(function(x){return x.id===fcid})[0]||CONTESTS[0];
+  Promise.all([getj(c.id+"/meta.json"),getj(c.id+"/top.json",true)]).then(function(r){var m=r[0],t=r[1];MM[c.id]=m;
+    el("tiles").innerHTML=tile("Contest",cname(c).slice(0,22))+tile("Entries",$(c.entries))+tile("Prize pool",money(m.contest.prize_pool))+tile("Paying",$(m.cash_line)+" places")+tile("Fights final",m.fights.filter(function(f){return f.status==="locked"}).length+" of "+m.fights.length);
+    var rows=(fsort==="score"?t.by_score:t.by_ev)||[];
+    var h="<tr><th>#</th><th>User</th><th>Score</th><th>Exp. rank</th><th>Win</th><th>Cash</th><th>Exp. payout</th><th style='text-align:left'>Lineup</th></tr>";
+    rows.forEach(function(x,i){h+="<tr data-u='"+x.u+"'><td>"+(i+1)+"</td><td>"+x.u+(x.of>1?" ("+x.n+"/"+x.of+")":"")+"</td><td>"+x.sc.toFixed(1)+"</td><td>"+$(x.rk)+"</td><td>"+x.w.toFixed(1)+"%</td><td class='"+(x.c>=60?"good":x.c<25?"bad":"warn")+"'>"+x.c.toFixed(1)+"%</td><td>"+money(x.ev)+"</td><td class='lu'>"+chips(m,x.f,m.slots.indexOf("CPT")>=0)+"</td></tr>"});
+    el("ftable").innerHTML=h;
+    Array.prototype.forEach.call(el("ftable").querySelectorAll("tr[data-u]"),function(tr){tr.onclick=function(){view="all";el("user").value=tr.dataset.u;loadUser(tr.dataset.u)}});
+    var oh="<tr><th style='text-align:left'>Fighter</th><th>Field ownership</th></tr>";
+    Object.keys(t.own).sort(function(a,b){return t.own[b]-t.own[a]}).forEach(function(n){oh+="<tr><td>"+n+"</td><td>"+t.own[n].toFixed(1)+"%</td></tr>"});el("otable").innerHTML=oh;
+    el("fnote").textContent="Top "+rows.length+" of "+$(c.entries)+" entries"+(fsort==="score"?" by current score":" by expected payout")+". Click a user to see all of their entries. Updated "+new Date(m.updated_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})+".";
+    wiPanel();fights();el("guide").innerHTML="<p class='note'>Type your DK username above for your own rooting guide: what each fighter winning does to your portfolio.</p>";
+  }).catch(function(){status("Could not load that contest yet.")});
+}
+
+// ---- what it takes (last fight): thresholds from whatif.json, bilinear on the (pts_a, pts_b) grid ----
+var WIC={}, wiScen=0, wiCustom=false, wiA=100, wiB=40;
+function wiLoad(cid){return getj(cid+"/whatif.json",true).then(function(w){WIC[cid]=w;return w}).catch(function(){WIC[cid]=null;return null})}
+function wiAt(W,ri,sa,sb){var g=W.grid,st=g[1]-g[0],n=g.length;sa=Math.max(0,Math.min(g[n-1],sa));sb=Math.max(0,Math.min(g[n-1],sb));
+  var ia=Math.min(n-2,Math.floor(sa/st)),ib=Math.min(n-2,Math.floor(sb/st)),fa=(sa-g[ia])/st,fb=(sb-g[ib])/st,G=W.G;
+  function v(i,j){return G[i][j][ri]}return v(ia,ib)*(1-fa)*(1-fb)+v(ia+1,ib)*fa*(1-fb)+v(ia,ib+1)*(1-fa)*fb+v(ia+1,ib+1)*fa*fb}
+function wiBucket(W,score,sa,sb){for(var r=0;r<W.ranks.length;r++){var rk=W.ranks[r];if(rk>W.cash_line)continue;if(score>=wiAt(W,r,sa,sb)-1e-9)return rk===1?"Wins":rk===W.cash_line?"Cashes":"Top "+rk}return "Out"}
+function wiCashIdx(W){var i=W.ranks.indexOf(W.cash_line);return i<0?W.ranks.length-1:i}
+// least points the scenario's winner needs (other fighter held at the scenario's points) to reach rank index ri; null = cannot, 0 = already there
+function wiNeed(W,x,ri,winnerIsA,sa,sb){for(var p=0;p<=200;p+=1){var A=winnerIsA?p:sa,B=winnerIsA?sb:p;if(x[0]+x[1]*A+x[2]*B>=wiAt(W,ri,A,B)-1e-9)return p}return null}
+function wiPanel(){
+  var sec=el("wi"),cids=view==="field"?(fcid?[fcid]:[]):(!PU.length?[]:view==="one"?[PU[cur].c.id]:PU.map(function(p){return p.c.id}));
+  if(!cids.length){sec.hidden=true;return}
+  Promise.all(cids.map(wiLoad)).then(function(ws){
+    var W0=null;ws.forEach(function(w){if(w&&!W0)W0=w});if(!W0){sec.hidden=true;return}
+    sec.hidden=false;var P=W0.presets;if(wiScen>=P.length)wiScen=0;var pr=P[wiScen];
+    var winA=pr.winner===W0.a,sa=wiCustom?wiA:pr.pa,sb=wiCustom?wiB:pr.pb;
+    var h="<div class='row'><span>Last fight</span><b>"+W0.a+" vs "+W0.b+"</b></div><div style='margin:8px 0'><label for='wiscen'>If it ends</label><select id='wiscen'>"+P.map(function(p,i){return "<option value='"+i+"'"+(!wiCustom&&i===wiScen?" selected":"")+">"+p.label+" ("+Math.round(p.p*100)+"%)</option>"}).join("")+"<option value='c'"+(wiCustom?" selected":"")+">Custom points</option></select></div>"
+      +"<div style='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px'><div><label>"+W0.a.split(" ").pop()+" DK pts</label><input id='wia' type='number' min='0' max='200' step='1' value='"+Math.round(sa)+"' style='width:90px;font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px'></div><div><label>"+W0.b.split(" ").pop()+" DK pts</label><input id='wib' type='number' min='0' max='200' step='1' value='"+Math.round(sb)+"' style='width:90px;font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px'></div></div>";
+    ws.forEach(function(W,i){if(!W)return;var c=(view==="field"?CONTESTS:PU.map(function(p){return p.c})).filter(function(x){return x.id===cids[i]})[0]||{name:cids[i]};
+      h+="<div class='row'><span>"+cname(c)+"</span><span>win &ge; <b>"+wiAt(W,0,sa,sb).toFixed(1)+"</b> &middot; top 10 &ge; "+wiAt(W,W.ranks.indexOf(10)<0?0:W.ranks.indexOf(10),sa,sb).toFixed(1)+" &middot; cash &ge; "+wiAt(W,wiCashIdx(W),sa,sb).toFixed(1)+"</span></div>"});
+    el("wihead").innerHTML=h;
+    var t="";
+    if(view==="field"){var W=WIC[fcid],pp=W&&!wiCustom?W.presets.filter(function(p){return p.label===pr.label})[0]:null;
+      t=pp?"<tr><th>#</th><th>User</th><th>Final score</th><th style='text-align:left'>Lineup</th></tr>"+pp.leaders.map(function(l,i){return "<tr data-u='"+l.u+"'><td>"+(i+1)+"</td><td>"+l.u+(l.of>1?" ("+l.n+"/"+l.of+")":"")+"</td><td>"+l.sc.toFixed(1)+"</td><td class='lu'>"+chips(MM[fcid],l.f,MM[fcid].slots.indexOf("CPT")>=0)+"</td></tr>"}).join(""):"";
+      el("winote").textContent=pp?"Who wins the contest if it ends this way: the top 5 entries. Click a user for all their entries.":"Pick a scenario to see who wins it.";}
+    else if(view==="one"){var W1=WIC[cids[0]],es=PU[cur].UD.e;
+      t="<tr><th>Entry</th><th>Final</th><th>Result</th><th>Needs to win</th><th>Needs to cash</th></tr>";
+      es.forEach(function(e,i){if(!e.x)return;var sc=e.x[0]+e.x[1]*sa+e.x[2]*sb,b=wiBucket(W1,sc,sa,sb),nw=wiNeed(W1,e.x,0,winA,sa,sb),nc=wiNeed(W1,e.x,wiCashIdx(W1),winA,sa,sb),nm=pr.winner.split(" ").pop(),f=function(n){return n===null?"not possible":n===0?"already":"&ge; "+n+" pts "+nm};
+        t+="<tr class='"+(i===sel?"sel":"")+"'><td>"+label(e)+"</td><td>"+sc.toFixed(1)+"</td><td class='"+(b==="Out"?"bad":b==="Cashes"?"warn":"good")+"'>"+b+"</td><td>"+f(nw)+"</td><td>"+f(nc)+"</td></tr>"});
+      el("winote").textContent="'Needs' = the points "+pr.winner+" must score, with the other fighter at "+Math.round(winA?sb:sa)+" pts. Entries not shown cannot be placed.";}
+    else{t="<tr><th>Contest</th><th>Wins</th><th>Top 10</th><th>Cashes</th><th>Entries</th></tr>";
+      PU.forEach(function(p,i){var W=ws[i];if(!W||!p.UD.e[0].x)return;var cw=0,c10=0,cc=0;p.UD.e.forEach(function(e){var b=wiBucket(W,e.x[0]+e.x[1]*sa+e.x[2]*sb,sa,sb);if(b==="Wins")cw++;if(b==="Wins"||/^Top (3|10)$/.test(b))c10++;if(b!=="Out")cc++});
+        t+="<tr><td>"+cname(p.c)+"</td><td>"+cw+"</td><td>"+c10+"</td><td>"+cc+"</td><td>"+p.UD.e.length+"</td></tr>"});
+      el("winote").textContent="How many of your entries land there if the last fight ends this way. Open a contest for each entry's detail.";}
+    el("witable").innerHTML=t;
+    el("wiscen").onchange=function(){if(this.value==="c"){wiCustom=true}else{wiCustom=false;wiScen=+this.value}wiPanel()};
+    el("wia").onchange=function(){wiCustom=true;wiA=+this.value;wiPanel()};el("wib").onchange=function(){wiCustom=true;wiB=+this.value;wiPanel()};
+    Array.prototype.forEach.call(el("witable").querySelectorAll("tr[data-u]"),function(tr){tr.onclick=function(){view="all";el("user").value=tr.dataset.u;loadUser(tr.dataset.u)}});
+  });
+}
+
+// ---- win paths: e.pw = [combo, win%, cash%] x 3 (best first); combo bit q set = fighter A of path_fights[q] wins ----
+function pathsOf(e,m){var out=[];if(!e.pw||!m.path_fights||!m.path_fights.length)return out;
+  for(var t=0;t<e.pw.length;t+=3){var cc=e.pw[t],names=m.path_fights.map(function(j,q){var f=m.fights[j-1];return ((cc>>q)&1?f.a:f.b).split(" ").pop()});out.push({names:names,win:e.pw[t+1],cash:e.pw[t+2]})}return out}
+function pathShort(e,m){var p=pathsOf(e,m)[0];return p?p.names.join(" &middot; ")+" &rarr; "+p.win.toFixed(1)+"% win":""}
+function pathPanel(e,m){var sec=el("pathsec"),ps=pathsOf(e,m);if(!ps.length){sec.hidden=true;return}sec.hidden=false;
+  el("pathtitle").textContent="Win paths: "+label(e);
+  el("pathtable").innerHTML="<tr><th style='text-align:left'>If these fighters win</th><th>Win</th><th>Cash</th></tr>"+ps.map(function(p){return "<tr><td style='text-align:left'>"+p.names.join(" &middot; ")+"</td><td class='"+(p.win>=1?"good":"")+"'>"+p.win.toFixed(1)+"%</td><td>"+p.cash.toFixed(0)+"%</td></tr>"}).join("");
+  el("pathnote").textContent="The next "+m.path_fights.length+" open fights ("+m.path_fights.map(function(j){var f=m.fights[j-1];return f.a.split(" ").pop()+"-"+f.b.split(" ").pop()}).join(", ")+"). Each path is the winners of those fights, re-simulated "+m.path_draws+" times; the three best for this entry."}
+
+// ---- exposure / combos / dupes (ported from the Sweat tool). One contest (fcid) at a time; "your" columns need a loaded username. ----
+var COMBO=[];
+function myEntries(cid){var p=PU.filter(function(x){return x.c.id===cid})[0];return p?p.UD.e:[]}
+function pc(v){return v==null||isNaN(v)?"":v.toFixed(1)+"%"}
+function lev(v){return v==null||isNaN(v)?"":"<span class='"+(v>0?"good":v<0?"bad":"")+"'>"+(v>0?"+":"")+v.toFixed(1)+"</span>"}
+function itemsOf(e,sd){var s={};e.f.forEach(function(f,i){if(sd)s[i===0?2*f+1:2*f]=1;else s[f]=1});return s}
+function drawExtra(){
+  document.querySelector(".stepper").hidden=true;["v-all","v-one","v-field"].forEach(function(i){el(i).hidden=true});el("pick").hidden=true;el("v-extra").hidden=false;el("fpick").hidden=false;
+  Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
+  if(!CONTESTS.length||!M0())return;el("fcontest").value=fcid;
+  Promise.all([getj(fcid+"/field.json",true),view==="combo"?getj(fcid+"/combos.json"):Promise.resolve(null)]).then(function(r){
+    var F=r[0],ue=myEntries(fcid),nU=ue.length,sd=F.sd,nm=F.fighters,E=F.E,h="",lost={};F.lost.forEach(function(n){lost[n]=1});
+    fights();el("guide").innerHTML="<p class='note'>Type your DK username above for your own rooting guide.</p>";
+    if(!usr)el("xwho").textContent="No username loaded: only field numbers show.";else el("xwho").textContent=nU?usr+": "+nU+" entries in this contest.":usr+" has no entries in this contest.";
+    if(view==="expo"){
+      var uc=nm.map(function(){return 0}),ucpt=nm.map(function(){return 0}),ua=nm.map(function(){return 0}),nUA=0;
+      ue.forEach(function(e){var dead=e.f.some(function(f){return lost[nm[f]]});if(!dead)nUA++;e.f.forEach(function(f,i){uc[f]++;if(sd&&i===0)ucpt[f]++;if(!dead)ua[f]++})});
+      var nF=E-nU,nFA=F.n_alive-nUA;
+      el("tiles").innerHTML=tile("Contest entries",$(E))+tile("Alive lineups",$(F.n_alive)+" ("+(F.n_alive/E*100).toFixed(0)+"%)")+(nU?tile("Your lineups",nU)+tile("Your alive",nUA+" of "+nU,nUA<nU?"warn":"good"):"");
+      var rows=nm.map(function(n,f){var you=nU?uc[f]/nU*100:null,fld=nF>0?(F.cnt[f]-uc[f])/nF*100:null,yA=nUA>0?ua[f]/nUA*100:null,fA=nFA>0?(F.alive_cnt[f]-ua[f])/nFA*100:null;
+        var cptY=nU&&sd?ucpt[f]/nU*100:null,cptF=sd&&nF>0?(F.cpt[f]-ucpt[f])/nF*100:null,pj=F.proj[f];
+        return {n:n,f:f,you:you,fld:fld,yA:yA,fA:fA,cptY:cptY,cptF:cptF,pj:pj,lost:!!lost[n]}}).sort(function(a,b){return (b.you||0)-(a.you||0)||(b.fld||0)-(a.fld||0)});
+      var hasPj=rows.some(function(x){return x.pj!=null});
+      h="<tr><th style='text-align:left'>Fighter</th><th>Your %</th><th>Field %</th><th>Leverage</th>"+(sd?"<th>Your CPT %</th><th>Field CPT %</th>":"")+"<th>Your alive %</th><th>Field alive %</th>"+(hasPj?"<th>Proj own</th><th>Field vs proj</th>":"")+"</tr>";
+      rows.forEach(function(x){h+="<tr class='"+(x.lost?"deadrow":"")+"'><td>"+x.n+(x.lost?" <span class='bad'>(lost)</span>":"")+"</td><td>"+pc(x.you)+"</td><td>"+pc(x.fld)+"</td><td>"+lev(x.you!=null&&x.fld!=null?x.you-x.fld:null)+"</td>"+(sd?"<td>"+pc(x.cptY)+"</td><td>"+pc(x.cptF)+"</td>":"")+"<td>"+(x.lost?"":pc(x.yA))+"</td><td>"+(x.lost?"":pc(x.fA))+"</td>"+(hasPj?"<td>"+pc(x.pj)+"</td><td>"+lev(x.pj!=null&&x.fld!=null?x.fld-x.pj:null)+"</td>":"")+"</tr>"});
+      el("xtitle").textContent="Exposure vs the field";el("xtable").innerHTML=h;el("xextra").innerHTML="";
+      el("xnote").textContent="Share of lineups holding each fighter: yours against everyone else's (leverage = you minus field). 'Alive' counts only lineups with no fighter who has already lost."}
+    else if(view==="combo"){
+      var C=r[1],K=C.K,dict={};C.k.forEach(function(k,i){dict[k]=C.n[i]});
+      var items=[];nm.forEach(function(n,f){if(sd){items.push({id:2*f,t:n+" (FLEX)"});items.push({id:2*f+1,t:n+" (CPT)"})}else items.push({id:f,t:n})});
+      var iname={};items.forEach(function(x){iname[x.id]=x.t});
+      var sel=COMBO.filter(function(id){return iname[id]!=null});
+      el("xtitle").textContent="Combo analysis";
+      var top="<div style='margin-bottom:8px'><label for='cbsel'>Add a "+(sd?"fighter and slot":"fighter")+" (up to 4)</label><select id='cbsel'><option value=''>Choose...</option>"+items.map(function(x){return "<option value='"+x.id+"'>"+x.t+"</option>"}).join("")+"</select> "+sel.map(function(id){return "<button class='chip' data-r='"+id+"'>"+iname[id]+" &times;</button>"}).join(" ")+(sel.length?" <button class='chip' id='cbclr'>clear</button>":"")+"</div>";
+      var body="";
+      if(sel.length){
+        var key=sel.slice().sort(function(a,b){return a-b}).join(","),tot=sel.length<=K?(dict[key]||0):null,mine=ue.filter(function(e){var s=itemsOf(e,sd);return sel.every(function(id){return s[id]})}).length;
+        el("tiles").innerHTML=tile("Your lineups",mine)+tile("Your %",nU?pc(mine/nU*100):"")+tile("Field lineups",tot==null?"n/a":$(tot-mine))+tile("Field %",tot==null||E-nU<=0?"":pc((tot-mine)/(E-nU)*100));
+        if(sel.length+1<=K&&tot){var ih="<tr><th style='text-align:left'>Also in those lineups</th><th>Your %</th><th>Field %</th><th>Leverage</th></tr>",rowsx=[];
+          items.forEach(function(x){if(sel.indexOf(x.id)>=0)return;var k2=sel.concat([x.id]).sort(function(a,b){return a-b}).join(","),t2=dict[k2]||0;if(!t2)return;
+            var m2=ue.filter(function(e){var s=itemsOf(e,sd);return sel.every(function(id){return s[id]})&&s[x.id]}).length,fy=mine?m2/mine*100:null,ff=(tot-mine)>0?(t2-m2)/(tot-mine)*100:null;rowsx.push({t:x.t,fy:fy,ff:ff})});
+          rowsx.sort(function(a,b){return (b.ff||0)-(a.ff||0)});rowsx.slice(0,40).forEach(function(x){ih+="<tr><td>"+x.t+"</td><td>"+pc(x.fy)+"</td><td>"+pc(x.ff)+"</td><td>"+lev(x.fy!=null&&x.ff!=null?x.fy-x.ff:null)+"</td></tr>"});body=ih}
+        else if(tot==null)body="<tr><td>Combos of "+sel.length+" are not precomputed (up to "+K+").</td></tr>";else if(!tot)body="<tr><td>No lineup contains that combination.</td></tr>";
+      }else{el("tiles").innerHTML=tile("Contest entries",$(E))}
+      el("xextra").innerHTML=top;el("xtable").innerHTML=body;el("xnote").textContent="Lineups that contain every selected "+(sd?"fighter in that slot":"fighter")+": yours and the field's, then who else shows up inside those lineups.";
+      var s=el("cbsel");if(s)s.onchange=function(){if(this.value!==""&&COMBO.indexOf(+this.value)<0&&COMBO.length<4){COMBO.push(+this.value);drawExtra()}};
+      Array.prototype.forEach.call(el("xextra").querySelectorAll("button[data-r]"),function(b){b.onclick=function(){COMBO=COMBO.filter(function(x){return x!==+b.dataset.r});drawExtra()}});var cc=el("cbclr");if(cc)cc.onclick=function(){COMBO=[];drawExtra()}}
+    else{
+      el("tiles").innerHTML=tile("Contest entries",$(E))+(nU?tile("Your lineups",nU)+tile("Your unique",ue.filter(function(e){return (e.d||1)===1}).length)+tile("Your most copied",Math.max.apply(null,ue.map(function(e){return e.d||1}))+" copies"):"");
+      var dist={};ue.forEach(function(e){var d=e.d||1;dist[d]=(dist[d]||0)+1});var ks=Object.keys(dist).map(Number).sort(function(a,b){return a-b}),mx=Math.max.apply(null,ks.map(function(k){return dist[k]})),svg="";
+      if(ks.length){var W=640,H=220,bw=Math.min(60,(W-60)/ks.length);ks.forEach(function(k,i){var bh=(H-50)*dist[k]/mx,x=40+i*(W-60)/ks.length;svg+="<rect x='"+x+"' y='"+(H-30-bh)+"' width='"+(bw-6)+"' height='"+bh+"' fill='#FFE500'/><text x='"+(x+(bw-6)/2)+"' y='"+(H-14)+"' text-anchor='middle' font-size='11' fill='#999'>"+k+"</text><text x='"+(x+(bw-6)/2)+"' y='"+(H-34-bh)+"' text-anchor='middle' font-size='11' fill='#fff'>"+dist[k]+"</text>"});svg="<svg viewBox='0 0 640 220' style='width:100%;height:auto'>"+svg+"</svg><p class='note'>Your lineups by copies in the contest (1 = unique).</p>"}
+      var most=ue.slice().sort(function(a,b){return (b.d||1)-(a.d||1)}).slice(0,10).filter(function(e){return (e.d||1)>1});
+      h="<tr><th>Copies</th><th>% of contest</th><th style='text-align:left'>Most duplicated lineups in the contest</th></tr>"+F.dupes.map(function(d){return "<tr><td>"+d.n+"</td><td>"+(d.n/E*100).toFixed(2)+"%</td><td class='lu'>"+chipsN(d.f.map(function(f){return nm[f]}),sd)+"</td></tr>"}).join("");
+      el("xtitle").textContent="Duplication";el("xextra").innerHTML=svg+(most.length?"<p class='note' style='margin-top:10px'>Your most copied: "+most.map(function(e){return label(e)+" &times;"+e.d}).join("; ")+"</p>":"");el("xtable").innerHTML=h;
+      el("xnote").textContent="Duplication counts lineups with the same fighters (same captain in Showdown). The table shows the 50 most duplicated lineups in this contest."}
+  }).catch(function(){status("Could not load that contest's field data yet.")});
+}
+
+// ---- standings (points so far, who is ahead): table.json = the contest by actual points so far, with lineups and the sim's view ----
+function tblName(m,f,sd){return chips(m,f,sd)}
+function drawTbl(){
+  document.querySelector(".stepper").hidden=true;["v-all","v-one","v-field"].forEach(function(i){el(i).hidden=true});el("pick").hidden=true;el("v-extra").hidden=false;el("fpick").hidden=false;
+  Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
+  if(!CONTESTS.length||!M0())return;el("fcontest").value=fcid;
+  Promise.all([getj(fcid+"/table.json",true),getj(fcid+"/meta.json")]).then(function(r){
+    var T=r[0],m=r[1],sd=m.slots.indexOf("CPT")>=0,me=(usr||"").toLowerCase(),rows=T.rows;
+    fights();el("guide").innerHTML="<p class='note'>Type your DK username above for your own rooting guide.</p>";
+    el("xwho").textContent=usr?usr+" is highlighted.":"No username loaded.";
+    var mine=rows.filter(function(x){return x.u.toLowerCase()===me});
+    el("tiles").innerHTML=tile("Entries",$(T.n))+tile("Leader so far",rows.length?rows[0].ps.toFixed(1):"")+(mine.length?tile("Your best now","#"+$(Math.min.apply(null,mine.map(function(x){return x.rn})))):"");
+    var h="<tr><th>#</th><th style='text-align:left'>User</th><th>So far</th><th>Exp. final</th><th>Win</th><th>Cash</th><th style='text-align:left'>Lineup</th></tr>";
+    rows.forEach(function(x){var isme=x.u.toLowerCase()===me;h+="<tr class='"+(isme?"sel":"")+"'><td>"+$(x.rn)+"</td><td style='text-align:left'>"+x.u+(x.of>1?" ("+x.n+"/"+x.of+")":"")+"</td><td>"+x.ps.toFixed(1)+"</td><td>"+(x.sc==null?"":x.sc.toFixed(1))+"</td><td>"+(x.w==null?"":x.w.toFixed(1)+"%")+"</td><td>"+(x.c==null?"":x.c.toFixed(1)+"%")+"</td><td class='lu'>"+tblName(m,x.f,sd)+"</td></tr>"});
+    el("xtitle").textContent="Standings so far";el("xextra").innerHTML="";el("xtable").innerHTML=h;
+    el("xnote").textContent=(T.full?"Every entry, ":"Top "+rows.length+" of "+$(T.n)+" entries, ")+"ranked by the actual DK points of the fights that are final. 'Exp. final' and the chances are the sim's view of where each lineup ends up.";
+  }).catch(function(){status("Could not load that contest's standings yet.")});
+}
+function aheadPanel(e,m){
+  var sec=el("aheadsec"),cid=PU[cur].c.id,sd=m.slots.indexOf("CPT")>=0;
+  getj(cid+"/table.json",true).then(function(T){
+    var rows=T.rows,i=-1;for(var q=0;q<rows.length;q++)if(rows[q].u.toLowerCase()===usr.toLowerCase()&&rows[q].n===e.n){i=q;break}
+    if(i<0){sec.hidden=!T.full&&rows.length?false:true;if(!rows.length||T.full){sec.hidden=true;return}
+      sec.hidden=false;el("aheadtitle").textContent="Who's ahead: "+label(e);el("aheadtable").innerHTML="<tr><td>This entry ("+$(e.rn)+"th, "+(e.ps||0).toFixed(1)+" so far) is outside the top "+rows.length+" shown for this big contest.</td></tr>";el("aheadnote").textContent="";return}
+    sec.hidden=false;var me=rows[i];el("aheadtitle").textContent="Who's ahead of "+label(e);
+    var from=Math.max(0,i-6),to=Math.min(rows.length-1,i+3),h="<tr><th>#</th><th style='text-align:left'>User</th><th>So far</th><th>Gap</th><th style='text-align:left'>Lineup</th></tr>";
+    for(var k=from;k<=to;k++){var x=rows[k],gap=x.ps-me.ps;h+="<tr class='"+(k===i?"sel":"")+"'><td>"+$(x.rn)+"</td><td style='text-align:left'>"+x.u+(x.of>1?" ("+x.n+"/"+x.of+")":"")+"</td><td>"+x.ps.toFixed(1)+"</td><td>"+(k===i?"":"<span class='"+(gap>0?"bad":"good")+"'>"+(gap>0?"+":"")+gap.toFixed(1)+"</span>")+"</td><td class='lu'>"+tblName(m,x.f,sd)+"</td></tr>"}
+    el("aheadtable").innerHTML=h;el("aheadnote").textContent="Actual DK points so far. Entries above you in red, below you in green; the gap is what they lead (or trail) by right now.";
+  }).catch(function(){sec.hidden=true});
 }
 init();
 </script>
