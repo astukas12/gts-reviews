@@ -17,7 +17,7 @@ select{font:inherit;background:var(--panel);color:var(--fg);border:1px solid var
 button{font:inherit;font-weight:600;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer}
 button:disabled{opacity:.4;cursor:default}
 .vbtn[aria-pressed=true]{background:var(--accent);color:#000;border-color:var(--accent)}
-#pick[hidden]{display:none!important}
+#pick[hidden],#fpick[hidden]{display:none!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .stepper{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
 .stepper .row1{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
@@ -56,8 +56,9 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
   <span class="pill">Pre-lock odds · updates after every fight</span>
  </header>
  <div class="bar">
-  <div role="group" aria-label="View" style="display:flex;gap:6px"><button class="vbtn" data-v="all" aria-pressed="true">All contests</button><button class="vbtn" data-v="one" aria-pressed="false">One contest</button></div>
+  <div role="group" aria-label="View" style="display:flex;gap:6px"><button class="vbtn" data-v="field" aria-pressed="true">Browse a contest</button><button class="vbtn" data-v="all" aria-pressed="false">My contests</button><button class="vbtn" data-v="one" aria-pressed="false">My entries in one contest</button></div>
   <div><label for="user">DK username</label><input id="user" list="ulist" autocomplete="off" style="font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:220px"><datalist id="ulist"></datalist></div>
+  <div id="fpick" hidden style="display:flex;gap:10px;flex-wrap:wrap"><div><label for="fcontest">Contest</label><select id="fcontest"></select></div><div><label for="fsort">Rank by</label><select id="fsort"><option value="ev">Expected payout</option><option value="score">Current score</option></select></div></div>
   <div id="pick" hidden style="display:flex;gap:10px;flex-wrap:wrap"><div><label for="contest">Contest</label><select id="contest"></select></div><div><label for="entry">Chart entry</label><select id="entry"></select></div></div>
  </div>
  <div id="status" class="note" style="margin:0 0 8px;min-height:1em"></div>
@@ -69,6 +70,8 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
  <div class="tiles" id="tiles"></div>
  <div class="grid">
   <div>
+   <div id="v-field" hidden><section><h2>Contest leaders</h2><div class="tw" style="max-height:520px;overflow-y:auto"><table id="ftable"></table></div><p class="note" id="fnote"></p></section>
+    <section><h2>Field ownership</h2><div class="tw"><table id="otable"></table></div></section></div>
    <div id="v-all"><section><h2>Every contest</h2><div class="tw"><table id="ctable"></table></div>
     <p class="note">Click a contest to open all of its entries. Totals above add every contest at the step you are viewing.</p></section></div>
    <div id="v-one" hidden>
@@ -88,7 +91,7 @@ tr.sel td{background:rgba(255,229,0,.1)}tbody tr{cursor:pointer}tbody tr:hover t
  </div>
 </div>
 <script>
-var CONTESTS=[], DEFAULT_USER="", FEATURED=[], REFRESH_MS=60000, last_upd="";
+var fcid=null,fsort="ev",CONTESTS=[], DEFAULT_USER="", FEATURED=[], REFRESH_MS=60000, last_upd="";
 var BASE=(location.protocol==="file:")?"data/":"https://astukas12.github.io/gts-reviews/live-data/mma/live/";
 var cache={}, UX={}, MM={}, usr=null, PU=[], cur=0, k=0, sel=0, gsel=null, view="all", NFIGHTS=13;
 function el(i){return document.getElementById(i)}
@@ -113,12 +116,18 @@ function init(){
   el("entry").onchange=function(){sel=+this.value;draw()};
   el("contest").onchange=function(){cur=+this.value;sel=bestEntry();setupEntries();draw()};
   Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.onclick=function(){view=b.dataset.v;draw()}});
-  getj("contests.json",true).then(function(c){CONTESTS=c.contests||[];FEATURED=c.featured||[];DEFAULT_USER=c.default_user||(FEATURED[0]||"");el("ulist").innerHTML=FEATURED.map(function(u){return "<option value='"+u+"'>"}).join("");if(!CONTESTS.length){status("No contests loaded yet. They appear here at lock.");return}if(DEFAULT_USER)loadUser(DEFAULT_USER);else status("Type a DK username above.")}).catch(function(){status("No live contests are loaded yet. This page fills in at lock.")});
+  el("fcontest").onchange=function(){fcid=this.value;draw()};el("fsort").onchange=function(){fsort=this.value;draw()};
+  getj("contests.json",true).then(function(c){CONTESTS=c.contests||[];FEATURED=c.featured||[];DEFAULT_USER=c.default_user||"";fcid=CONTESTS.length?CONTESTS[0].id:null;
+    el("ulist").innerHTML=FEATURED.map(function(u){return "<option value='"+u+"'>"}).join("");
+    el("fcontest").innerHTML=CONTESTS.map(function(x){return "<option value='"+x.id+"'>"+cname(x)+" ("+x.entries.toLocaleString()+" entries)</option>"}).join("");
+    if(!CONTESTS.length){status("No contests loaded yet. They appear here at lock.");return}
+    return getj(CONTESTS[0].id+"/meta.json",true).then(function(m){MM[CONTESTS[0].id]=m;last_upd=m.updated_at;NFIGHTS=m.fights.length;
+      if(DEFAULT_USER)loadUser(DEFAULT_USER);else{view="field";draw()}})}).catch(function(){status("No live contests are loaded yet. This page fills in at lock.")});
   setInterval(refresh,REFRESH_MS);
 }
-function refresh(){if(!CONTESTS.length||!usr)return;getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;var wasCur=(k>=curStep());cache={};loadUser(usr,true,wasCur)}).catch(function(){})}
+function refresh(){if(!CONTESTS.length)return;if(!usr){getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;last_upd=m.updated_at;MM[CONTESTS[0].id]=m;delete cache[fcid+"/top.json"];delete cache[fcid+"/meta.json"];if(view==="field")draw()}).catch(function(){});return}getj(CONTESTS[0].id+"/meta.json",true).then(function(m){if(m.updated_at===last_upd)return;var wasCur=(k>=curStep());cache={};loadUser(usr,true,wasCur)}).catch(function(){})}
 function loadUser(name,quiet,keepFollow){
-  if(!name)return;if(!quiet)status("Looking up "+name+" in every contest...");
+  if(!name)return;if(!quiet&&view==="field")view="all";if(!quiet)status("Looking up "+name+" in every contest...");
   Promise.all(CONTESTS.map(function(c){return Promise.all([getj(c.id+"/meta.json",quiet),getj(c.id+"/users.json",quiet)]).then(function(r){MM[c.id]=r[0];UX[c.id]=r[1]})})).then(function(){
     var hits=[];CONTESTS.forEach(function(c){var row=UX[c.id].filter(function(r){return r[0].toLowerCase()===name.toLowerCase()})[0];if(row)hits.push({c:c,row:row})});
     if(!hits.length){status("No user named "+name+" in the contests loaded here.");return}
@@ -147,7 +156,8 @@ function caption(){
   el("cap").textContent=(f?"After "+f.a+" vs "+f.b+" ("+k+" of "+NFIGHTS+" final): "+winnerName(f)+" scored "+Math.max(f.pts_a,f.pts_b).toFixed(1)+", "+(winnerName(f)===f.a?f.b:f.a)+" "+Math.min(f.pts_a,f.pts_b).toFixed(1):"After "+k+" of "+NFIGHTS+" fights final")+tag}
 function tile(k_,v,cl){return "<div class='tile'><div class='k'>"+k_+"</div><div class='v "+(cl||"")+"'>"+v+"</div></div>"}
 function draw(){
-  if(!PU.length)return;while(k>0&&!have(k))k--;el("slider").value=k;el("slider").max=NFIGHTS;el("prev").disabled=k===0;el("next").disabled=k>=curStep();caption();
+  if(view==="field"){drawField();return}
+  if(!PU.length){el("v-field").hidden=true;el("fpick").hidden=true;status("Type your DK username above to see your own contests.");return}document.querySelector(".stepper").hidden=false;el("v-field").hidden=true;el("fpick").hidden=true;while(k>0&&!have(k))k--;el("slider").value=k;el("slider").max=NFIGHTS;el("prev").disabled=k===0;el("next").disabled=k>=curStep();caption();
   Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
   el("v-all").hidden=view!=="all";el("v-one").hidden=view!=="one";el("pick").hidden=view!=="one";
   fights();if(view==="all")drawAll();else drawOne();
@@ -216,6 +226,25 @@ function pchart(ev,fe){
   q+="<line x1='"+X(k)+"' x2='"+X(k)+"' y1='"+T+"' y2='"+(H-B)+"' stroke='#fff' stroke-dasharray='3 3'/><polyline fill='none' stroke='#FFE500' stroke-width='2.5' points='"+ev.map(function(v,i){return v==null?null:X(i)+","+YE(v)}).filter(Boolean).join(" ")+"'/>";
   ev.forEach(function(v,i){if(v==null)return;q+="<circle cx='"+X(i)+"' cy='"+YE(v)+"' r='"+(i===k?5:3)+"' fill='#FFE500'/>"});
   el("pchart").innerHTML=q;
+}
+
+function drawField(){
+  document.querySelector(".stepper").hidden=true;el("v-all").hidden=true;el("v-one").hidden=true;el("pick").hidden=true;el("v-field").hidden=false;el("fpick").hidden=false;
+  Array.prototype.forEach.call(document.querySelectorAll(".vbtn"),function(b){b.setAttribute("aria-pressed",b.dataset.v===view)});
+  if(!CONTESTS.length||!M0())return;el("fcontest").value=fcid;
+  var c=CONTESTS.filter(function(x){return x.id===fcid})[0]||CONTESTS[0];
+  Promise.all([getj(c.id+"/meta.json"),getj(c.id+"/top.json",true)]).then(function(r){var m=r[0],t=r[1];MM[c.id]=m;
+    el("tiles").innerHTML=tile("Contest",cname(c).slice(0,22))+tile("Entries",$(c.entries))+tile("Prize pool",money(m.contest.prize_pool))+tile("Paying",$(m.cash_line)+" places")+tile("Fights final",m.fights.filter(function(f){return f.status==="locked"}).length+" of "+m.fights.length);
+    var rows=(fsort==="score"?t.by_score:t.by_ev)||[];
+    var h="<tr><th>#</th><th>User</th><th>Score</th><th>Exp. rank</th><th>Win</th><th>Cash</th><th>Exp. payout</th><th style='text-align:left'>Lineup</th></tr>";
+    rows.forEach(function(x,i){h+="<tr data-u='"+x.u+"'><td>"+(i+1)+"</td><td>"+x.u+(x.of>1?" ("+x.n+"/"+x.of+")":"")+"</td><td>"+x.sc.toFixed(1)+"</td><td>"+$(x.rk)+"</td><td>"+x.w.toFixed(1)+"%</td><td class='"+(x.c>=60?"good":x.c<25?"bad":"warn")+"'>"+x.c.toFixed(1)+"%</td><td>"+money(x.ev)+"</td><td class='lu'>"+x.f.map(function(i2){return m.fighters[i2]}).join(", ")+"</td></tr>"});
+    el("ftable").innerHTML=h;
+    Array.prototype.forEach.call(el("ftable").querySelectorAll("tr[data-u]"),function(tr){tr.onclick=function(){view="all";el("user").value=tr.dataset.u;loadUser(tr.dataset.u)}});
+    var oh="<tr><th style='text-align:left'>Fighter</th><th>Field ownership</th></tr>";
+    Object.keys(t.own).sort(function(a,b){return t.own[b]-t.own[a]}).forEach(function(n){oh+="<tr><td>"+n+"</td><td>"+t.own[n].toFixed(1)+"%</td></tr>"});el("otable").innerHTML=oh;
+    el("fnote").textContent="Top "+rows.length+" of "+$(c.entries)+" entries"+(fsort==="score"?" by current score":" by expected payout")+". Click a user to see all of their entries. Updated "+new Date(m.updated_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})+".";
+    fights();el("guide").innerHTML="<p class='note'>Type your DK username above for your own rooting guide: what each fighter winning does to your portfolio.</p>";
+  }).catch(function(){status("Could not load that contest yet.")});
 }
 init();
 </script>
