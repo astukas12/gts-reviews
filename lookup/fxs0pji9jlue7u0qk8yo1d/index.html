@@ -45,16 +45,59 @@ td.n{text-align:left;white-space:normal}
 .pos{color:var(--good)}.neg{color:var(--bad)}
 .ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0}
 .ctl label{font-size:12px;color:var(--mute)}
+
+/* ---- visual pass ---- */
+[hidden]{display:none!important}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #2a2a2a}.kv>span:last-child{text-align:right}
+.sum .big{line-height:1.15}.sum .big span{line-height:1.2}
+#bar{position:sticky;top:0;z-index:20;background:var(--bg);margin:0 -16px;padding:6px 16px 4px;border-bottom:1px solid var(--line)}
+#bar .row{margin:6px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#bar .row::-webkit-scrollbar{display:none}
+#bar .row button{flex:0 0 auto}
+button{min-height:40px;padding:8px 14px}
+#fresh{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);margin:4px 0}
+.dot{width:9px;height:9px;border-radius:50%;background:#777;display:inline-block}
+.dot.g{background:var(--good);box-shadow:0 0 8px rgba(76,175,80,.6)}.dot.a{background:#ff9800}.dot.r{background:var(--bad)}
+.card>.hd{padding:13px 12px;min-height:48px}
+.card>.hd .t{flex:1 1 100%}.card>.hd .m{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:2px 10px}
+details{margin:10px 0;border:1px solid var(--line);border-radius:10px;background:#161616}
+details>summary{cursor:pointer;padding:12px;font-weight:600;color:var(--accent);min-height:44px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";color:var(--mute);font-weight:700}
+details[open]>summary::after{content:"\2212"}
+details>*:not(summary){margin-left:10px;margin-right:10px}details>*:last-child{margin-bottom:10px}
+h3{font:600 12.5px/1.2 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin:12px 0 4px}
+.xr,.rr{padding:8px 0;border-bottom:1px solid #2a2a2a}
+.xtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.xn{font-weight:600;min-width:0;overflow-wrap:anywhere}.xnum{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:13px}
+.xsub{color:var(--mute);font-size:11.5px;margin-top:1px}
+.xb{position:relative;height:7px;background:#2a2a2a;border-radius:4px;margin-top:5px;overflow:visible}
+.xbar{display:block;height:7px;background:var(--accent);border-radius:4px}
+.xtick{position:absolute;top:-3px;width:2px;height:13px;background:#fff;border-radius:1px}
+.lev{display:inline-block;min-width:38px;text-align:center;border-radius:999px;padding:1px 7px;font-size:12px;font-weight:700;margin-left:6px}
+.lv0{background:#2a2a2a;color:#bbb}.lv2{background:rgba(76,175,80,.18);color:#8bd68e}.lv3{background:rgba(76,175,80,.4);color:#c9f5cb}
+.lm2{background:rgba(244,67,54,.18);color:#f0908a}.lm3{background:rgba(244,67,54,.4);color:#ffd0cc}
+.itm{background:rgba(76,175,80,.25);color:#b8efba;border-radius:999px;padding:0 8px;font-weight:700;font-size:12px}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.flt button{padding:6px 12px;min-height:36px;font-size:13px}
+.rtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.big{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:6px 0}
+@media (min-width:700px){.sum{grid-template-columns:repeat(4,1fr)}}
 </style></head><body><div class="wrap">
 <header><h1>Sweat Lookup</h1><div class="sub" id="sub">Loading...</div></header>
+<div id="bar"><div class="row" id="views" role="group" aria-label="View"><button data-v="today" aria-pressed="true">Today (live)</button><button data-v="hist" aria-pressed="false">History</button></div>
 <div class="row" id="users" role="group" aria-label="Username"></div>
-<div class="row" id="sports" role="group" aria-label="Sport"></div>
+<div class="row" id="sports" role="group" aria-label="Sport"></div><div id="fresh"></div></div>
 <div id="msg" class="note"></div>
+<div id="today"></div>
+<div id="hist" hidden>
 <div class="tiles" id="tiles"></div>
 <section id="slsec" hidden><h2>Slates</h2>
  <div class="ctl"><label for="sort">Sort</label><select id="sort"><option value="date">Newest</option><option value="profit">Profit</option><option value="entries">Entries</option><option value="fees">Fees</option></select>
  <label for="gt">Type</label><select id="gt"><option value="all">All</option><option value="cl">Classic</option><option value="sd">Showdown</option></select></div>
  <div id="slates"></div></section>
+</div>
 </div>
 <script>
 "use strict";
@@ -99,10 +142,9 @@ function expo(r,cs,own,fieldN,what){
  var pl=r.sp.players,cnt={},n=0,hasLU=0;
  cs.forEach(function(c){c.e.forEach(function(e){n++;if(e[4].length)hasLU++;e[4].forEach(function(t){var k=t<0?"c"+(-t):""+t;cnt[k]=(cnt[k]||0)+1})})});
  var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
- var rows=ks.map(function(t){var mine=100*cnt[t]/Math.max(1,hasLU),f=own[t]==null?0:own[t];var cp=t.charAt(0)==="c";var id=cp?t.slice(1):t;return{n:(cp?'<span class="c">CPT</span>':"")+esc(pl[+id-1]),mine:mine,f:f,lev:mine-f}});
- var h='<div class="note" style="margin:0 0 6px">His % = share of his '+hasLU+' lineups with the player. Field % = share of '+(what==="contest"?"this contest's":"all captured")+' entries ('+n0(fieldN)+'). Lev = his minus field.</div><div class="tw"><table><thead><tr><th>Player</th><th>His %</th><th></th><th>Field %</th><th>Lev</th></tr></thead><tbody>';
- h+=rows.slice(0,60).map(function(x){return'<tr><td class="n">'+x.n+'</td><td>'+x.mine.toFixed(1)+'</td><td style="min-width:54px"><span class="bar" style="width:'+Math.min(50,x.mine/2)+'px"></span></td><td>'+x.f.toFixed(1)+'</td><td class="'+cls(x.lev)+'">'+(x.lev>0?"+":"")+x.lev.toFixed(1)+'</td></tr>'}).join("");
- return h+'</tbody></table></div>'+(rows.length>60?'<div class="note">Top 60 of '+rows.length+' players.</div>':"");
+ var h='<div class="note" style="margin:0 0 6px">Gold bar = his share of his '+hasLU+' lineups; white tick = field share ('+n0(fieldN)+' entries'+(what==="contest"?" in this contest":" across the slate")+'). The pill is his minus field.</div>';
+ h+=ks.slice(0,40).map(function(t){var mine=100*cnt[t]/Math.max(1,hasLU),f=own[t]==null?0:own[t],cp=t.charAt(0)==="c",id=cp?t.slice(1):t;return xrow((cp?'<span class="c">CPT</span>':"")+esc(pl[+id-1]),"",mine,f,"")}).join("");
+ return h+(ks.length>40?'<div class="note">Top 40 of '+ks.length+' players.</div>':"");
 }
 function slateBody(r){
  var h='<h2 style="margin-top:10px">Slate exposures</h2>'+expo(r,r.s.contests,r.s.own,r.s.fieldN,"slate")+'<h2 style="margin-top:14px">Contests</h2>';
@@ -120,7 +162,7 @@ function contestBody(r,c){
 }
 document.addEventListener("click",function(ev){
  var b=ev.target.closest&&ev.target.closest("button[data-u],button[data-s]");
- if(b){if(b.hasAttribute("data-u"))USER=b.getAttribute("data-u")||null;else SPORT=b.getAttribute("data-s")||null;render();return}
+ if(b){if(b.hasAttribute("data-u"))USER=b.getAttribute("data-u")||null;else SPORT=b.getAttribute("data-s")||null;if(VIEW==="today"){tabs();renderToday()}else render();return}
  var hd=ev.target.closest&&ev.target.closest(".hd");if(!hd)return;
  var card=hd.parentNode;
  if(hd.hasAttribute("data-c")){var ck=card.getAttribute("data-ck");OPEN[ck]=!OPEN[ck];var parts=ck.split("|");var sk=parts.slice(0,3).join("|");var r=ROWS.filter(function(x){return x.u.user+"|"+x.sport+"|"+x.s.dg===sk})[0];var c=r.s.contests.filter(function(x){return x.id===parts[3]})[0];card.classList.toggle("open",!!OPEN[ck]);card.querySelector(".bd").innerHTML=OPEN[ck]?contestBody(r,c):"";return}
@@ -128,7 +170,124 @@ document.addEventListener("click",function(ev){
 });
 document.addEventListener("keydown",function(ev){if((ev.key==="Enter"||ev.key===" ")&&ev.target.classList&&ev.target.classList.contains("hd")){ev.preventDefault();ev.target.click()}});
 $("sort").onchange=function(){SORT=this.value;render()};$("gt").onchange=function(){GT=this.value;render()};
+
+var VIEW="today", T=null, TOPEN={};
+function hid(v){return v==="locked"||v==="LOCKED"}
+function det(title,body,open){return '<details'+(open?' open':'')+'><summary>'+title+'</summary>'+body+'</details>'}
+function levPill(l){var c=l>=15?"lv3":l>=5?"lv2":l<=-15?"lm3":l<=-5?"lm2":"lv0";return '<span class="lev '+c+'">'+(l>0?"+":"")+l.toFixed(0)+'</span>'}
+function xrow(name,sub,mine,fo,extra){return '<div class="xr"><div class="xtop"><span class="xn">'+name+'</span><span class="xnum"><b>'+mine.toFixed(0)+'%</b> <span class="mute">vs '+fo.toFixed(0)+'%</span>'+levPill(mine-fo)+'</span></div>'+(sub||extra?'<div class="xsub">'+(sub||"")+(extra?' · '+extra:"")+'</div>':"")+'<div class="xb"><span class="xbar" style="width:'+Math.min(100,mine)+'%"></span><span class="xtick" style="left:'+Math.min(99,fo)+'%"></span></div></div>'}
+function fresh(){
+ var el=$("fresh");if(!el)return;if(!T||VIEW!=="today"){el.innerHTML=D?'<span class="mute">History built '+esc(D.built)+'</span>':"";return}
+ var m=(Date.now()-Date.parse(T.built.replace(" ","T")+"Z"))/60000,live=T.games&&T.games.some(function(g){return g[1]==="in"});
+ var c=!live?"":m<6?"g":m<15?"a":"r";
+ el.innerHTML='<span class="dot '+c+'"></span><span>Live data '+(m<1?"just now":Math.round(m)+" min ago")+(c==="r"?' &middot; <b class="bad">stale: the feed may be down</b>':c==="a"?' &middot; <span style="color:#ff9800">slow</span>':'')+(live?'':' &middot; no games in progress')+'</span>';
+}
+setInterval(fresh,20000);
+function userSummary(){
+ var us=(USER?[USER.toLowerCase()]:T.users.map(function(x){return x.toLowerCase()})),rows=[];
+ us.forEach(function(u){var ct=0,en=0,itm=0,fees=0,best=null,bestc="";
+  T.contests.forEach(function(c){var e=c.entries[u];if(!e)return;ct++;en+=e.length;fees+=e.length*(c.fee||0);var L=c.lines;e.forEach(function(x){if(L&&L.paid!=null&&x[0]<=L.paid)itm++;if(best==null||x[0]<best){best=x[0];bestc=c.name}})});
+  if(!ct)return;
+  rows.push('<div class="tile"><div class="k">'+esc(u)+'</div><div class="big '+(itm?"good":"")+'">'+n0(itm)+' <span class="mute" style="font-size:12px;font-weight:400">of '+n0(en)+' in the money</span></div><div class="note" style="margin:2px 0 0">'+ct+' contests &middot; '+money(fees)+' in &middot; best #'+n0(best)+'</div></div>')});
+ return rows.length?'<div class="sum">'+rows.join("")+'</div>':"";
+}
+var CF="all";
+function rootBlock(rk,u){
+ if(!rk.length)return '<section><h2>Who to root for</h2><div class="note">Nothing left to root for, or no lineups visible yet (DK hides players until their game starts).</div></section>';
+ var mx=rk[0][1]||1;
+ function row(r){return '<div class="rr"><div class="rtop"><span class="xn">'+esc(r[0])+' <span class="mute" style="font-weight:400">'+esc(r[9]||"")+' '+esc(r[4]||"")+'</span></span><span class="xnum"><b>'+r[1]+'</b> lineups'+(r[3]?' &middot; '+r[3]+' CPT':'')+'</span></div><div class="xsub">'+esc(r[5])+' &middot; '+esc(r[7])+(r[8]!=null?' &middot; '+r[8]+' pts now':'')+(r[10]!=null?' &middot; proj '+r[10]:'')+'</div><div class="xb"><span class="xbar" style="width:'+(100*r[1]/mx)+'%"></span></div></div>'}
+ return '<section><h2>Who to root for'+(u?' &middot; '+esc(USER):'')+'</h2><div class="note" style="margin:0 0 6px">Players still playing, by how many of his lineups hold them. DK hides players until their game starts.</div>'+rk.slice(0,10).map(row).join("")+(rk.length>10?det("Show "+(Math.min(rk.length,60)-10)+" more",rk.slice(10,60).map(row).join(""),false):"")+'</section>';
+}
+function renderToday(){
+ var el=$("today");fresh();
+ if(!T){el.innerHTML='<section><h2>Today</h2><div class="note">No live data yet. The live feed runs while games are on.</div></section>';return}
+ var u=USER?USER.toLowerCase():null;
+ var cs=T.contests.filter(function(c){return !u||c.entries[u]});
+ var ne=0,nf=0;cs.forEach(function(c){Object.keys(c.entries).forEach(function(k){if(u&&k!==u)return;ne+=c.entries[k].length;nf+=c.entries[k].length*(c.fee||0)})});
+ var h=userSummary();
+ var rk=T.roots[u||"*"]||[];
+ h+=rootBlock(rk,u);
+ var gm={};rk.forEach(function(r){var g=r[5]||"?";gm[g]=gm[g]||{st:r[7],n:0,pl:0,pj:0};gm[g].n+=r[1];gm[g].pl++;gm[g].pj+=(r[1]+0.5*(r[3]||0))*(r[10]||0)});var gk=Object.keys(gm).sort(function(a,b){return gm[b].n-gm[a].n});
+ if(gk.length)h+=det("Rooting by game ("+gk.length+")",'<div class="tw"><table><thead><tr><th>Game</th><th>Status</th><th>Slots</th><th>Proj left</th></tr></thead><tbody>'+gk.map(function(g){return '<tr><td class="n">'+esc(g)+'</td><td class="n">'+esc(gm[g].st)+'</td><td>'+gm[g].n+'</td><td>'+(ne?(gm[g].pj/ne).toFixed(1):"-")+'</td></tr>'}).join("")+'</tbody></table></div>',false);
+ h+=det("Games",(T.games.length?T.games.map(function(g){var c=g[1]==="in"?"good":g[1]==="post"?"mute":"";return '<span class="chip"><b>'+esc(g[0])+'</b> <span class="'+c+'">'+esc(g[2])+'</span></span>'}).join(" "):'<span class="mute">no scoreboard</span>'),false);
+ // contests: compact, in-the-money first
+ var list=cs.map(function(c){var us=Object.keys(c.entries).filter(function(k){return !u||k===u});var all=[];us.forEach(function(k){c.entries[k].forEach(function(e){all.push({u:k,e:e})})});
+  var itm=c.lines&&c.lines.paid!=null?all.filter(function(x){return x.e[0]<=c.lines.paid}).length:0;var best=all.reduce(function(m,x){return Math.min(m,x.e[0])},1e9);return{c:c,us:us,all:all,itm:itm,best:best}});
+ var cnt={all:list.length,itm:list.filter(function(x){return x.itm>0}).length,sd:list.filter(function(x){return x.c.gt==="showdown"}).length,cl:list.filter(function(x){return x.c.gt!=="showdown"}).length};
+ var shown=list.filter(function(x){return CF==="all"||(CF==="itm"&&x.itm>0)||(CF==="sd"&&x.c.gt==="showdown")||(CF==="cl"&&x.c.gt!=="showdown")});
+ shown.sort(function(a,b){return (b.itm>0)-(a.itm>0)||b.c.fee*b.all.length-a.c.fee*a.all.length});
+ h+='<section><h2>Live contests ('+ne+' entries, '+money(nf)+')</h2><div class="flt">'+[["all","All"],["itm","In the money"],["sd","Showdown"],["cl","Classic"]].map(function(f){return '<button data-cf="'+f[0]+'" aria-pressed="'+(CF===f[0])+'">'+f[1]+' '+cnt[f[0]]+'</button>'}).join("")+'</div>';
+ if(!cs.length)h+='<div class="note">None of the scanned contests hold '+(u?esc(USER):'these users')+' yet. The scan widens every few minutes.</div>';
+ shown.forEach(function(x){var c=x.c,k=c.id;
+  h+='<div class="card'+(TOPEN[k]?" open":"")+'" data-tk="'+esc(k)+'"><div class="hd" role="button" tabindex="0"><span class="t">'+(u?"":x.us.map(function(z){return '<span class="chip">'+esc(z)+'</span>'}).join(""))+esc(c.name)+'</span><span class="m"><span>'+x.all.length+'x '+money(c.fee||0)+'</span><span>field '+n0(c.size)+'</span><span>best #'+n0(x.best)+'</span>'+(x.itm?'<span class="itm">'+x.itm+' ITM</span>':'')+'</span></div><div class="bd">'+(TOPEN[k]?todayBody(c,x.all):"")+'</div></div>'});
+ el.innerHTML=h+'</section>';
+}
+function infoOf(c,p){var i=c.info&&c.info[p];return i?{tm:i[0],pos:i[1],sal:i[2],proj:i[3],pown:i[4],game:i[5],st:i[6]}:{tm:"",pos:"",sal:null,proj:null,pown:null,game:"",st:""}}
+function rollups(c,lus,sd){
+ var N=lus.length||1,team={},game={},stk={qb0:0,qb1:0,qb2:0,qb3:0,bb:0},pos={};
+ lus.forEach(function(lu){var tc={},gc={},qb=null,pc={},opp=null;
+  lu.forEach(function(p,i){if(hid(p))return;var f=infoOf(c,p);if(f.tm){tc[f.tm]=(tc[f.tm]||0)+1}if(f.game){gc[f.game]=(gc[f.game]||0)+1}if(f.pos){pos[f.pos]=(pos[f.pos]||0)+1}if(f.pos==="QB")qb=f});
+  Object.keys(tc).forEach(function(t){team[t]=team[t]||{n:0,pl:0};team[t].n++;team[t].pl+=tc[t]});
+  Object.keys(gc).forEach(function(g){game[g]=game[g]||{n:0,pl:0};game[g].n++;game[g].pl+=gc[g]});
+  if(qb){var mates=0,bb=0;lu.forEach(function(p){if(hid(p))return;var f=infoOf(c,p);if(f.pos==="QB")return;if(f.tm===qb.tm&&(f.pos==="WR"||f.pos==="TE"))mates++;else if(f.tm!==qb.tm&&qb.game&&f.game===qb.game&&(f.pos==="WR"||f.pos==="TE"||f.pos==="RB"))bb++});stk[mates>=3?"qb3":mates===2?"qb2":mates===1?"qb1":"qb0"]++;if(bb>0&&mates>0)stk.bb++}});
+ function tbl(o,h1){var ks=Object.keys(o).sort(function(a,b){return o[b].n-o[a].n});return '<div class="tw"><table><thead><tr><th>'+h1+'</th><th>Lineups</th><th>%</th><th>Avg players</th></tr></thead><tbody>'+ks.slice(0,40).map(function(k){return '<tr><td class="n">'+esc(k)+'</td><td>'+o[k].n+'</td><td>'+(100*o[k].n/N).toFixed(1)+'</td><td>'+(o[k].pl/o[k].n).toFixed(1)+'</td></tr>'}).join("")+'</tbody></table></div>'}
+ var h='<h2 style="margin-top:12px">By team</h2>'+tbl(team,"Team")+'<h2 style="margin-top:12px">By game</h2>'+tbl(game,"Game");
+ if(!sd&&(stk.qb0+stk.qb1+stk.qb2+stk.qb3)){h+='<h2 style="margin-top:12px">QB stacks</h2><div class="tw"><table><thead><tr><th>Stack</th><th>Lineups</th><th>%</th></tr></thead><tbody>'+[["QB naked",stk.qb0],["QB + 1 (WR/TE)",stk.qb1],["QB + 2",stk.qb2],["QB + 3 or more",stk.qb3],["with a bring-back",stk.bb]].map(function(r){return '<tr><td class="n">'+r[0]+'</td><td>'+r[1]+'</td><td>'+(100*r[1]/N).toFixed(1)+'</td></tr>'}).join("")+'</tbody></table></div>'}
+ return h;
+}
+function prizeAt(L,rank){if(!L||!L.pay)return null;for(var i=0;i<L.pay.length;i++){var b=L.pay[i];if(rank>=b[0]&&rank<=b[1])return b[2]}return 0}
+function kv(l,v,sub){return '<div class="kv"><span>'+l+'</span><span><b>'+v+'</b>'+(sub?'<br><span class="mute" style="font-size:11.5px">'+sub+'</span>':'')+'</span></div>'}
+function linesBlock(c,all){
+ var L=c.lines;if(!L)return '<div class="note">Payout lines appear after the next refresh.</div>';
+ var h='<h3>Payout lines and who is ahead</h3>';
+ h+=kv('Cash line',L.cash!=null?L.cash+' pts':'-',L.paid!=null?'top '+n0(L.paid)+' of '+n0(c.size)+' paid':'');
+ h+=kv('Top 10%',L.t10!=null?L.t10+' pts':'-','rank '+n0(L.t10r||0))+kv('Top 1%',L.t1!=null?L.t1+' pts':'-','rank '+n0(L.t1r||0));
+ (L.lead||[]).forEach(function(d,i){h+=kv((i?'#'+d.r+' ':'Leader ')+esc(d.u),d.p+' pts','')});
+ if(L.lead&&L.lead[0]&&L.lead[0].lu)h+='<div class="note" style="margin:6px 0 0">Leader lineup: '+esc(L.lead[0].lu.replace(/LOCKED/g,"hidden"))+'</div>';
+ var mine=all.reduce(function(m,x){return x.e[1]>m?x.e[1]:m},0);
+ var itm=all.filter(function(x){return L.paid!=null&&x.e[0]<=L.paid}).length;
+ h+='<div class="note" style="margin:6px 0 8px">'+(L.paid!=null?'<b>'+itm+'</b> of his '+all.length+' entries are in the money now. ':'')+(L.cash!=null&&mine<L.cash?'Best entry needs '+(L.cash-mine).toFixed(2)+' more to cash. ':'')+(L.t1!=null&&mine<L.t1?'Best entry is '+(L.t1-mine).toFixed(2)+' off the top 1%.':'')+'</div>';
+ return h;
+}
+function expTable(c,ks,cnt,n,title){
+ if(!ks.length)return "";
+ return '<h3>'+title+'</h3>'+ks.slice(0,40).map(function(k){var cp=k.indexOf("CPT:")===0,nm=k.replace("CPT:",""),f=infoOf(c,k),mine=100*cnt[k]/n,o=c.own[k],fo=o?o[0]:0;
+  var sub=[f.pos+(f.tm?" "+f.tm:""),f.sal!=null?"$"+n0(f.sal):"",f.proj!=null?"proj "+f.proj:"",f.pown!=null?"proj own "+f.pown+"%":"",o&&o[1]!=null?o[1]+" pts now":""].filter(function(z){return z}).join(" &middot; ");
+  return xrow(esc(nm)+(cp?' <span class="c">CPT</span>':""),sub,mine,fo,"")}).join("")+(ks.length>40?'<div class="note">Top 40 of '+ks.length+' players.</div>':"");
+}
+function sdCombos(c,lus){
+ var N=lus.length||1,cp={},cf={},ff={},dup={};
+ function add(o,k){o[k]=(o[k]||0)+1}
+ lus.forEach(function(lu){var vis=lu.filter(function(p){return !hid(p)});if(!vis.length)return;var cap=hid(lu[0])?null:lu[0],fl=lu.slice(1).filter(function(p){return !hid(p)}).sort();
+  if(cap){add(cp,cap);fl.forEach(function(f){add(cf,cap+" + "+f)})}
+  for(var i=0;i<fl.length;i++)for(var j=i+1;j<fl.length;j++)add(ff,fl[i]+" + "+fl[j]);
+  if(cap&&lu.length>1&&fl.length===lu.length-1)add(dup,cap+" | "+fl.join(", "))});
+ function tbl(o,h1,top,minn){var ks=Object.keys(o).filter(function(k){return o[k]>=(minn||1)}).sort(function(a,b){return o[b]-o[a]});if(!ks.length)return '<div class="note">none</div>';return '<div class="tw"><table><thead><tr><th>'+h1+'</th><th>Lineups</th><th>%</th></tr></thead><tbody>'+ks.slice(0,top).map(function(k){return '<tr><td class="n">'+esc(k)+'</td><td>'+o[k]+'</td><td>'+(100*o[k]/N).toFixed(1)+'</td></tr>'}).join("")+'</tbody></table></div>'}
+ return '<h2 style="margin-top:12px">Captain + flex pairs</h2>'+tbl(cf,"CPT + FLEX",25)+'<h2 style="margin-top:12px">Flex + flex pairs</h2>'+tbl(ff,"FLEX + FLEX",25)+'<h2 style="margin-top:12px">His duplicate lineups</h2><div class="note" style="margin:0 0 6px">Same captain and same flex set, any order (only fully visible lineups).</div>'+tbl(dup,"Lineup",20,2);
+}
+function todayBody(c,all){
+ var cnt={},hidn=0,n=0,lus=all.map(function(x){return x.e[3]}),sd=c.gt==="showdown";
+ all.forEach(function(x){n++;x.e[3].forEach(function(p,i){if(hid(p)){hidn++;return}var k=(sd&&i===0?"CPT:":"")+p;cnt[k]=(cnt[k]||0)+1})});
+ var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
+ var h='<div class="note" style="margin:0 0 8px"><a href="https://www.draftkings.com/contest/gamecenter/'+esc(c.id)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600">Open on DraftKings &#8599;</a> · '+esc(c.group)+' · prize pool '+(c.prize?money(c.prize):"?")+' · locked '+esc(c.lock)+' UTC'+(hidn?' · '+hidn+' lineup slots still hidden by DK (games not started)':'')+'</div>';
+ h+=linesBlock(c,all);
+ h+='<div class="note" style="margin:0 0 6px">Pos, salary, projection and projected ownership come from the slate input sheet'+(sd?' (captain rows use the captain salary, 1.5x projection and captain ownership)':'')+'. Field % is DK\'s live %Drafted. Lev = his minus field.</div>';
+ if(sd){var cks=ks.filter(function(k){return k.indexOf("CPT:")===0}),fks=ks.filter(function(k){return k.indexOf("CPT:")!==0});
+  h+=expTable(c,cks,cnt,n,"Captain exposure vs this contest")+expTable(c,fks,cnt,n,"Flex exposure vs this contest")+det("Team, game and pairs",rollups(c,lus,true)+sdCombos(c,lus),false)}
+ else h+=expTable(c,ks,cnt,n,"Exposure vs this contest")+det("Team, game and QB stacks",rollups(c,lus,false),false);
+ h+='<details open><summary>Entries ('+all.length+')</summary><div class="tw"><table><thead><tr><th>Rank</th><th>User</th><th>Pts</th><th>Prize now</th><th>To cash</th><th>Time left</th><th style="text-align:left">Lineup</th></tr></thead><tbody>'+all.slice().sort(function(a,b){return a.e[0]-b.e[0]}).slice(0,300).map(function(x){return '<tr><td>'+n0(x.e[0])+'</td><td class="n">'+esc(x.u)+'</td><td>'+x.e[1]+'</td><td>'+(function(){var z=prizeAt(c.lines,x.e[0]);return z>0?'<span class="pos">'+money(z)+'</span>':'-'})()+'</td><td>'+(function(){var L=c.lines;if(!L||L.cash==null)return '-';var g=L.cash-x.e[1];return g<=0?'<span class="pos">in</span>':g.toFixed(1)})()+'</td><td>'+(x.e[2]==null?"-":x.e[2])+'</td><td class="lu">'+x.e[3].map(function(p,i){if(hid(p))return '<span class="mute">hidden</span>';var cp=sd&&i===0,f=infoOf(c,(cp?"CPT:":"")+p);return (cp?'<span class="c">CPT</span>':"")+esc(p)+(f.tm?' <span class="mute">'+esc(f.pos)+' '+esc(f.tm)+'</span>':"")}).join(" · ")+'</td></tr>'}).join("")+'</tbody></table></div></details>';
+ return h;
+}
+function loadToday(){fetch("today.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){T=d;fresh();if(VIEW==="today")renderToday()}).catch(function(){if(VIEW==="today")renderToday()})}
+function setView(v){VIEW=v;document.querySelectorAll("#views button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===v)});$("today").hidden=v!=="today";$("hist").hidden=v!=="hist";$("sports").hidden=v!=="hist";if(v==="today"){tabs();renderToday()}else{render()}fresh()}
+document.addEventListener("click",function(ev){
+ var vb=ev.target.closest&&ev.target.closest("#views button");if(vb){setView(vb.getAttribute("data-v"));return}
+ var fb=ev.target.closest&&ev.target.closest("button[data-cf]");if(fb){CF=fb.getAttribute("data-cf");renderToday();return}
+ var hd=ev.target.closest&&ev.target.closest("#today .hd");if(!hd)return;var k=hd.parentNode.getAttribute("data-tk");TOPEN[k]=!TOPEN[k];renderToday()
+});
+setInterval(function(){if(VIEW==="today"&&!document.hidden)loadToday()},60000);
+
 fetch("data.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
- D=d;$("sub").textContent="Final standings from the GTS contest database · built "+d.built+" · private page";render();
+ D=d;$("sub").textContent="Private page · history: final standings from the GTS contest database, built "+d.built;setView("today");loadToday();
 }).catch(function(e){$("sub").textContent="Could not load data ("+e.message+")"});
 </script></body></html>
