@@ -95,27 +95,26 @@ function render(){
 }
 var ROWS=[];
 function US(){return !!USER}
-function expo(r){
- var pl=r.sp.players,own=r.s.own,cnt={},n=0;
- r.s.contests.forEach(function(c){c.e.forEach(function(e){n++;e[4].forEach(function(t){var k=t<0?"c"+(-t):""+t;cnt[k]=(cnt[k]||0)+1})})});
- var hasLU=0;r.s.contests.forEach(function(c){c.e.forEach(function(e){if(e[4].length)hasLU++})});
+function expo(r,cs,own,fieldN,what){
+ var pl=r.sp.players,cnt={},n=0,hasLU=0;
+ cs.forEach(function(c){c.e.forEach(function(e){n++;if(e[4].length)hasLU++;e[4].forEach(function(t){var k=t<0?"c"+(-t):""+t;cnt[k]=(cnt[k]||0)+1})})});
  var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
- var rows=ks.map(function(t){var mine=100*cnt[t]/hasLU,f=own[t]==null?0:own[t];var cp=t.charAt(0)==="c";var id=cp?t.slice(1):t;return{n:(cp?'<span class="c">CPT</span>':"")+esc(pl[+id]),mine:mine,f:f,lev:mine-f,w:mine}});
- var h='<div class="note" style="margin:0 0 6px">Exposure = share of his lineups with the player ('+hasLU+' lineups, every entry across the slate). Field = share of all captured entries in this draft group ('+n0(r.s.fieldN)+'). Leverage = his minus field.</div><div class="tw"><table><thead><tr><th>Player</th><th>His %</th><th></th><th>Field %</th><th>Lev</th></tr></thead><tbody>';
+ var rows=ks.map(function(t){var mine=100*cnt[t]/Math.max(1,hasLU),f=own[t]==null?0:own[t];var cp=t.charAt(0)==="c";var id=cp?t.slice(1):t;return{n:(cp?'<span class="c">CPT</span>':"")+esc(pl[+id-1]),mine:mine,f:f,lev:mine-f}});
+ var h='<div class="note" style="margin:0 0 6px">His % = share of his '+hasLU+' lineups with the player. Field % = share of '+(what==="contest"?"this contest's":"all captured")+' entries ('+n0(fieldN)+'). Lev = his minus field.</div><div class="tw"><table><thead><tr><th>Player</th><th>His %</th><th></th><th>Field %</th><th>Lev</th></tr></thead><tbody>';
  h+=rows.slice(0,60).map(function(x){return'<tr><td class="n">'+x.n+'</td><td>'+x.mine.toFixed(1)+'</td><td style="min-width:54px"><span class="bar" style="width:'+Math.min(50,x.mine/2)+'px"></span></td><td>'+x.f.toFixed(1)+'</td><td class="'+cls(x.lev)+'">'+(x.lev>0?"+":"")+x.lev.toFixed(1)+'</td></tr>'}).join("");
  return h+'</tbody></table></div>'+(rows.length>60?'<div class="note">Top 60 of '+rows.length+' players.</div>':"");
 }
 function slateBody(r){
- var h='<h2 style="margin-top:10px">Exposures</h2>'+expo(r)+'<h2 style="margin-top:14px">Contests</h2>';
+ var h='<h2 style="margin-top:10px">Slate exposures</h2>'+expo(r,r.s.contests,r.s.own,r.s.fieldN,"slate")+'<h2 style="margin-top:14px">Contests</h2>';
  var cs=r.s.contests.slice().sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:b.fee-a.fee});
  cs.forEach(function(c){var k=r.u.user+"|"+r.sport+"|"+r.s.dg+"|"+c.id;var pz=0;c.e.forEach(function(e){pz+=e[2]});var best=c.e.reduce(function(m,e){return Math.min(m,e[0])},1e9);var pr=pz-c.e.length*c.fee;
   h+='<div class="card'+(OPEN[k]?" open":"")+'" data-ck="'+esc(k)+'"><div class="hd" role="button" tabindex="0" data-c="1"><span class="t">'+esc(c.name)+'</span><span class="m">'+c.e.length+'x '+money(c.fee)+' · field '+n0(c.size)+' · best #'+n0(best)+' · <span class="'+cls(pr)+'">'+money(pr)+'</span></span></div><div class="bd">'+(OPEN[k]?contestBody(r,c):"")+'</div></div>'});
  return h;
 }
-function lineup(pl,ids,sd){return ids.map(function(t,i){var cp=t<0;var id=cp?-t:t;return(cp?'<span class="c">CPT</span>':"")+esc(pl[+id])}).join(" · ")}
+function lineup(pl,ids,sd){return ids.map(function(t,i){var cp=t<0;var id=cp?-t:t;return(cp?'<span class="c">CPT</span>':"")+esc(pl[+id-1])}).join(" · ")}
 function contestBody(r,c){
  var pl=r.sp.players,es=c.e.slice().sort(function(a,b){return a[0]-b[0]});
- var h='<div class="note" style="margin:0 0 8px"><a href="https://www.draftkings.com/contest/gamecenter/'+esc(c.id)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600">Open on DraftKings &#8599;</a> · '+esc(c.group)+' · '+esc(c.structure)+' · prize pool '+money(c.prize_pool)+' · starts '+esc(c.start)+' UTC'+(c.win!=null?' · winning score '+c.win:'')+(c.cash!=null?' · cash line '+c.cash:'')+(c.max!=null?' · max '+c.max+' entries':'')+'</div><div class="tw"><table><thead><tr><th>Rank</th><th>Pts</th><th>Prize</th><th>Dupes</th><th style="text-align:left">Lineup</th></tr></thead><tbody>';
+ var h='<div class="note" style="margin:0 0 8px"><a href="https://www.draftkings.com/contest/gamecenter/'+esc(c.id)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600">Open on DraftKings &#8599;</a> · '+esc(c.group)+' · '+esc(c.structure)+' · prize pool '+money(c.prize_pool)+' · starts '+esc(c.start)+' UTC'+(c.win!=null?' · winning score '+c.win:'')+(c.cash!=null?' · cash line '+c.cash:'')+(c.max!=null?' · max '+c.max+' entries':'')+'</div>'+(c.fieldN?'<h2 style="margin-top:6px">Exposure in this contest</h2>'+expo(r,[c],c.own||{},c.fieldN,"contest"):'')+'<h2 style="margin-top:12px">Entries</h2><div class="tw"><table><thead><tr><th>Rank</th><th>Pts</th><th>Prize</th><th>Dupes</th><th style="text-align:left">Lineup</th></tr></thead><tbody>';
  h+=es.slice(0,400).map(function(e){return'<tr><td>'+n0(e[0])+'</td><td>'+e[1]+'</td><td class="'+(e[2]>0?"pos":"")+'">'+(e[2]>0?money(e[2]):"-")+'</td><td>'+(e[3]||'-')+'</td><td class="lu">'+(e[4].length?lineup(pl,e[4]):'<span class="mute">no lineup in standings</span>')+'</td></tr>'}).join("");
  return h+'</tbody></table></div>'+(es.length>400?'<div class="note">Showing best 400 of '+es.length+' entries.</div>':"")+'<div class="note">Final standings only. Live and unfinished contests are not in the contest database yet, so there is no rooting guide.</div>';
 }
