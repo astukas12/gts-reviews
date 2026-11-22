@@ -47,11 +47,13 @@ tr.me td{background:#2b2a12}tr.cut td{border-bottom:2px dashed var(--warn)}
  <section><h2>Constructors</h2><div class="tw"><table id="con"></table></div><div class="note">Both drivers' finish pts + both classified +2, both top 10 +5, both top 3 +3, fastest lap +3, laps led x0.25.</div></section>
 </div></div>
 <script>
-var BASE="../../live-data/f1/live/",S=null,CUR={},cache={};
+var RAW="https://raw.githubusercontent.com/astukas12/gts-reviews/main/live-data/f1/live/",SITE="../../live-data/f1/live/",BASE=RAW,S=null,CUR={},cache={};
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
 function nz(s){return String(s).normalize("NFKD").replace(/[^\x00-\x7f]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim()}
-function get(f){return fetch(BASE+f+"?t="+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json()})}
+var API="https://api.github.com/repos/astukas12/gts-reviews/contents/live-data/f1/live/";
+function getj(u,o){return fetch(u,o).then(function(r){if(!r.ok)throw 0;return r.json()})}
+function get(f){return getj(API+f+"?ref=main",{headers:{Accept:"application/vnd.github.raw+json"},cache:"no-cache"}).catch(function(){return getj(RAW+f+"?t="+Date.now())}).catch(function(){return getj(SITE+f+"?t="+Date.now())})}
 function fx(x,d){return x==null?"":Number(x).toFixed(d==null?2:d).replace(/\.00$/,"")}
 function money(x){return x?"$"+Number(x).toLocaleString(undefined,{maximumFractionDigits:2}):""}
 var PM={},PI={};
@@ -70,7 +72,7 @@ function lineup(s,k){var nm=s.names,E=s.cols,ix={};E.forEach(function(c,i){ix[c]
  var o=[["CPT","cpt"],["D","d1"],["D","d2"],["D","d3"],["D","d4"],["C","cn"]];
  return o.map(function(p){var i=col(p[1])[k];if(i==null)return"";var n=nm[i],pt=PM[nz(n)],m=p[0]==="CPT"?1.5:1;return(p[0]==="CPT"?"<b>":"")+esc(n)+(pt==null?"":" "+fx(pt*m))+(p[0]==="CPT"?"</b>":"")}).join(" · ")}
 function render(){if(!S)return;head();raceTables();var id=$("c").value,u=$("u").value.trim().toLowerCase();if(!id)return;
- Promise.all([cache[id]||get(id+".json").then(function(j){cache[id]=j;return j}),get(id+".live.json")]).then(function(r){var s=r[0],l=r[1];draw(id,s,l,u)}).catch(function(){$("stand").innerHTML="";$("stn").textContent="Contest data not published yet (pulled at lock, 11 PM ET)."})}
+ (cache[id]?Promise.resolve(cache[id]):get(id+".json").then(function(j){cache[id]=j;return j})).then(function(s){var l=(S.live||{})[id];if(!l)throw 0;draw(id,s,l,u)}).catch(function(){$("stand").innerHTML="";$("stn").textContent="Contest data not published yet (pulled at lock, 11 PM ET)."})}
 function draw(id,s,l,u){var n=l.pts.length,ix={};s.cols.forEach(function(c,i){ix[c]=Array.isArray(s.entries[i])?s.entries[i]:[s.entries[i]]});
  var ord=[];for(var k=0;k<n;k++)ord.push(k);ord.sort(function(a,b){return l.rank[a]-l.rank[b]||a-b});
  var users=s.users,mine=[];ord.forEach(function(k){if(u&&users[ix.u[k]].toLowerCase()===u)mine.push(k)});
