@@ -41,6 +41,7 @@ tr.me td{background:#2b2a12}tr.cut td{border-bottom:2px dashed var(--warn)}
 <div class="tiles" id="tiles"></div>
 <div class="grid"><div>
  <section><h2 id="sth">Standings</h2><div class="tw"><table id="stand"></table></div><div class="note" id="stn"></div></section>
+ <section id="xsec"><div style="display:flex;gap:6px;margin-bottom:10px"><button class="vb" data-v="expo" aria-pressed="true">Exposure</button><button class="vb" data-v="dupe" aria-pressed="false">Dupes</button></div><h2 id="xh"></h2><div class="tw" style="max-height:60vh;overflow-y:auto"><table id="xt"></table></div><div class="note" id="xn"></div></section>
  <section id="mine" hidden><h2 id="mineh">Entries</h2><div class="tw"><table id="minet"></table></div></section>
 </div><div>
  <section><h2>Race: DK points if it ended now</h2><div class="tw"><table id="drv"></table></div><div class="note">Finish pts + places gained + FL +3 + laps led x0.25 + beat teammate +5 + classified +1. Includes the teammate and constructor bonuses DK leaves out during the race.</div></section>
@@ -73,10 +74,25 @@ function lineup(s,k){var nm=s.names,E=s.cols,ix={};E.forEach(function(c,i){ix[c]
  return o.map(function(p){var i=col(p[1])[k];if(i==null)return"";var n=nm[i],pt=PM[nz(n)],m=p[0]==="CPT"?1.5:1;return(p[0]==="CPT"?"<b>":"")+esc(n)+(pt==null?"":" "+fx(pt*m))+(p[0]==="CPT"?"</b>":"")}).join(" · ")}
 function render(){if(!S)return;head();raceTables();var id=$("c").value,u=$("u").value.trim().toLowerCase();if(!id)return;
  (cache[id]?Promise.resolve(cache[id]):get(id+".json").then(function(j){cache[id]=j;return j})).then(function(s){var l=(S.live||{})[id];if(!l)throw 0;draw(id,s,l,u)}).catch(function(){$("stand").innerHTML="";$("stn").textContent="Contest data not published yet (pulled at lock, 11 PM ET)."})}
+var XV="expo",XL=null;
+function extra(id,s,l,u,ix,users){var n=l.pts.length,own={},grp={},mineK={};
+ for(var k=0;k<n;k++){var c=[ix.cpt[k],ix.d1[k],ix.d2[k],ix.d3[k],ix.d4[k],ix.cn[k]];if(c.indexOf(null)>=0)continue;
+  var key=c[0]+"|"+c.slice(1,5).sort().join(",")+"|"+c[5];(grp[key]=grp[key]||[]).push(k);
+  c.forEach(function(i,j){var o=own[i]=own[i]||{f:0,c:0,u:0,uc:0};o.f++;if(j===0)o.c++});
+  if(u&&users[ix.u[k]].toLowerCase()===u){mineK[k]=1;c.forEach(function(i,j){own[i].u++;if(j===0)own[i].uc++})}}
+ var nu=Object.keys(mineK).length;
+ if(XV==="expo"){$("xh").textContent="Exposure vs the field";var rows=Object.keys(own).map(function(i){var o=own[i],nm=s.names[i],pt=PM[nz(nm)];return{nm:nm,o:o,pt:pt}}).sort(function(a,b){return b.o.f-a.o.f});
+  $("xt").innerHTML="<tr><th>Player</th><th class=n>Live pts</th><th class=n>Field %</th><th class=n>Field CPT %</th>"+(nu?"<th class=n>"+esc(u)+" %</th><th class=n>vs field</th>":"")+"</tr>"+rows.map(function(r){var f=r.o.f/n*100,m=nu?r.o.u/nu*100:0;return"<tr><td>"+esc(r.nm)+"</td><td class=n>"+fx(r.pt)+"</td><td class=n>"+f.toFixed(1)+"</td><td class=n>"+(r.o.c/n*100).toFixed(1)+"</td>"+(nu?"<td class=n>"+m.toFixed(1)+"</td><td class='n "+(m-f>0?"good":"bad")+"'>"+(m-f>0?"+":"")+(m-f).toFixed(1)+"</td>":"")+"</tr>"}).join("");
+  $("xn").textContent=nu?"Your % is over your "+nu+" entries in this contest. Field % counts each lineup slot (captain included); CPT % is captain only.":"Pick a username to compare an exposure against the field."}
+ else{$("xh").textContent="Duplication";var gs=Object.keys(grp).map(function(k){return grp[k]}).sort(function(a,b){return b.length-a.length});
+  function lu2(k){return lineup(s,k)}
+  var top=gs.filter(function(g){return g.length>1}).slice(0,25);
+  $("xt").innerHTML="<tr><th class=n>Copies</th><th class=n>% of contest</th><th class=n>Rank</th><th class=n>Pts</th><th>Lineup</th></tr>"+top.map(function(g){return"<tr><td class=n>"+g.length+"</td><td class=n>"+(g.length/n*100).toFixed(2)+"</td><td class=n>"+l.rank[g[0]]+"</td><td class=n>"+fx(l.pts[g[0]])+"</td><td class=lu>"+lu2(g[0])+"</td></tr>"}).join("")+(nu?"<tr><th colspan=5 style='padding-top:14px'>"+esc(u)+": your entries and their copies</th></tr>"+gs.filter(function(g){return g.some(function(k){return mineK[k]})}).map(function(g){var mk=g.filter(function(k){return mineK[k]});return"<tr class=me><td class=n>"+g.length+"</td><td class=n>"+(g.length/n*100).toFixed(2)+"</td><td class=n>"+l.rank[g[0]]+"</td><td class=n>"+fx(l.pts[g[0]])+"</td><td class=lu>"+lu2(g[0])+(mk.length>1?" <span class=mute>(you x"+mk.length+")</span>":"")+"</td></tr>"}).join(""):"");
+  var uniq=gs.filter(function(g){return g.length===1}).length;$("xn").textContent=uniq+" of "+n+" lineups are unique. Duplicates = same drivers, same captain, same constructor.";}}
 function draw(id,s,l,u){var n=l.pts.length,ix={};s.cols.forEach(function(c,i){ix[c]=Array.isArray(s.entries[i])?s.entries[i]:[s.entries[i]]});
  var ord=[];for(var k=0;k<n;k++)ord.push(k);ord.sort(function(a,b){return l.rank[a]-l.rank[b]||a-b});
  var users=s.users,mine=[];ord.forEach(function(k){if(u&&users[ix.u[k]].toLowerCase()===u)mine.push(k)});
- var ct=s.contest;$("sth").textContent=ct.name+" · "+n+" entries";
+ extra(id,s,l,u,ix,users);var ct=s.contest;$("sth").textContent=ct.name+" · "+n+" entries";
  $("tiles").innerHTML=[["Top score",fx(l.top)],["Cash line",l.cut==null?"-":fx(l.cut)+" (rk "+l.paid+")"],["Entries",n],["Prize pool",money(ct.prize_pool)]].concat(mine.length?[["Best "+esc(u),"rk "+l.rank[mine[0]]+" · "+fx(l.pts[mine[0]])+(l.prize[mine[0]]?" · "+money(l.prize[mine[0]]):"")]]:[]).map(function(t){return"<div class=tile><div class=k>"+t[0]+"</div><div class=v>"+t[1]+"</div></div>"}).join("");
  function row(k,cls){return"<tr class='"+(cls||"")+"'><td class=n>"+l.rank[k]+"</td><td>"+esc(users[ix.u[k]])+(ct.max_per_user>1?" <span class=mute>#"+ix.n[k]+"</span>":"")+"</td><td class=n><b>"+fx(l.pts[k])+"</b></td><td class=n "+(l.prize[k]?"":"style='color:#666'")+">"+(l.prize[k]?money(l.prize[k]):(l.tkt&&l.tkt[k]?"ticket":""))+"</td><td class=lu>"+lineup(s,k)+"</td></tr>"}
  var H="<tr><th class=n>Rank</th><th>User</th><th class=n>Pts</th><th class=n>Prize</th><th>Lineup (live pts)</th></tr>";
@@ -88,5 +104,5 @@ function load(){get("state.json").then(function(j){S=j;buildPM();var sel=$("c"),
  var pu=$("pu");if(!pu.dataset.d){pu.dataset.d=1;pu.innerHTML=j.priority_users.map(function(x){return"<button data-u='"+esc(x)+"'>"+esc(x)+"</button>"}).join(" ");pu.onclick=function(e){var b=e.target.closest("button");if(!b)return;$("u").value=b.dataset.u;Array.prototype.forEach.call(pu.children,function(x){x.setAttribute("aria-pressed",x===b)});
  var cs=(S.user_contests||{})[b.dataset.u]||[];if(cs.length&&cs.indexOf($("c").value)<0)$("c").value=cs[0];render()}}
  render()}).catch(function(){$("sub").textContent="waiting for the first publish..."})}
-$("c").onchange=render;$("u").oninput=render;load();setInterval(load,20000);
+document.querySelector("#xsec").onclick=function(e){var b=e.target.closest(".vb");if(!b)return;XV=b.dataset.v;Array.prototype.forEach.call(document.querySelectorAll(".vb"),function(x){x.setAttribute("aria-pressed",x===b)});render()};$("c").onchange=render;$("u").oninput=render;load();setInterval(load,20000);
 </script></div></body></html>
