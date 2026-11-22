@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F1 Live Scoring</title>
+<style>
+:root{--bg:#121212;--panel:#1e1e1e;--fg:#fff;--mute:#999;--line:#404040;--accent:#FFE500;--good:#4caf50;--warn:#ff9800;--bad:#f44336;--chip:#2d2d2d;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,Arial,sans-serif;padding:0 16px 32px}
+.wrap{max-width:1300px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}
+h1{font-size:22px;margin:0;color:var(--accent)}.sub{color:var(--mute);font-size:13px}
+.pill{display:inline-block;background:var(--chip);border-radius:999px;padding:4px 10px;font-size:12px;margin-left:6px}
+.live{background:var(--good);color:#000;font-weight:700}.wait{background:var(--warn);color:#000;font-weight:700}
+.bar{display:flex;flex-wrap:wrap;gap:10px 14px;margin:14px 0;align-items:end}
+label{font-size:12px;color:var(--mute);display:block;margin-bottom:3px}
+select,input{font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;max-width:100%}
+button{font:inherit;font-weight:600;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer}
+button[aria-pressed=true]{background:var(--accent);color:#000;border-color:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}.tile .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+section+section{margin-top:16px}
+h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px;color:var(--accent)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid #2a2a2a;white-space:nowrap}td.n,th.n{text-align:right}
+tr.me td{background:#2b2a12}tr.cut td{border-bottom:2px dashed var(--warn)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.lu{white-space:normal;font-size:12px;color:#ccc}.lu b{color:#fff}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+.note{font-size:12px;color:var(--mute);margin-top:8px}
+</style></head><body><div class="wrap">
+<header><div><h1 id="title">F1 Live Scoring</h1><div class="sub" id="sub">loading...</div></div><div><span class="pill" id="st"></span><span class="pill" id="upd"></span></div></header>
+<div class="bar">
+ <div><label for="c">Contest</label><select id="c"></select></div>
+ <div><label for="u">Username</label><input id="u" placeholder="any username" list="ul" autocomplete="off"><datalist id="ul"></datalist></div>
+ <div id="pu"></div>
+</div>
+<div class="tiles" id="tiles"></div>
+<div class="grid"><div>
+ <section><h2 id="sth">Standings</h2><div class="tw"><table id="stand"></table></div><div class="note" id="stn"></div></section>
+ <section id="mine" hidden><h2 id="mineh">Entries</h2><div class="tw"><table id="minet"></table></div></section>
+</div><div>
+ <section><h2>Race: DK points if it ended now</h2><div class="tw"><table id="drv"></table></div><div class="note">Finish pts + places gained + FL +3 + laps led x0.25 + beat teammate +5 + classified +1. Includes the teammate and constructor bonuses DK leaves out during the race.</div></section>
+ <section><h2>Constructors</h2><div class="tw"><table id="con"></table></div><div class="note">Both drivers' finish pts + both classified +2, both top 10 +5, both top 3 +3, fastest lap +3, laps led x0.25.</div></section>
+</div></div>
+<script>
+var BASE="../../live-data/f1/live/",S=null,CUR={},cache={};
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function nz(s){return String(s).normalize("NFKD").replace(/[^\x00-\x7f]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim()}
+function get(f){return fetch(BASE+f+"?t="+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json()})}
+function fx(x,d){return x==null?"":Number(x).toFixed(d==null?2:d).replace(/\.00$/,"")}
+function money(x){return x?"$"+Number(x).toLocaleString(undefined,{maximumFractionDigits:2}):""}
+var PM={},PI={};
+function buildPM(){PM={};PI={};S.state.drivers.forEach(function(d){if(d.dk_name){PM[nz(d.dk_name)]=d.pts;PI[nz(d.dk_name)]=d}});S.state.constructors.forEach(function(c){if(c.dk_name){PM[nz(c.dk_name)]=c.pts;PI[nz(c.dk_name)]=c}})}
+function head(){var st=S.state;$("title").textContent=(S.race_name||"F1")+" - Live DK Scoring";
+ var ago=Math.max(0,Math.round((Date.now()-Date.parse(st.updated))/1000));
+ $("sub").textContent="Lap "+st.lap+(st.total_laps?" / "+st.total_laps:"")+" · "+(st.msgs&&st.msgs.length?esc(st.msgs[st.msgs.length-1]):"");
+ var live=st.status==="live"||st.status==="red flag"||st.status==="final";var e=$("st");e.textContent=st.status;e.className="pill "+(live?"live":"wait");
+ $("upd").textContent="data "+ago+"s old";}
+function raceTables(){var st=S.state;
+ $("drv").innerHTML="<tr><th class=n>Pos</th><th>Driver</th><th class=n>Grid</th><th class=n>Fin</th><th class=n>+/-</th><th class=n>LL</th><th class=n>FL</th><th class=n>TM</th><th class=n>Cl</th><th class=n>DK pts</th></tr>"+
+ st.drivers.map(function(d){return"<tr><td class=n>"+d.pos+"</td><td><span class=dot style='background:"+d.color+"'></span>"+esc(d.name)+(d.out?" <span class=bad>OUT</span>":"")+"</td><td class=n>"+d.grid+"</td><td class=n>"+d.fin_pts+"</td><td class=n>"+(d.pd_pts>0?"+":"")+d.pd_pts+"</td><td class=n>"+fx(d.ll_pts)+"</td><td class=n>"+(d.fl_pts||"")+"</td><td class=n>"+(d.tm_pts||"")+"</td><td class=n>"+d.cls_pts+"</td><td class=n><b>"+fx(d.pts)+"</b></td></tr>"}).join("");
+ $("con").innerHTML="<tr><th>Constructor</th><th class=n>Fin</th><th class=n>Bonus</th><th class=n>LL</th><th class=n>DK pts</th></tr>"+
+ st.constructors.map(function(c){return"<tr><td><span class=dot style='background:"+c.color+"'></span>"+esc(c.team)+"</td><td class=n>"+c.fin_pts+"</td><td class=n>"+(c.b_cls+c.b10+c.b3+c.bfl)+"</td><td class=n>"+fx(c.ll_pts)+"</td><td class=n><b>"+fx(c.pts)+"</b></td></tr>"}).join("");}
+function lineup(s,k){var nm=s.names,E=s.cols,ix={};E.forEach(function(c,i){ix[c]=s.entries[i]});function col(c){return Array.isArray(ix[c])?ix[c]:[ix[c]]}
+ var o=[["CPT","cpt"],["D","d1"],["D","d2"],["D","d3"],["D","d4"],["C","cn"]];
+ return o.map(function(p){var i=col(p[1])[k];if(i==null)return"";var n=nm[i],pt=PM[nz(n)],m=p[0]==="CPT"?1.5:1;return(p[0]==="CPT"?"<b>":"")+esc(n)+(pt==null?"":" "+fx(pt*m))+(p[0]==="CPT"?"</b>":"")}).join(" · ")}
+function render(){if(!S)return;head();raceTables();var id=$("c").value,u=$("u").value.trim().toLowerCase();if(!id)return;
+ Promise.all([cache[id]||get(id+".json").then(function(j){cache[id]=j;return j}),get(id+".live.json")]).then(function(r){var s=r[0],l=r[1];draw(id,s,l,u)}).catch(function(){$("stand").innerHTML="";$("stn").textContent="Contest data not published yet (pulled at lock, 11 PM ET)."})}
+function draw(id,s,l,u){var n=l.pts.length,ix={};s.cols.forEach(function(c,i){ix[c]=Array.isArray(s.entries[i])?s.entries[i]:[s.entries[i]]});
+ var ord=[];for(var k=0;k<n;k++)ord.push(k);ord.sort(function(a,b){return l.rank[a]-l.rank[b]||a-b});
+ var users=s.users,mine=[];ord.forEach(function(k){if(u&&users[ix.u[k]].toLowerCase()===u)mine.push(k)});
+ var ct=s.contest;$("sth").textContent=ct.name+" · "+n+" entries";
+ $("tiles").innerHTML=[["Top score",fx(l.top)],["Cash line",l.cut==null?"-":fx(l.cut)+" (rk "+l.paid+")"],["Entries",n],["Prize pool",money(ct.prize_pool)]].concat(mine.length?[["Best "+esc(u),"rk "+l.rank[mine[0]]+" · "+fx(l.pts[mine[0]])+(l.prize[mine[0]]?" · "+money(l.prize[mine[0]]):"")]]:[]).map(function(t){return"<div class=tile><div class=k>"+t[0]+"</div><div class=v>"+t[1]+"</div></div>"}).join("");
+ function row(k,cls){return"<tr class='"+(cls||"")+"'><td class=n>"+l.rank[k]+"</td><td>"+esc(users[ix.u[k]])+(ct.max_per_user>1?" <span class=mute>#"+ix.n[k]+"</span>":"")+"</td><td class=n><b>"+fx(l.pts[k])+"</b></td><td class=n "+(l.prize[k]?"":"style='color:#666'")+">"+(l.prize[k]?money(l.prize[k]):(l.tkt&&l.tkt[k]?"ticket":""))+"</td><td class=lu>"+lineup(s,k)+"</td></tr>"}
+ var H="<tr><th class=n>Rank</th><th>User</th><th class=n>Pts</th><th class=n>Prize</th><th>Lineup (live pts)</th></tr>";
+ var top=ord.slice(0,100);$("stand").innerHTML=H+top.map(function(k,i){var m=u&&users[ix.u[k]].toLowerCase()===u;return row(k,(m?"me ":"")+(l.paid&&l.rank[k]<=l.paid&&(i+1>=top.length||l.rank[top[i+1]]>l.paid)?"cut":""))}).join("");
+ $("stn").textContent=n>100?"Top 100 shown; type a username above to see all of a user's entries.":"";
+ if(u){$("mine").hidden=false;$("mineh").textContent=(mine.length?mine.length+" entries for ":"No entries for ")+u+" in this contest";$("minet").innerHTML=H+mine.map(function(k){return row(k,"me")}).join("")}else $("mine").hidden=true}
+function load(){get("state.json").then(function(j){S=j;buildPM();var sel=$("c"),cur=sel.value;
+ if(!sel.options.length||sel.dataset.n!=String(j.contests.length)){sel.dataset.n=j.contests.length;sel.innerHTML=j.contests.map(function(c){return"<option value='"+c.id+"'>"+esc(c.name)+" ("+c.entries+")</option>"}).join("");if(cur)sel.value=cur}
+ var pu=$("pu");if(!pu.dataset.d){pu.dataset.d=1;pu.innerHTML=j.priority_users.map(function(x){return"<button data-u='"+esc(x)+"'>"+esc(x)+"</button>"}).join(" ");pu.onclick=function(e){var b=e.target.closest("button");if(!b)return;$("u").value=b.dataset.u;Array.prototype.forEach.call(pu.children,function(x){x.setAttribute("aria-pressed",x===b)});
+ var cs=(S.user_contests||{})[b.dataset.u]||[];if(cs.length&&cs.indexOf($("c").value)<0)$("c").value=cs[0];render()}}
+ render()}).catch(function(){$("sub").textContent="waiting for the first publish..."})}
+$("c").onchange=render;$("u").oninput=render;load();setInterval(load,20000);
+</script></div></body></html>
