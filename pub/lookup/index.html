@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Contest Lookup</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16181d;--mute:#667085;--line:#e3e6eb;--acc:#b8860b;--good:#1a7f37;--bad:#c0392b;--chip:#eef0f4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a21;--ink:#e8eaee;--mute:#9aa3b2;--line:#262b35;--acc:#e0b84a;--good:#3fb950;--bad:#ff6b5e;--chip:#222732}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 2px}.sub{color:var(--mute);font-size:13px}
+form{display:flex;gap:8px;margin:14px 0}
+input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:16px}
+button{padding:12px 18px;border:0;border-radius:10px;background:var(--acc);color:#111;font-weight:600;font-size:15px;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.sport{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:22px 0 -4px}
+.k{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{background:var(--chip);border-radius:8px;padding:3px 9px;font-size:13px}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500;font-size:12px}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.lu{font-size:12.5px;color:var(--mute)}.lu b{color:var(--ink);font-weight:500}
+details>summary{cursor:pointer;color:var(--mute);font-size:13px;margin-top:8px}
+.fresh{font-size:12px;color:var(--mute)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:5px}
+@media(max-width:560px){th:nth-child(5),td:nth-child(5){display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Live Contest Lookup</h1>
+  <div class="sub">Type any DraftKings username to see that user's live contests across every sport we track: rank, points, estimated payout, exposure vs the field and duplicates.</div>
+  <form id="f"><input id="u" placeholder="DraftKings username" autocomplete="off" autocapitalize="off" spellcheck="false"><button>Look up</button></form>
+  <div id="fresh" class="fresh"></div>
+  <div id="out"></div>
+  <p class="sub" id="note"></p>
+</div>
+<script>
+// ---- the ONE data-access function: a login / paywall gate goes here later (check access, add a token header) ----------------
+const BASE = "../live/";
+async function gtsFetch(path) {
+  const r = await fetch(BASE + path + (path.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error(path + " " + r.status);
+  return r.json();
+}
+// ---- same hash as lookup_pub.R ---------------------------------------------------------------------------------------------
+const NB = 128;
+function bucket(name) { let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 65521; return h % NB; }
+const $ = (s) => document.getElementById(s);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const money = (x) => x == null ? "–" : "$" + Number(x).toLocaleString(undefined, { maximumFractionDigits: 2 });
+const SPORT = { cbb: "College basketball", nfl: "NFL", soc: "Soccer", nba: "NBA", nhl: "NHL", cfb: "College football", mma: "MMA", f1: "Formula 1" };
+let META = null;
+// minutes in a full lineup (DK TimeRemaining starts at this): pace views only where known
+const TOTMIN = { cbb: { classic: 200 }, nba: { classic: 240 } };
+const PRIOR = 20;   // minutes of field-average pace blended in, so early pace does not swing wildly
+function pace(c, e) {
+  const L = c.lines || {}, tot = (TOTMIN[c.sport] || {})[c.gt];
+  if (!tot || L.avg_pts == null || L.avg_trem == null) return null;
+  const played = tot - e[3], fpl = tot - L.avg_trem; if (fpl <= 0) return null;
+  const fpace = L.avg_pts / fpl;                       // field average points per lineup minute
+  const own = played > 0 ? e[2] / played : fpace;
+  const blend = (played * own + PRIOR * fpace) / (played + PRIOR);
+  const proj = e[2] + blend * e[3];
+  const fproj = L.avg_pts + fpace * L.avg_trem;        // field-average projected final
+  const k = (line) => line == null ? null : line + (fproj - L.avg_pts);   // lines move with the field: add the field's expected remaining points
+  return { played, own, proj, cash: k(L.cash_pts), t10: k(L.top10_pts), t1: k(L.top1_pts) };
+}
+
+function paceNote(c) {   // projected cash / top-10% / top-1% lines for this contest
+  const fake = pace(c, [0, 0, 0, (TOTMIN[c.sport] || {})[c.gt] || 0]); if (!fake || fake.cash == null) return "";
+  return "proj. cash " + fake.cash.toFixed(0) + " · top 10% " + (fake.t10 == null ? "–" : fake.t10.toFixed(0)) + " · top 1% " + (fake.t1 == null ? "–" : fake.t1.toFixed(0));
+}
+function payFor(c, rank) {
+  const L = c.lines || {}; if (!L.pay) return 0;
+  for (const b of L.pay) if (rank >= b[0] && rank <= b[1]) return b[2] || 0;
+  return 0;
+}
+function keyOf(c, tok) { const i = tok.indexOf(" "); return c.gt === "showdown" ? tok : tok.slice(i + 1); }
+
+function render(user, row) {
+  const out = $("out");
+  if (!row) { out.innerHTML = '<div class="card">No live entries found for <b>' + esc(user) + '</b> in the contests we are tracking right now. Usernames are not case sensitive. If a slate just locked, check back in a few minutes.</div>'; return; }
+  const disp = row[0], ents = row[1];
+  const by = {}; ents.forEach((e) => { (by[e[0]] = by[e[0]] || []).push(e); });
+  let tot = 0, itm = 0, fees = 0, win = 0;
+  const groups = {};
+  Object.keys(by).forEach((ci) => {
+    const c = META.contests[ci]; if (!c) return;
+    const sk = c.sport + "|" + (c.slate || "");
+    (groups[sk] = groups[sk] || []).push([c, by[ci]]);
+  });
+  let h = '<div class="card"><b>' + esc(disp) + '</b><div class="k" id="tot"></div></div>';
+  Object.keys(groups).sort().forEach((sk) => {
+    const [sp, slate] = sk.split("|");
+    h += '<div class="sport">' + esc(SPORT[sp] || sp) + (slate ? " · " + esc(slate) : "") + "</div>";
+    groups[sk].sort((a, b) => (b[0].fee || 0) - (a[0].fee || 0)).forEach(([c, es]) => {
+      es.sort((a, b) => a[1] - b[1]);
+      const L = c.lines || {}, paid = L.paid, n = es.length;
+      const rows = es.map((e) => {
+        const pay = payFor(c, e[1]), inm = paid && e[1] <= paid;
+        tot++; if (inm) itm++; win += pay; fees += (c.fee || 0);
+        const names = e[5].map((t) => { const k = keyOf(c, META.tok[t]); const o = c.own && c.own[k]; const sl = META.tok[t].split(" ")[0]; const nm = META.tok[t].slice(sl.length + 1); if (nm === "LOCKED") return "<i class=\"mute\">hidden</i>"; return "<b>" + esc(nm) + "</b> " + (o && o[1] != null ? "(" + o[1] + ")" : ""); }).join(" · ");
+        const pp = pace(c, e);
+        const gap = (L.cash_pts != null) ? (e[2] - L.cash_pts) : null;
+        return "<tr><td class='n'>" + e[1].toLocaleString() + "</td><td class='n'>" + e[2] + "</td><td class='n " + (inm ? "good" : "") + "'>" + (pay ? money(pay) : (inm ? "cash" : "–")) + "</td><td class='n'>" + (gap == null ? "" : (gap >= 0 ? "+" : "") + gap.toFixed(1)) + "</td><td class='n " + (pp && pp.cash != null ? (pp.proj >= pp.cash ? "good" : "bad") : "") + "' title='" + (pp ? "pace " + (pp.own * 10).toFixed(1) + " pts per 10 min; projected cash line " + (pp.cash == null ? "n/a" : pp.cash.toFixed(1)) : "") + "'>" + (pp ? pp.proj.toFixed(1) : "") + "</td><td class='n'>" + (e[4] > 1 ? e[4] + "×" : "") + "</td><td class='lu'>" + names + "</td></tr>";
+      }).join("");
+      // exposure vs field
+      const cnt = {}; es.forEach((e) => e[5].forEach((t) => { if (/(^| )LOCKED$/.test(META.tok[t])) return; const k = keyOf(c, META.tok[t]); cnt[k] = (cnt[k] || 0) + 1; }));
+      const ex = Object.keys(cnt).map((k) => ({ k, me: 100 * cnt[k] / n, fd: c.own && c.own[k] ? c.own[k][0] : null, pts: c.own && c.own[k] ? c.own[k][1] : null })).sort((a, b) => b.me - a.me).slice(0, 14);
+      // field favourites this user has 0 of (leverage the other way): top field-owned players not in any of the user's lineups
+      const zero = Object.keys(c.own || {}).filter((k) => !cnt[k] && !/(^| )LOCKED$/.test(k) && c.own[k][0] >= 5).sort((a, b) => c.own[b][0] - c.own[a][0]).slice(0, 10).map((k) => ({ k, me: 0, fd: c.own[k][0], pts: c.own[k][1] }));
+      const exrow = (x) => "<tr><td>" + esc(x.k) + "</td><td class='n'>" + x.me.toFixed(0) + "%</td><td class='n'>" + (x.fd == null ? "–" : x.fd.toFixed(1) + "%") + "</td><td class='n " + (x.fd != null && x.me - x.fd > 5 ? "good" : x.fd != null && x.me - x.fd < -5 ? "bad" : "") + "'>" + (x.fd == null ? "" : (x.me - x.fd >= 0 ? "+" : "") + (x.me - x.fd).toFixed(0)) + "</td><td class='n'>" + (x.pts == null ? "" : x.pts) + "</td></tr>";
+      const hid = es.some((e) => e[5].some((t) => /(^| )LOCKED$/.test(META.tok[t])));
+      const exh = ex.map(exrow).join("") + (zero.length ? "<tr><th colspan='5'>Not on your lineups (field owns 5%+)</th></tr>" + zero.map(exrow).join("") : "") + (hid ? "<tr><td colspan='5' class='mute'>Hidden (locked) slots can't be counted, so exposure is understated until those games start.</td></tr>" : "");
+      const lead = (L.lead || []).map((l) => "<tr><td class='n'>" + l.r + "</td><td>" + esc(l.u) + "</td><td class='n'>" + l.p + "</td></tr>").join("");
+      h += '<div class="card"><b>' + esc(c.name || c.id) + '</b><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + "</div>" +
+        "<table><tr><th class='n'>Rank</th><th class='n'>Pts</th><th class='n'>Est. pay</th><th class='n'>vs cash</th><th class='n'>Proj</th><th class='n'>Dupes</th><th>Lineup (live pts)</th></tr>" + rows + "</table>" +
+        "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary><table><tr><th>Player</th><th class='n'>You</th><th class='n'>Field</th><th class='n'>Diff</th><th class='n'>Pts</th></tr>" + exh + "</table></details>" +
+        "<details><summary>Leaderboard top 10</summary><table><tr><th class='n'>Rank</th><th>User</th><th class='n'>Pts</th></tr>" + lead + "</table></details></div>";
+    });
+  });
+  // the "main" contests (flagships and GPPs) for context, including the ones this user is not in
+  const mine = new Set(Object.keys(by).map((ci) => META.contests[ci] && META.contests[ci].id));
+  const mains = META.contests.filter((c) => c.main && !mine.has(c.id));
+  if (mains.length) {
+    const msp = {}; mains.forEach((c) => { (msp[c.sport] = msp[c.sport] || []).push(c); });
+    h += '<div class="sport">Main contests (you are not in these)</div><div class="card">';
+    Object.keys(msp).sort().forEach((sp) => {
+      h += "<table><tr><th>" + esc(SPORT[sp] || sp) + "</th><th class='n'>Entry</th><th class='n'>Entries</th><th class='n'>Cash line</th><th>Leader</th></tr>" +
+        msp[sp].sort((a, b) => (b.fee || 0) - (a.fee || 0)).map((c) => { const L = c.lines || {}, ld = (L.lead || [])[0]; return "<tr><td>" + esc(c.name || c.id) + "</td><td class='n'>" + (c.fee != null ? money(c.fee) : "") + "</td><td class='n'>" + (c.size || "").toLocaleString() + "</td><td class='n'>" + (L.cash_pts != null ? L.cash_pts : "") + "</td><td>" + (ld ? esc(ld.u) + " · " + ld.p : "") + "</td></tr>"; }).join("") + "</table>";
+    });
+    h += "</div>";
+  }
+  out.innerHTML = h;
+  $("tot").innerHTML = '<span class="chip">' + tot + ' live entries</span><span class="chip">' + itm + ' in the money</span><span class="chip">est. winnings ' + money(win) + '</span>';
+}
+
+async function lookup(user) {
+  user = user.trim().toLowerCase(); if (!user) return;
+  try { localStorage.setItem("gtsLookupUser", user); } catch (e) {}
+  $("out").innerHTML = '<div class="card mute">Looking up…</div>';
+  try {
+    META = await gtsFetch("meta.json");
+    const sh = await gtsFetch("u/" + bucket(user) + ".json");
+    if (sh.v !== META.v) { META = await gtsFetch("meta.json"); }
+    const t = new Date(META.built);
+    $("fresh").innerHTML = '<span class="dot"></span>Data as of ' + t.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + " (updates every few minutes)";
+    $("note").textContent = META.note || "";
+    const row = sh.u[user];
+    if (row) { // detail files (field ownership, payout table, leaderboard) only for this user's contests
+      const ids = [...new Set(row[1].map((e) => e[0]))];
+      await Promise.all(ids.map(async (ci) => { const c = META.contests[ci]; if (!c || c.own) return; try { const d = await gtsFetch("c/" + c.id + ".json"); c.own = d.own; c.lines = Object.assign(c.lines || {}, { pay: d.pay, lead: d.lead }); } catch (e) {} }));
+    }
+    render(user, row);
+  } catch (e) { $("out").innerHTML = '<div class="card">No live contest data is published right now. Check back when a slate is live.</div>'; }
+}
+$("f").addEventListener("submit", (ev) => { ev.preventDefault(); const u = $("u").value; history.replaceState(null, "", "?u=" + encodeURIComponent(u.trim())); lookup(u); });
+const q = new URLSearchParams(location.search).get("u"); if (q) { $("u").value = q; lookup(q); }
+</script>
+</body>
+</html>
