@@ -249,11 +249,16 @@ function linesBlock(c,all){
  h+='<div class="note" style="margin:6px 0 8px">'+(L.paid!=null?'<b>'+itm+'</b> of his '+all.length+' entries are in the money now. ':'')+(L.cash!=null&&mine<L.cash?'Best entry needs '+(L.cash-mine).toFixed(2)+' more to cash. ':'')+(L.t1!=null&&mine<L.t1?'Best entry is '+(L.t1-mine).toFixed(2)+' off the top 1%.':'')+'</div>';
  return h;
 }
-function expTable(c,ks,cnt,n,title){
- if(!ks.length)return "";
- return '<h3>'+title+'</h3>'+ks.slice(0,40).map(function(k){var cp=k.indexOf("CPT:")===0,nm=k.replace("CPT:",""),f=infoOf(c,k),mine=100*cnt[k]/n,o=c.own[k],fo=o?o[0]:0;
+function expTable(c,ks,cnt,n,title,zks){
+ if(!ks.length&&!(zks&&zks.length))return "";
+ var rowf=function(k){var cp=k.indexOf("CPT:")===0,nm=k.replace("CPT:",""),f=infoOf(c,k),mine=100*(cnt[k]||0)/n,o=c.own[k],fo=o?o[0]:0;
   var sub=[f.pos+(f.tm?" "+f.tm:""),f.sal!=null?"$"+n0(f.sal):"",f.proj!=null?"proj "+f.proj:"",f.pown!=null?"proj own "+f.pown+"%":"",o&&o[1]!=null?o[1]+" pts now":""].filter(function(z){return z}).join(" &middot; ");
-  return xrow(esc(nm)+(cp?' <span class="c">CPT</span>':""),sub,mine,fo,"")}).join("")+(ks.length>40?'<div class="note">Top 40 of '+ks.length+' players.</div>':"");
+  return xrow(esc(nm)+(cp?' <span class="c">CPT</span>':""),sub,mine,fo,"")};
+ return '<h3>'+title+'</h3>'+ks.slice(0,40).map(rowf).join("")+(ks.length>40?'<div class="note">Top 40 of '+ks.length+' players.</div>':"")+
+  (zks&&zks.length?'<div class="note" style="margin:8px 0 2px"><b>Not on his lineups</b> (field owns 5%+, he has 0)</div>'+zks.slice(0,10).map(rowf).join(""):"");
+}
+function zeroKeys(c,cnt,wantCpt){   // field favourites (standings %Drafted >= 5) that appear in none of his visible lineups
+ return Object.keys(c.own||{}).filter(function(k){var o=c.own[k];return o&&o[0]>=5&&!cnt[k]&&!/(^|:)LOCKED$/.test(k)&&(wantCpt===undefined||(k.indexOf("CPT:")===0)===wantCpt)}).sort(function(a,b){return c.own[b][0]-c.own[a][0]});
 }
 function sdCombos(c,lus){
  var N=lus.length||1,cp={},cf={},ff={},dup={};
@@ -273,8 +278,8 @@ function todayBody(c,all){
  h+=linesBlock(c,all);
  h+='<div class="note" style="margin:0 0 6px">Pos, salary, projection and projected ownership come from the slate input sheet'+(sd?' (captain rows use the captain salary, 1.5x projection and captain ownership)':'')+'. Field % is DK\'s live %Drafted. Lev = his minus field.</div>';
  if(sd){var cks=ks.filter(function(k){return k.indexOf("CPT:")===0}),fks=ks.filter(function(k){return k.indexOf("CPT:")!==0});
-  h+=expTable(c,cks,cnt,n,"Captain exposure vs this contest")+expTable(c,fks,cnt,n,"Flex exposure vs this contest")+det("Team, game and pairs",rollups(c,lus,true)+sdCombos(c,lus),false)}
- else h+=expTable(c,ks,cnt,n,"Exposure vs this contest")+det("Team, game and QB stacks",rollups(c,lus,false),false);
+  h+=expTable(c,cks,cnt,n,"Captain exposure vs this contest",zeroKeys(c,cnt,true))+expTable(c,fks,cnt,n,"Flex exposure vs this contest",zeroKeys(c,cnt,false))+det("Team, game and pairs",rollups(c,lus,true)+sdCombos(c,lus),false)}
+ else h+=expTable(c,ks,cnt,n,"Exposure vs this contest",zeroKeys(c,cnt))+det("Team, game and QB stacks",rollups(c,lus,false),false);
  h+='<details open><summary>Entries ('+all.length+')</summary><div class="tw"><table><thead><tr><th>Rank</th><th>User</th><th>Pts</th><th>Prize now</th><th>To cash</th><th>Time left</th><th style="text-align:left">Lineup</th></tr></thead><tbody>'+all.slice().sort(function(a,b){return a.e[0]-b.e[0]}).slice(0,300).map(function(x){return '<tr><td>'+n0(x.e[0])+'</td><td class="n">'+esc(x.u)+'</td><td>'+x.e[1]+'</td><td>'+(function(){var z=prizeAt(c.lines,x.e[0]);return z>0?'<span class="pos">'+money(z)+'</span>':'-'})()+'</td><td>'+(function(){var L=c.lines;if(!L||L.cash==null)return '-';var g=L.cash-x.e[1];return g<=0?'<span class="pos">in</span>':g.toFixed(1)})()+'</td><td>'+(x.e[2]==null?"-":x.e[2])+'</td><td class="lu">'+x.e[3].map(function(p,i){if(hid(p))return '<span class="mute">hidden</span>';var cp=sd&&i===0,f=infoOf(c,(cp?"CPT:":"")+p);return (cp?'<span class="c">CPT</span>':"")+esc(p)+(f.tm?' <span class="mute">'+esc(f.pos)+' '+esc(f.tm)+'</span>':"")}).join(" · ")+'</td></tr>'}).join("")+'</tbody></table></div></details>';
  return h;
 }
