@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>GTS Subscriber Master</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#121212">
+<style>
+:root{--bg:#121212;--panel:#1e1e1e;--ink:#fff;--mute:#999;--line:#404040;--acc:#FFE500;--good:#4caf50;--bad:#f44336;--chip:#2d2d2d;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,Arial,sans-serif;padding:0 14px 28px}
+.wrap{max-width:1100px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;padding:14px 0 12px;border-bottom:1px solid var(--line)}
+header img{height:48px;width:auto;border-radius:6px;flex:none}
+h1{font:700 22px/1.1 Inter,sans-serif;margin:0;color:var(--acc)}.sub{color:var(--mute);font-size:13px;margin-top:3px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;margin:12px 0;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:12px}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+table.st th[data-s]{cursor:pointer;user-select:none;white-space:nowrap}
+table.st th[data-s]:after{content:' \2195';color:var(--mute);font-size:10px}
+table.st th[data-s].asc:after{content:' \25B2';color:var(--acc)}table.st th[data-s].desc:after{content:' \25BC';color:var(--acc)}
+tr.u{cursor:pointer}tr.u:hover,tr.u:active{background:var(--chip)}
+.fb{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px}
+.fb input,.fb select{padding:9px 11px;font:inherit;font-size:14px;min-height:40px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px}
+.fb input{flex:1 1 160px;min-width:0}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;background:var(--chip)}.badge.in{background:var(--good);color:#000}
+a{color:var(--acc);text-decoration:none;font-weight:600}
+.fresh{font-size:12.5px;color:var(--mute);margin:4px 0}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--mute);font-size:12px}
+@media(max-width:560px){h1{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="../../pub/lookup/gts_logo.jpg" alt="Golden Ticket Sims"><div><h1>GTS Subscriber Master</h1><div class="sub">One row per watched subscriber across every sport. Tap a row to open that user's full lookup.</div></div></header>
+  <div class="fresh" id="fresh">Loading…</div>
+  <div class="card"><div class="fb"><input id="q" placeholder="Filter subscribers" aria-label="Filter"><select id="sp" aria-label="Sport"><option value="">All sports</option></select><select id="lv" aria-label="Live"><option value="">Live or not</option><option value="1">Live now</option><option value="0">Nothing live</option></select></div>
+  <table class="st" id="t"><thead><tr><th data-s="t">Subscriber</th><th data-s="t">Sports</th><th class="n" data-s="n">Live</th><th class="n" data-s="n">Entries</th><th class="n" data-s="n">In the money</th><th class="n" data-s="n">Best rank</th><th class="n" data-s="n">Est. won</th><th class="n" data-s="n">Fees</th><th data-s="t">Root for (live)</th></tr></thead><tbody id="tb"></tbody></table></div>
+  <footer>Private page. Reads the same public standings data as the public lookup, for the watched usernames only.</footer>
+</div>
+<script>
+const PUB = "../../pub/live/";
+async function gf(p) { const r = await fetch(PUB + p + (p.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error(p); return r.json(); }
+async function gu() { const r = await fetch("users.json?t=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error("users"); return r.json(); }
+const NB = 128;
+function bucket(n) { let h = 0; for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 65521; return h % NB; }
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const money = (x) => "$" + Number(x).toLocaleString(undefined, { maximumFractionDigits: 0 });
+const SPORT = { cbb: "CBB", nfl: "NFL", soc: "Soccer", nba: "NBA", nhl: "NHL", cfb: "CFB" };
+let ROWS = [], ST = { col: 0, dir: 1 };
+const detail = {};
+async function det(c) { if (detail[c.id]) return detail[c.id]; try { detail[c.id] = await gf("c/" + c.id + ".json"); } catch (e) { detail[c.id] = {}; } return detail[c.id]; }
+function payFor(pay, rank) { for (const b of pay || []) if (rank >= b[0] && rank <= b[1]) return b[2] || 0; return 0; }
+async function load() {
+  const users = await gu(); const META = await gf("meta.json");
+  const rows = [];
+  for (const u of users.users) {
+    let sh; try { sh = await gf("u/" + bucket(u.toLowerCase()) + ".json"); } catch (e) { sh = { u: {} }; }
+    const rec = sh.u[u.toLowerCase()]; const r = { user: u, disp: rec ? rec[0] : u, sports: new Set(), live: 0, entries: 0, itm: 0, best: null, won: 0, fees: 0, root: {} };
+    if (rec) {
+      const by = {}; rec[1].forEach((e) => { (by[e[0]] = by[e[0]] || []).push(e); });
+      for (const ci of Object.keys(by)) {
+        const c = META.contests[ci]; if (!c) continue; const d = await det(c); const es = by[ci];
+        r.sports.add(c.sport); r.entries += es.length; r.fees += (c.fee || 0) * es.length;
+        const paid = c.lines && c.lines.paid, pm = d.pm || {};
+        let anyLive = false;
+        es.forEach((e) => {
+          const rk = e[1]; if (r.best == null || rk < r.best) r.best = rk;
+          if (paid && rk <= paid) r.itm++; r.won += payFor(d.pay, rk);
+          e[5].forEach((t) => { const nm = META.tok[t].slice(META.tok[t].indexOf(" ") + 1); const m = pm[nm]; if (m && m.gs === "in") { anyLive = true; r.root[nm] = (r.root[nm] || 0) + 1; } });
+        });
+        if (anyLive) r.live++;
+      }
+    }
+    rows.push(r);
+  }
+  ROWS = rows; const t = new Date(META.built);
+  document.getElementById("fresh").textContent = "Data from " + t.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + " · refreshes every 2 min";
+  const sps = [...new Set(rows.flatMap((r) => [...r.sports]))].sort(); const sel = document.getElementById("sp");
+  const cur = sel.value; sel.innerHTML = '<option value="">All sports</option>' + sps.map((s) => '<option value="' + s + '">' + (SPORT[s] || s) + "</option>").join(""); sel.value = cur;
+  draw();
+}
+function draw() {
+  const q = document.getElementById("q").value.toLowerCase(), sp = document.getElementById("sp").value, lv = document.getElementById("lv").value;
+  let rs = ROWS.filter((r) => (!q || r.disp.toLowerCase().includes(q)) && (!sp || r.sports.has(sp)) && (lv === "" || (lv === "1") === (r.live > 0)));
+  const key = [(r) => r.disp.toLowerCase(), (r) => [...r.sports].join(","), (r) => r.live, (r) => r.entries, (r) => r.itm, (r) => r.best == null ? 1e12 : r.best, (r) => r.won, (r) => r.fees, (r) => Object.keys(r.root).sort((a, b) => r.root[b] - r.root[a])[0] || ""][ST.col];
+  rs.sort((a, b) => { const x = key(a), y = key(b); return (x < y ? -1 : x > y ? 1 : 0) * ST.dir; });
+  document.getElementById("tb").innerHTML = rs.map((r) => { const top = Object.keys(r.root).sort((a, b) => r.root[b] - r.root[a]).slice(0, 3).map((n) => esc(n) + " (" + r.root[n] + ")").join(", ");
+    return "<tr class='u' onclick=\"location.href='../../pub/lookup/?u=" + encodeURIComponent(r.user) + "'\"><td><b>" + esc(r.disp) + "</b></td><td>" + esc([...r.sports].map((s) => SPORT[s] || s).join(", ") || "–") + "</td><td class='n'>" + (r.live ? "<span class='badge in'>" + r.live + "</span>" : "0") + "</td><td class='n'>" + r.entries + "</td><td class='n " + (r.itm ? "good" : "") + "'>" + r.itm + "</td><td class='n'>" + (r.best == null ? "–" : r.best.toLocaleString()) + "</td><td class='n " + (r.won > r.fees ? "good" : "") + "'>" + money(r.won) + "</td><td class='n'>" + money(r.fees) + "</td><td>" + (top || "<span class='mute'>–</span>") + "</td></tr>"; }).join("") || "<tr><td colspan='9' class='mute'>Nothing matches.</td></tr>";
+  [...document.querySelectorAll("#t th")].forEach((th, i) => { th.classList.toggle("asc", i === ST.col && ST.dir === 1); th.classList.toggle("desc", i === ST.col && ST.dir === -1); });
+}
+[...document.querySelectorAll("#t th[data-s]")].forEach((th, i) => th.addEventListener("click", () => { ST.dir = ST.col === i ? -ST.dir : (th.dataset.s === "n" ? -1 : 1); ST.col = i; draw(); }));
+["q", "sp", "lv"].forEach((id) => document.getElementById(id).addEventListener(id === "q" ? "input" : "change", draw));
+load().catch(() => { document.getElementById("fresh").textContent = "No data yet."; });
+setInterval(() => { if (!document.hidden) load().catch(() => {}); }, 120000);
+</script>
+</body>
+</html>

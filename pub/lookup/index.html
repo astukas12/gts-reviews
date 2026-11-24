@@ -185,8 +185,8 @@ function rootingHTML(by) {
   return "<div class='card'><b>Rooting guide</b><div class='lu'>By game, live first. Root for = you own a bigger share of him than the field; root against = the field has him and you don't. 'Near money' counts your entries inside or close to the paid places that include him.</div>" + active.map(block).join("") + (done.length ? "<details><summary>Finished games (" + done.length + ")</summary>" + done.map(block).join("") + "</details>" : "") + "</div>";
 }
 function gcChips(c) {   // market context from the slate sheet's game tab: total, spread (home-relative, negative = home favoured) and implied team totals
-  return (c.gc || []).map((g) => { const fav = g.spread < 0 ? g.home : g.away, m = Math.abs(g.spread);
-    return "<span class='chip' title='Vegas total, spread and implied team totals'>" + esc(g.away) + " @ " + esc(g.home) + " · total " + g.total + " · " + esc(fav) + " -" + m + " · implied " + esc(g.away) + " " + g.imp_away + " / " + esc(g.home) + " " + g.imp_home + "</span>"; }).join("");
+  return (c.gc || []).map((g) => { const fav = g.fav, m = g.margin;
+    return "<span class='chip' title='Vegas total, spread and implied team totals'>" + esc(g.away) + " @ " + esc(g.home) + " · total " + g.total + " · " + (fav === 'PK' ? 'pick' : esc(fav) + " -" + m) + " · implied " + esc(g.away) + " " + g.imp_away + " / " + esc(g.home) + " " + g.imp_home + "</span>"; }).join("");
 }
 function stackInfo(c, e) {   // QB + same-team pass catchers, bring-back from the other team, and the team split (positions from ESPN rosters / DK, teams from DK)
   const nm = visNames(c, e), pm = c.pm || {}; const pl = nm.map((n) => ({ n, t: pm[n] && pm[n].team, p: pm[n] && pm[n].pos })).filter((x) => x.t);
