@@ -52,6 +52,7 @@ table.st:not(.more) .opt{display:none}
 .cc{padding:14px}
 .st1{font-size:18px;font-weight:700;line-height:1.3;padding-left:10px;border-left:5px solid var(--line)}
 .st1.good{border-color:var(--good)}.st1.mid{border-color:#ff9800}.st1.bad{border-color:var(--bad)}.st1.done{border-color:var(--mute)}
+.asof{font-size:12px;font-weight:600;color:var(--mute);margin:3px 0 0 15px}.asof.amber{color:#ff9800}.asof.red{color:var(--bad)}
 .ttl{margin:8px 0 2px;font-size:14px}.sub2{font-size:13px;color:var(--mute);margin-bottom:6px}
 .need{font-size:15px;margin:8px 0}
 .roots{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:8px 0}
@@ -264,7 +265,10 @@ function simpleHTML(c, es, n) {   // the default view of a contest: where do I s
   const fors = pick(rows.filter((r) => r.d > 5 && r.yp > 0), (r) => r.yp), ags = pick(rows.filter((r) => r.d < -5), (r) => r.fp);
   const rp = (r) => "<div class='rp'>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + "<b>" + esc(r.nm) + "</b> <span class='mute'>" + esc(r.p.team || '') + (r.live === 0 ? " · <span class='live'>live</span>" : "") + "</span><small>you " + r.yp.toFixed(0) + "% · field " + r.fp.toFixed(0) + "%</small><span class='bar'><i style='width:" + Math.min(100, r.yp).toFixed(0) + "%'></i></span></div>";
   const roots = (fors.length || ags.length) ? "<div class='roots'><div class='for'><h4>Root for</h4>" + (fors.map(rp).join('') || "<div class='mute'>–</div>") + "</div><div class='ag'><h4>Root against</h4>" + (ags.map(rp).join('') || "<div class='mute'>–</div>") + "</div></div>" : "";
-  return "<div class='st1 " + cls + "'>" + icon + " " + esc(text) + "</div>" + ttl + needLine + roots;
+  // when this contest's standings were pulled (viewer's local time); amber after 10 min and red after 20 while a game of this contest is live
+  const liveNow = Object.values(c.pm || {}).some((m) => m.gs === 'in'), ageMin = c.at ? (Date.now() - new Date(c.at)) / 60000 : null;
+  const asof = c.at ? "<div class='asof " + (liveNow && ageMin > 20 ? 'red' : liveNow && ageMin > 10 ? 'amber' : '') + "' title='When these standings were pulled from DraftKings'>as of " + new Date(c.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + " · " + (ageMin < 1 ? 'just now' : Math.round(ageMin) + ' min ago') + "</div>" : "";
+  return "<div class='st1 " + cls + "'>" + icon + " " + esc(text) + "</div>" + asof + ttl + needLine + roots;
 }
 function paceNote(c) {   // projected cash / top-10% / top-1% lines for this contest
   const fake = pace(c, [0, 0, 0, (TOTMIN[c.sport] || {})[c.gt] || 0]); if (!fake || fake.cash == null) return "";
