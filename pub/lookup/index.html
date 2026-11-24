@@ -49,6 +49,18 @@ table.st th[data-s].asc:after{content:' \25B2';color:var(--acc)}table.st th[data
 table.st:not(.more) .opt{display:none}
 .pg{display:block;margin:8px auto 2px;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 18px;font-size:13px;min-height:40px;font-weight:600;cursor:pointer}
 .sum{font-size:13px;color:var(--mute);margin:2px 0 6px}.sum b{color:var(--ink)}
+.cc{padding:14px}
+.st1{font-size:18px;font-weight:700;line-height:1.3;padding-left:10px;border-left:5px solid var(--line)}
+.st1.good{border-color:var(--good)}.st1.mid{border-color:#ff9800}.st1.bad{border-color:var(--bad)}.st1.done{border-color:var(--mute)}
+.ttl{margin:8px 0 2px;font-size:14px}.sub2{font-size:13px;color:var(--mute);margin-bottom:6px}
+.need{font-size:15px;margin:8px 0}
+.roots{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:8px 0}
+.roots h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.roots .for h4{color:var(--good)}.roots .ag h4{color:var(--bad)}
+.rp{font-size:13.5px;margin:5px 0;line-height:1.25}.rp small{color:var(--mute);display:block}
+.bar{display:block;height:5px;background:var(--chip);border-radius:3px;margin-top:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+details.dt>summary{font-size:15px;padding:10px 0;border-top:1px solid var(--line);margin-top:10px}
+@media(max-width:420px){.roots{grid-template-columns:1fr}}
 .nr{text-align:center;color:var(--mute);padding:10px}
 details>summary{cursor:pointer;color:var(--acc);font-size:13.5px;font-weight:600;margin-top:10px;padding:6px 0;min-height:36px}
 .fresh{font-size:12.5px;color:var(--mute);margin:4px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px}
@@ -232,6 +244,28 @@ function stackInfo(c, e) {   // QB + same-team pass catchers, bring-back from th
   const q = qbs[0], mates = pl.filter((x) => x !== q && x.t === q.t && (x.p === 'WR' || x.p === 'TE')).length, opp = pl.filter((x) => x.t !== q.t && (x.p === 'WR' || x.p === 'TE' || x.p === 'RB' || x.p === 'QB')).length;
   return { text: 'QB+' + mates + ' ' + q.t + (opp ? ' · bring-back ' + opp : ' · no bring-back'), split };
 }
+function simpleHTML(c, es, n) {   // the default view of a contest: where do I stand, what do I need, who do I root for / against
+  const L = c.lines || {}, paid = L.paid, cash = L.cash_pts, size = (c.size || L.n || 0), dollars = (c.fee || 0) * n;
+  const best = es.reduce((a, e) => e[2] > a[2] ? e : a, es[0]), bestRank = Math.min(...es.map((e) => e[1]));
+  const itmN = paid ? es.filter((e) => e[1] <= paid).length : 0, need = cash != null ? Math.max(0, cash - best[2]) : null;
+  const names = visNames(c, best), hid = best[5].length - names.length, left = names.filter((nm) => gstat(c, nm) !== 'post').length + hid;
+  const alive = left > 0;
+  let cls, icon, text;
+  if (paid && bestRank <= paid) { cls = 'good'; icon = '🟢'; text = 'In the money · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
+  else if (!alive) { cls = 'done'; icon = '⚪'; text = 'Finished · out of the money · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
+  else if (need != null && cash > 0 && need / cash < 0.15) { cls = 'mid'; icon = '🟡'; text = 'Close · need +' + need.toFixed(1) + ' pts to cash · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
+  else { cls = 'bad'; icon = '🔴'; text = 'Out of the money' + (need != null ? ' · need +' + need.toFixed(1) + ' pts to cash' : '') + ' · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
+  const ttl = "<div class='ttl'><b>" + esc(c.name || c.id) + "</b> <a class='dk' href='" + DK + c.id + "' target='_blank' rel='noopener noreferrer'>DK ↗</a></div><div class='sub2'>" + n + " entr" + (n === 1 ? 'y' : 'ies') + (c.fee ? " × " + money(c.fee) + " = " + money(dollars) : "") + (paid && n > 1 ? " · " + itmN + " in the money" : "") + "</div>";
+  const needLine = "<div class='need'>" + (cash != null ? "Cash line <b>" + cash + " pts</b> · your best <b>" + best[2] + "</b>" + (need > 0 ? " (<b>+" + need.toFixed(1) + "</b> needed)" : " ✓") + ". " : "") + (alive ? "Your best entry has <b>" + left + "</b> player" + (left === 1 ? '' : 's') + " still to play." : "All your players are done.") + "</div>";
+  // who to root for / against: this contest only, live games first
+  const G = contestGames(c, es), rows = [];
+  Object.keys(G).forEach((gk) => { const g = G[gk]; if (g.state === 'post') return; Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], yp = 100 * p.you / p.ent, fp = p.fw / p.ent, d = yp - fp; rows.push({ nm, p, yp, fp, d, live: g.state === 'in' ? 0 : 1 }); }); });
+  const pick = (arr, key) => arr.sort((a, b) => a.live - b.live || key(b) - key(a)).slice(0, 3);
+  const fors = pick(rows.filter((r) => r.d > 5 && r.yp > 0), (r) => r.yp), ags = pick(rows.filter((r) => r.d < -5), (r) => r.fp);
+  const rp = (r) => "<div class='rp'>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + "<b>" + esc(r.nm) + "</b> <span class='mute'>" + esc(r.p.team || '') + (r.live === 0 ? " · <span class='live'>live</span>" : "") + "</span><small>you " + r.yp.toFixed(0) + "% · field " + r.fp.toFixed(0) + "%</small><span class='bar'><i style='width:" + Math.min(100, r.yp).toFixed(0) + "%'></i></span></div>";
+  const roots = (fors.length || ags.length) ? "<div class='roots'><div class='for'><h4>Root for</h4>" + (fors.map(rp).join('') || "<div class='mute'>–</div>") + "</div><div class='ag'><h4>Root against</h4>" + (ags.map(rp).join('') || "<div class='mute'>–</div>") + "</div></div>" : "";
+  return "<div class='st1 " + cls + "'>" + icon + " " + esc(text) + "</div>" + ttl + needLine + roots;
+}
 function paceNote(c) {   // projected cash / top-10% / top-1% lines for this contest
   const fake = pace(c, [0, 0, 0, (TOTMIN[c.sport] || {})[c.gt] || 0]); if (!fake || fake.cash == null) return "";
   return "proj. cash " + fake.cash.toFixed(0) + " · top 10% " + (fake.t10 == null ? "–" : fake.t10.toFixed(0)) + " · top 1% " + (fake.t1 == null ? "–" : fake.t1.toFixed(0));
@@ -255,11 +289,11 @@ function render(user, row) {
     const sk = c.sport + "|" + (c.slate || "");
     (groups[sk] = groups[sk] || []).push([c, by[ci]]);
   });
-  let h = '<div class="card"><b>' + esc(disp) + '</b><div class="k" id="tot"></div></div>' + rootingHTML(by);
+  let h = '<div class="card"><b>' + esc(disp) + '</b><div class="k" id="tot"></div></div>';
   Object.keys(groups).sort().forEach((sk) => {
     const [sp, slate] = sk.split("|");
     h += '<div class="sport">' + esc(SPORT[sp] || sp) + (slate ? " · " + esc(slate) : "") + "</div>";
-    groups[sk].sort((a, b) => (b[0].fee || 0) - (a[0].fee || 0)).forEach(([c, es]) => {
+    groups[sk].sort((a, b) => (b[0].fee || 0) * b[1].length - (a[0].fee || 0) * a[1].length).forEach(([c, es]) => {
       es.sort(SORTBY === 'ppk' ? ((a, b) => { const sa = salStats(c, e2n(c, a), a[2]), sb = salStats(c, e2n(c, b), b[2]); return (sb && sb.ppk != null ? sb.ppk : -1) - (sa && sa.ppk != null ? sa.ppk : -1) || a[1] - b[1]; }) : SORTBY === 'proj' ? ((a, b) => { const pa = pace(c, a), pb = pace(c, b); return (pb ? pb.proj : -1) - (pa ? pa.proj : -1) || a[1] - b[1]; }) : ((a, b) => a[1] - b[1]));
       const L = c.lines || {}, paid = L.paid, n = es.length;
       const rows = es.map((e) => {
@@ -300,18 +334,19 @@ function render(user, row) {
       const exnote = "<div class='lu'>" + (hidShare > 0.15 ? "<b>" + Math.round(100 * hidShare) + "% of your lineup slots are still hidden</b> (games not started), so your exposure is understated and Diff is greyed out until more games start. " : hid ? "Hidden (locked) slots can't be counted, so exposure is slightly understated. " : "") + "Zero = the field owns 5%+ and you have none.</div>";
       const chipsJson = JSON.stringify([{ k: 'act', label: 'Status', opts: [['active', 'Live + upcoming'], ['done', 'Finished'], ['', 'All']] }, { k: 'lev', label: 'Leverage', opts: [['', 'Leverage: all'], ['over', 'Over (you > field)'], ['under', 'Under'], ['zero', 'Zero (you have none)']] }, { k: 'team', label: 'Team', opts: 'auto' }, { k: 'pos', label: 'Pos', opts: 'auto' }]).replace(/'/g, '&#39;');
       const lead = (L.lead || []).map((l) => { const e = [0, l.r, l.p, l.t == null ? 0 : l.t, 0, []]; const nl = l.lu ? l.lu.map((t) => t.slice(t.indexOf(' ') + 1)) : []; const ss = l.lu ? salStats(c, nl, l.p) : null; const det = l.lu ? lineStats(c, e, nl) : ''; return "<tr onclick='toggleRow(this)' style='cursor:pointer'><td class='n'>" + l.r + "</td><td>" + esc(l.u) + "</td><td class='n'>" + l.p + "</td><td class='n'>" + (minLeft(c, l.t) == null ? '' : minLeft(c, l.t)) + "</td><td class='n'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + 'K' : '') + "</td><td class='n'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td></tr>" + (det ? "<tr class='dr' hidden><td colspan='6' class='lu'>" + det + "</td></tr>" : ''); }).join("");
-      h += '<div class="card"><b>' + esc(c.name || c.id) + '</b> <a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">DK ↗</a><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + gcChips(c) + "</div>" +
+      h += '<div class="card cc">' + simpleHTML(c, es, n) + '<details class="dt"><summary>Details</summary><b>' + esc(c.name || c.id) + '</b> <a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">DK ↗</a><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + gcChips(c) + "</div>" +
         sumLine + groupHTML + "<div class='tb' data-key='ent" + c.id + "' data-page='25' data-more='1' data-ph='Filter entries (player or captain)' data-chips='" + JSON.stringify([{ k: 'itm', label: 'Money', opts: [['', 'All entries'], ['yes', 'In the money'], ['no', 'Out of the money']] }, { k: 'core', label: 'Core', opts: 'auto' }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>" + (c.gt === 'showdown' ? 'Captain' : 'Core') + "</th><th class='n' data-s='n'>Pts</th><th class='n opt' data-s='n'>Min left</th><th class='n opt' data-s='n'>$ spent</th><th class='n opt' data-s='n'>Pts/$1K</th><th class='n' data-s='n'>Est. pay</th></tr></thead><tbody>" + rows + "</tbody></table></div><div class='lu'>Tap an entry to see its lineup.</div>" +
         "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary><div class='tb' data-key='exp" + c.id + "' data-more='1' data-ph='Filter player or team' data-def='{&quot;act&quot;:&quot;active&quot;}' data-chips='" + chipsJson + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='t'>Team</th><th data-s='t' class='opt'>Pos</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n opt' data-s='n'>Salary</th><th class='n opt' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th><th data-s='n' class='opt'>Game</th></tr></thead><tbody>" + exh + "</tbody></table>" + exnote + "</div></details>" +
         "<details><summary>Lineup profile vs field</summary>" + profileHTML(c, es) + "</details>" +
-        "<details><summary>Leaderboard top 10</summary><div class='tb' data-key='lb" + c.id + "' data-ph='Filter leaderboard'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>User</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Min left</th><th class='n' data-s='n'>$ spent</th><th class='n' data-s='n'>Pts/$1K</th></tr></thead><tbody>" + lead + "</tbody></table></div></details></div>";
+        "<details><summary>Leaderboard top 10</summary><div class='tb' data-key='lb" + c.id + "' data-ph='Filter leaderboard'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>User</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Min left</th><th class='n' data-s='n'>$ spent</th><th class='n' data-s='n'>Pts/$1K</th></tr></thead><tbody>" + lead + "</tbody></table></div></details></details></div>";
     });
   });
   // every contest we track, by sport: open for sports the user plays, collapsed for the rest
   const mine = new Set(Object.keys(by).map((ci) => META.contests[ci] && META.contests[ci].id));
   const mysp = new Set(Object.keys(by).map((ci) => META.contests[ci] && META.contests[ci].sport));
-  const asp = {}; META.contests.forEach((c) => { (asp[c.sport] = asp[c.sport] || []).push(c); });
-  h += '<div class="sport">All contests</div>';
+  const asp = {}; META.contests.filter((c) => !c.dead).forEach((c) => { (asp[c.sport] = asp[c.sport] || []).push(c); });
+  h += '<details class="card"><summary><b>Full rooting guide</b> <span class="mute">every game, every contest</span></summary>' + rootingHTML(by) + '</details>';
+  h += '<details class="card"><summary><b>All contests</b> <span class="mute">every contest we track, with winning and top 1% scores</span></summary>';
   Object.keys(asp).sort((a, b) => (mysp.has(b) ? 1 : 0) - (mysp.has(a) ? 1 : 0) || a.localeCompare(b)).forEach((sp) => {
     const list = asp[sp].slice().sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0) || (b.fee || 0) - (a.fee || 0));
     const chips = JSON.stringify([{ k: 'in', label: 'Mine', opts: [['', 'All contests'], ['yes', 'Ones I am in'], ['no', 'Ones I am not in']] }, { k: 'main', label: 'Type', opts: [['', 'Main + other'], ['main', 'Main only'], ['other', 'Satellites / small']] }]).replace(/'/g, '&#39;');
@@ -319,6 +354,7 @@ function render(user, row) {
     h += '<details class="card"' + (mysp.has(sp) ? ' open' : '') + '><summary>' + esc(SPORT[sp] || sp) + ' · ' + list.length + ' contests' + (mysp.has(sp) ? '' : ' · you are not in this sport') + "</summary><div class='tb' data-key='all" + sp + "' data-ph='Filter contests' data-chips='" + chips + "'><table class='st'><thead><tr><th data-s='t'>Contest</th><th class='n' data-s='n'>Entry</th><th class='n' data-s='n'>Entries</th><th class='n' data-s='n'>Win</th><th class='n' data-s='n'>Top 1%</th><th class='n' data-s='n'>Cash</th></tr></thead><tbody>" +
       list.map((c) => { const L = c.lines || {}; const win = L.win_pts != null ? L.win_pts : (L.lead && L.lead[0] ? L.lead[0].p : ''); return "<tr data-q='" + esc((c.name || c.id).toLowerCase()) + "' data-in='" + (mine.has(c.id) ? 'yes' : 'no') + "' data-main='" + (c.main ? 'main' : 'other') + "'><td>" + (mine.has(c.id) ? '<span class="good">●</span> ' : '') + '<a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">' + esc(c.name || c.id) + "</a></td><td class='n' data-v='" + num(c.fee) + "'>" + (c.fee != null ? money(c.fee) : "") + "</td><td class='n' data-v='" + num(c.size) + "'>" + (c.size || "").toLocaleString() + "</td><td class='n' data-v='" + num(win) + "'>" + win + "</td><td class='n' data-v='" + num(L.top1_pts) + "'>" + (L.top1_pts != null ? L.top1_pts : "") + "</td><td class='n' data-v='" + num(L.cash_pts) + "'>" + (L.cash_pts != null ? L.cash_pts : "") + "</td></tr>"; }).join("") + "</tbody></table></div></details>";
   });
+  h += '</details>';
   out.innerHTML = h; CUR = [user, row]; $('sortbox').hidden = false; tbAll();
   $("tot").innerHTML = '<span class="chip">' + tot + ' live entries</span><span class="chip">' + itm + ' in the money</span><span class="chip">est. winnings ' + money(win) + '</span>';
 }
