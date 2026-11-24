@@ -42,6 +42,13 @@ table.st th[data-s].asc:after{content:' \25B2';color:var(--acc)}table.st th[data
 .role-for{color:var(--good);font-weight:700}.role-ag{color:var(--bad);font-weight:700}
 .ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line);min-height:36px;padding:6px 12px;font-size:13px;margin-left:8px}
 .dot.amber{background:#ff9800}.dot.red{background:var(--bad)}
+.lg{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;font-size:13px;margin:4px 0 8px}
+.lg>span,.ll>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ll{font-size:13px;margin:4px 0 8px;line-height:1.7}.ll .cpt{color:var(--acc);font-weight:700}
+.tg{display:inline-block;min-width:26px;color:var(--mute);font-size:10.5px;font-weight:700;letter-spacing:.03em}
+table.st:not(.more) .opt{display:none}
+.pg{display:block;margin:8px auto 2px;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 18px;font-size:13px;min-height:40px;font-weight:600;cursor:pointer}
+.sum{font-size:13px;color:var(--mute);margin:2px 0 6px}.sum b{color:var(--ink)}
 .nr{text-align:center;color:var(--mute);padding:10px}
 details>summary{cursor:pointer;color:var(--acc);font-size:13.5px;font-weight:600;margin-top:10px;padding:6px 0;min-height:36px}
 .fresh{font-size:12.5px;color:var(--mute);margin:4px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px}
@@ -146,6 +153,22 @@ function profileHTML(c, es) {
     "<div class='lu' style='margin:6px 0'>" + fieldLine + "</div>" +
     "<div class='tb' data-key='cmb" + c.id + "' data-ph='Filter combos' data-chips='" + JSON.stringify([{ k: 'kind', label: 'Type', opts: [['', 'Pairs + trios'], ['pair', 'Pairs'], ['trio', 'Trios']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Your common combos</th><th data-s='t'>Type</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th></tr></thead><tbody>" + crows + "</tbody></table></div>";
 }
+function sn(n) { const t = String(n).split(' '); while (t.length > 1 && /^(Jr\.?|Sr\.?|II|III|IV|V)$/i.test(t[t.length - 1])) t.pop(); return t.length > 1 ? t[t.length - 1] : t[0]; }
+function lineupHTML(c, e) {   // compact: classic = 2-column grid of "POS Last", showdown = one line with the captain highlighted
+  const toks = e[5].map((t) => META.tok[t]);
+  const one = (tk, i) => { const sl = tk.split(' ')[0], nm = tk.slice(sl.length + 1); if (nm === 'LOCKED') return "<span class='mute'><span class='tg'>" + esc(sl) + "</span>hidden</span>";
+    const m = c.pm && c.pm[nm], gs = m && m.gs, o = c.own && (c.own[nm] || c.own[tk]), pt = o && o[1] != null ? " <span class='mute'>" + o[1] + "</span>" : "";
+    return "<span class='" + (gs === 'post' ? 'fin ' : '') + (sl === 'CPT' ? 'cpt' : '') + "' title='" + esc(nm + (m ? ' · ' + (m.team || '') + ' ' + (m.pos || '') : '')) + "'>" + (gs === 'in' ? "<span class='live'>●</span>" : "") + "<span class='tg'>" + esc(sl) + "</span>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(sn(nm)) + pt + "</span>"; };
+  return c.gt === 'showdown' ? "<div class='ll'>" + toks.map(one).join(" · ") + "</div>" : "<div class='lg'>" + toks.map(one).join("") + "</div>";
+}
+function coreOf(c, e) {   // showdown: the captain; classic: the QB when there is one, else the highest-salary player
+  const toks = e[5].map((t) => META.tok[t]);
+  if (c.gt === 'showdown') { const cp = toks.find((t) => t.startsWith('CPT ')); return cp ? cp.slice(4) : ''; }
+  const names = toks.map((t) => t.slice(t.indexOf(' ') + 1)).filter((n) => n !== 'LOCKED');
+  const q = names.find((n) => c.pm && c.pm[n] && c.pm[n].pos === 'QB'); if (q) return q;
+  if (c.sal) { let b = '', v = -1; names.forEach((n) => { if ((c.sal[n] || 0) > v) { v = c.sal[n] || 0; b = n; } }); return b; }
+  return names[0] || '';
+}
 function gstat(c, name) { const m = c.pm && c.pm[name]; return m && m.gs ? m.gs : null; }
 function statusBadge(gs, gd, start) {
   if (gs === 'in') return "<span class='badge in'>LIVE</span> <span class='live'>" + esc(gd || '') + "</span>";
@@ -230,35 +253,44 @@ function render(user, row) {
       const rows = es.map((e) => {
         const pay = payFor(c, e[1]), inm = paid && e[1] <= paid;
         tot++; if (inm) itm++; win += pay; fees += (c.fee || 0);
-        const names = e[5].map((t) => { const k = keyOf(c, META.tok[t]); const o = c.own && c.own[k]; const sl = META.tok[t].split(" ")[0]; const nm = META.tok[t].slice(sl.length + 1); if (nm === "LOCKED") return "<i class=\"mute\">hidden</i>"; const m = c.pm && c.pm[nm]; const tag = m ? " <span class='mute' title='" + esc((m.pos || '') + (m.game ? ' · ' + m.game : '') + (m.fppg ? ' · season ' + m.fppg + ' DK pts/g' : '')) + "'>" + esc(m.team || '') + "</span>" + (m.status && m.status !== 'None' ? " <span class='bad' title='DraftKings status'>" + esc(m.status) + "</span>" : "") : ""; const gs = m && m.gs; return "<span class='" + (gs === 'post' ? 'fin' : '') + "'>" + (gs === 'in' ? "<span class='live' title='live: " + esc(m.gd || '') + "'>●</span> " : "") + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + "<b>" + esc(nm) + "</b>" + tag + " " + (o && o[1] != null ? "(" + o[1] + ")" : "") + "</span>"; }).join(" · ");
         const pp = pace(c, e);
         const nmsList = e[5].map((t) => META.tok[t].slice(META.tok[t].indexOf(' ') + 1));
         const det = lineStats(c, e, nmsList);
         const gap = (L.cash_pts != null) ? (e[2] - L.cash_pts) : null;
         const ss = salStats(c, nmsList, e[2]);
+        const core = coreOf(c, e);
         const extra = (gap == null ? '' : 'vs cash line: ' + (gap >= 0 ? '+' : '') + gap.toFixed(1) + ' pts') + (e[4] > 1 ? ' · ' + e[4] + ' duplicates of this lineup' : '') + (pp ? '<br>pace projection: ' + pp.proj.toFixed(1) + (pp.cash != null ? ' vs projected cash line ' + pp.cash.toFixed(1) : '') : '');
-        return "<tr onclick='toggleRow(this)' style='cursor:pointer'><td class='n'>" + e[1].toLocaleString() + "</td><td class='n'>" + e[2] + "</td><td class='n'>" + (minLeft(c, e[3]) == null ? '' : minLeft(c, e[3])) + "</td><td class='n'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + "K<br><span class='mute'>" + ss.pct.toFixed(0) + "%</span>" : '') + "</td><td class='n'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td><td class='n " + (inm ? "good" : "") + "'>" + (pay ? money(pay) : (inm ? "cash" : "–")) + "</td><td class='lu'>" + names + "</td></tr><tr class='dr' hidden><td colspan='7' class='lu'>" + (det ? det + '<br>' : '') + extra + "</td></tr>";
+        return "<tr onclick='toggleRow(this)' style='cursor:pointer' data-q='" + esc((core + ' ' + nmsList.join(' ')).toLowerCase()) + "' data-itm='" + (inm ? 'yes' : 'no') + "' data-core='" + esc(core) + "'><td class='n' data-v='" + e[1] + "'>" + e[1].toLocaleString() + "</td><td>" + esc(sn(core)) + "</td><td class='n'>" + e[2] + "</td><td class='n opt'>" + (minLeft(c, e[3]) == null ? '' : minLeft(c, e[3])) + "</td><td class='n opt' data-v='" + (ss ? ss.vis : '') + "'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + "K" : '') + "</td><td class='n opt' data-v='" + (ss && ss.ppk != null ? ss.ppk : '') + "'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td><td class='n " + (inm ? "good" : "") + "' data-v='" + pay + "'>" + (pay ? money(pay) : (inm ? "cash" : "–")) + "</td></tr><tr class='dr' hidden><td colspan='7' class='lu'>" + lineupHTML(c, e) + (det ? det + '<br>' : '') + extra + "</td></tr>";
       }).join("");
+      const ranks = es.map((e) => e[1]).sort((a, b) => a - b), ptsv = es.map((e) => e[2]).sort((a, b) => a - b), med = (a) => a[Math.floor(a.length / 2)];
+      const itmN = paid ? es.filter((e) => e[1] <= paid).length : 0;
+      const sumLine = "<div class='sum'><b>" + n + "</b> entr" + (n === 1 ? 'y' : 'ies') + " · best <b>" + ranks[0].toLocaleString() + "</b> · median " + med(ranks).toLocaleString() + " · worst " + ranks[n - 1].toLocaleString() + (paid ? " · in the money <b class='" + (itmN ? 'good' : '') + "'>" + itmN + "</b>" : "") + " · pts " + ptsv[0] + "–" + ptsv[n - 1] + "</div>";
+      // grouped by core (captain / QB / top salary): the main view for a user with many entries
+      const gmap = {}; es.forEach((e) => { const k = coreOf(c, e) || '–'; (gmap[k] = gmap[k] || []).push(e); });
+      const grows = Object.keys(gmap).map((k) => { const g = gmap[k], rk = g.map((e) => e[1]).sort((a, b) => a - b), gi = paid ? g.filter((e) => e[1] <= paid).length : 0, ap = g.reduce((a, e) => a + e[2], 0) / g.length;
+        return "<tr data-q='" + esc(k.toLowerCase()) + "'><td>" + esc(k) + "</td><td class='n' data-v='" + g.length + "'>" + g.length + " <span class='mute'>(" + Math.round(100 * g.length / n) + "%)</span></td><td class='n' data-v='" + rk[0] + "'>" + rk[0].toLocaleString() + "</td><td class='n' data-v='" + med(rk) + "'>" + med(rk).toLocaleString() + "</td><td class='n " + (gi ? 'good' : '') + "' data-v='" + gi + "'>" + gi + "</td><td class='n' data-v='" + ap + "'>" + ap.toFixed(1) + "</td></tr>"; }).join("");
+      const groupHTML = Object.keys(gmap).length > 1 ? "<details><summary>Grouped by " + (c.gt === 'showdown' ? 'captain' : 'core player') + " (" + Object.keys(gmap).length + ")</summary><div class='tb' data-key='grp" + c.id + "' data-ph='Filter groups'><table class='st'><thead><tr><th data-s='t'>" + (c.gt === 'showdown' ? 'Captain' : 'Core') + "</th><th class='n' data-s='n'>Entries</th><th class='n' data-s='n'>Best</th><th class='n' data-s='n'>Median</th><th class='n' data-s='n'>ITM</th><th class='n' data-s='n'>Avg pts</th></tr></thead><tbody>" + grows + "</tbody></table></div></details>" : "";
       // exposure vs field
       const cnt = {}; es.forEach((e) => e[5].forEach((t) => { if (/(^| )LOCKED$/.test(META.tok[t])) return; const k = keyOf(c, META.tok[t]); cnt[k] = (cnt[k] || 0) + 1; }));
       const ex = Object.keys(cnt).map((k) => ({ k, me: 100 * cnt[k] / n, fd: c.own && c.own[k] ? c.own[k][0] : null, pts: c.own && c.own[k] ? c.own[k][1] : null })).sort((a, b) => b.me - a.me).slice(0, 14);
       // field favourites this user has 0 of (leverage the other way): top field-owned players not in any of the user's lineups
       const zero = Object.keys(c.own || {}).filter((k) => !cnt[k] && !/(^| )LOCKED$/.test(k) && c.own[k][0] >= 5).sort((a, b) => c.own[b][0] - c.own[a][0]).slice(0, 10).map((k) => ({ k, me: 0, fd: c.own[k][0], pts: c.own[k][1] }));
       const cls = c.gt === 'classic';
+      const slotsAll = es.reduce((a, e) => a + e[5].length, 0), slotsHid = es.reduce((a, e) => a + e[5].filter((t) => /(^| )LOCKED$/.test(META.tok[t])).length, 0), hidShare = slotsAll ? slotsHid / slotsAll : 0;   // your exposure only counts started players, the field's % counts everyone
       const exrow = (x, zr) => {
         const nmk = cls ? x.k : x.k.replace(/^[A-Z]+ /, ''); const m = c.pm && c.pm[nmk]; const sal = cls && c.sal ? c.sal[nmk] : null;
         const ppk = sal && x.pts != null ? x.pts / (sal / 1000) : null; const d = x.fd == null ? null : x.me - x.fd;
         const lev = zr ? 'zero' : d == null ? '' : d > 5 ? 'over' : d < -5 ? 'under' : 'even';
-        const gs = m ? m.gs : null; return "<tr data-act='" + (gs === 'post' ? 'done' : 'active') + "' class='" + (gs === 'post' ? 'fin' : '') + "' data-q='" + esc((x.k + ' ' + (m ? m.team + ' ' + m.pos : '')).toLowerCase()) + "' data-lev='" + lev + "' data-team='" + esc(m ? m.team || '' : '') + "' data-pos='" + esc(m ? m.pos || '' : '') + "'><td>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(x.k) + "</td><td>" + esc(m ? m.team || '' : '') + "</td><td>" + esc(m ? m.pos || '' : '') + "</td><td class='n' data-v='" + x.me + "'>" + x.me.toFixed(0) + "%</td><td class='n' data-v='" + (x.fd == null ? '' : x.fd) + "'>" + (x.fd == null ? "–" : x.fd.toFixed(1) + "%") + "</td><td class='n " + (d != null && d > 5 ? "good" : d != null && d < -5 ? "bad" : "") + "' data-v='" + (d == null ? '' : d) + "'>" + (d == null ? "" : (d >= 0 ? "+" : "") + d.toFixed(0)) + "</td><td class='n' data-v='" + (sal == null ? '' : sal) + "'>" + (sal == null ? '' : '$' + (sal / 1000).toFixed(1) + 'K') + "</td><td class='n' data-v='" + (x.pts == null ? '' : x.pts) + "'>" + (x.pts == null ? "" : x.pts) + "</td><td class='n' data-v='" + (ppk == null ? '' : ppk) + "'>" + (ppk == null ? '' : ppk.toFixed(2)) + "</td><td data-v='" + (gs === 'in' ? 0 : gs === 'post' ? 2 : 1) + "'>" + (m && m.gs ? statusBadge(m.gs, m.gd, m.start) : '') + "</td></tr>";
+        const gs = m ? m.gs : null; return "<tr data-act='" + (gs === 'post' ? 'done' : 'active') + "' class='" + (gs === 'post' ? 'fin' : '') + "' data-q='" + esc((x.k + ' ' + (m ? m.team + ' ' + m.pos : '')).toLowerCase()) + "' data-lev='" + lev + "' data-team='" + esc(m ? m.team || '' : '') + "' data-pos='" + esc(m ? m.pos || '' : '') + "'><td>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(x.k) + "</td><td>" + esc(m ? m.team || '' : '') + "</td><td class='opt'>" + esc(m ? m.pos || '' : '') + "</td><td class='n' data-v='" + x.me + "'>" + x.me.toFixed(0) + "%</td><td class='n' data-v='" + (x.fd == null ? '' : x.fd) + "'>" + (x.fd == null ? "–" : x.fd.toFixed(1) + "%") + "</td><td class='n " + (hidShare > 0.15 ? "mute" : d != null && d > 5 ? "good" : d != null && d < -5 ? "bad" : "") + "' data-v='" + (d == null ? '' : d) + "'>" + (d == null ? "" : (d >= 0 ? "+" : "") + d.toFixed(0)) + "</td><td class='n opt' data-v='" + (sal == null ? '' : sal) + "'>" + (sal == null ? '' : '$' + (sal / 1000).toFixed(1) + 'K') + "</td><td class='n opt' data-v='" + (x.pts == null ? '' : x.pts) + "'>" + (x.pts == null ? "" : x.pts) + "</td><td class='n' data-v='" + (ppk == null ? '' : ppk) + "'>" + (ppk == null ? '' : ppk.toFixed(2)) + "</td><td class='opt' data-v='" + (gs === 'in' ? 0 : gs === 'post' ? 2 : 1) + "'>" + (m && m.gs ? statusBadge(m.gs, m.gd, m.start) : '') + "</td></tr>";
       };
       const hid = es.some((e) => e[5].some((t) => /(^| )LOCKED$/.test(META.tok[t])));
       const exh = ex.map((x) => exrow(x, false)).join("") + zero.map((x) => exrow(x, true)).join("");
-      const exnote = "<div class='lu'>" + (hid ? "Hidden (locked) slots can't be counted, so exposure is understated until those games start. " : "") + "Zero = the field owns 5%+ and you have none.</div>";
+      const exnote = "<div class='lu'>" + (hidShare > 0.15 ? "<b>" + Math.round(100 * hidShare) + "% of your lineup slots are still hidden</b> (games not started), so your exposure is understated and Diff is greyed out until more games start. " : hid ? "Hidden (locked) slots can't be counted, so exposure is slightly understated. " : "") + "Zero = the field owns 5%+ and you have none.</div>";
       const chipsJson = JSON.stringify([{ k: 'act', label: 'Status', opts: [['active', 'Live + upcoming'], ['done', 'Finished'], ['', 'All']] }, { k: 'lev', label: 'Leverage', opts: [['', 'Leverage: all'], ['over', 'Over (you > field)'], ['under', 'Under'], ['zero', 'Zero (you have none)']] }, { k: 'team', label: 'Team', opts: 'auto' }, { k: 'pos', label: 'Pos', opts: 'auto' }]).replace(/'/g, '&#39;');
       const lead = (L.lead || []).map((l) => { const e = [0, l.r, l.p, l.t == null ? 0 : l.t, 0, []]; const nl = l.lu ? l.lu.map((t) => t.slice(t.indexOf(' ') + 1)) : []; const ss = l.lu ? salStats(c, nl, l.p) : null; const det = l.lu ? lineStats(c, e, nl) : ''; return "<tr onclick='toggleRow(this)' style='cursor:pointer'><td class='n'>" + l.r + "</td><td>" + esc(l.u) + "</td><td class='n'>" + l.p + "</td><td class='n'>" + (minLeft(c, l.t) == null ? '' : minLeft(c, l.t)) + "</td><td class='n'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + 'K' : '') + "</td><td class='n'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td></tr>" + (det ? "<tr class='dr' hidden><td colspan='6' class='lu'>" + det + "</td></tr>" : ''); }).join("");
       h += '<div class="card"><b>' + esc(c.name || c.id) + '</b> <a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">DK ↗</a><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + gcChips(c) + "</div>" +
-        "<div class='tb' data-key='ent" + c.id + "' data-ph='Filter your lineups (player or team)'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Min left</th><th class='n' data-s='n'>$ spent</th><th class='n' data-s='n'>Pts/$1K</th><th class='n' data-s='n'>Est. pay</th><th>Lineup (live pts)</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-        "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary><div class='tb' data-key='exp" + c.id + "' data-ph='Filter player or team' data-def='{&quot;act&quot;:&quot;active&quot;}' data-chips='" + chipsJson + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='t'>Team</th><th data-s='t'>Pos</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n' data-s='n'>Salary</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th><th data-s='n'>Game</th></tr></thead><tbody>" + exh + "</tbody></table>" + exnote + "</div></details>" +
+        sumLine + groupHTML + "<div class='tb' data-key='ent" + c.id + "' data-page='25' data-more='1' data-ph='Filter entries (player or captain)' data-chips='" + JSON.stringify([{ k: 'itm', label: 'Money', opts: [['', 'All entries'], ['yes', 'In the money'], ['no', 'Out of the money']] }, { k: 'core', label: 'Core', opts: 'auto' }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>" + (c.gt === 'showdown' ? 'Captain' : 'Core') + "</th><th class='n' data-s='n'>Pts</th><th class='n opt' data-s='n'>Min left</th><th class='n opt' data-s='n'>$ spent</th><th class='n opt' data-s='n'>Pts/$1K</th><th class='n' data-s='n'>Est. pay</th></tr></thead><tbody>" + rows + "</tbody></table></div><div class='lu'>Tap an entry to see its lineup.</div>" +
+        "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary><div class='tb' data-key='exp" + c.id + "' data-more='1' data-ph='Filter player or team' data-def='{&quot;act&quot;:&quot;active&quot;}' data-chips='" + chipsJson + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='t'>Team</th><th data-s='t' class='opt'>Pos</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n opt' data-s='n'>Salary</th><th class='n opt' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th><th data-s='n' class='opt'>Game</th></tr></thead><tbody>" + exh + "</tbody></table>" + exnote + "</div></details>" +
         "<details><summary>Lineup profile vs field</summary>" + profileHTML(c, es) + "</details>" +
         "<details><summary>Leaderboard top 10</summary><div class='tb' data-key='lb" + c.id + "' data-ph='Filter leaderboard'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>User</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Min left</th><th class='n' data-s='n'>$ spent</th><th class='n' data-s='n'>Pts/$1K</th></tr></thead><tbody>" + lead + "</tbody></table></div></details></div>";
     });
@@ -334,13 +366,15 @@ function tbApply(box) {
     gs = gs.map((g, i) => ({ g, v: val(g), i })).sort((a, b) => (a.v === null) - (b.v === null) || (a.v < b.v ? -st.dir : a.v > b.v ? st.dir : 0) || a.i - b.i).map((x) => x.g);
     [...tb.tHead.rows[0].cells].forEach((c, i) => { c.classList.toggle('asc', i === st.col && st.dir === 1); c.classList.toggle('desc', i === st.col && st.dir === -1); });
   }
-  const body = tb.tBodies[0]; let shown = 0;
+  const body = tb.tBodies[0]; let shown = 0; const lim = parseInt(box.dataset.page || '0', 10), cap = lim ? (st.lim || lim) : 1e9;
   gs.forEach((g) => {
     const r = g[0]; const q = (r.dataset.q || r.innerText).toLowerCase(); let ok = !st.q || q.includes(st.q.toLowerCase());
     for (const k in st.f) if (st.f[k] && r.dataset[k] !== st.f[k]) ok = false;
-    g.forEach((x) => { if (x.classList.contains('dr')) { if (!ok) x.hidden = true; } else x.hidden = !ok; body.appendChild(x); });
+    const vis = ok && shown < cap; g.forEach((x) => { if (x.classList.contains('dr')) { if (!vis) x.hidden = true; } else x.hidden = !vis; body.appendChild(x); });
     if (ok) shown++;
   });
+  let pg = box.querySelector('.pg'); const left = lim ? Math.max(0, shown - cap) : 0;
+  if (left > 0) { if (!pg) { pg = document.createElement('button'); pg.type = 'button'; pg.className = 'pg'; pg.addEventListener('click', () => { st.lim = (st.lim || lim) + lim; tbApply(box); }); box.appendChild(pg); } pg.textContent = 'Show ' + Math.min(lim, left) + ' more (' + left + ' left)'; } else if (pg) pg.remove();
   let nr = box.querySelector('.nr');
   if (!shown) { if (!nr) { nr = document.createElement('div'); nr.className = 'nr'; nr.textContent = 'Nothing matches the filter.'; box.appendChild(nr); } } else if (nr) nr.remove();
 }
@@ -359,6 +393,7 @@ function tbInit(box) {
     sel.innerHTML = opts.map((o) => '<option value="' + esc(o[0]) + '"' + (st.f[ch.k] === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('');
     sel.addEventListener('change', () => { st.f[ch.k] = sel.value; tbApply(box); }); bar.appendChild(sel);
   });
+  if (box.dataset.more) { const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'ghost'; mb.textContent = '＋ columns'; mb.addEventListener('click', () => { tb.classList.toggle('more'); mb.textContent = tb.classList.contains('more') ? '− columns' : '＋ columns'; }); bar.appendChild(mb); }
   box.insertBefore(bar, tb);
   [...tb.tHead.rows[0].cells].forEach((th, i) => { if (th.dataset.s) th.addEventListener('click', () => { st.dir = st.col === i ? -st.dir : (th.dataset.s === 'n' ? -1 : 1); st.col = i; tbApply(box); }); });
   tbApply(box);
