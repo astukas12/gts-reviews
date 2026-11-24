@@ -11,7 +11,8 @@
 :root{--bg:#121212;--panel:#1e1e1e;--card:#1e1e1e;--ink:#fff;--mute:#999;--line:#404040;--acc:#FFE500;--good:#4caf50;--bad:#f44336;--chip:#2d2d2d;color-scheme:dark}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,Arial,sans-serif;padding:0 max(14px,env(safe-area-inset-left)) 28px max(14px,env(safe-area-inset-right))}
-.wrap{max-width:1000px;margin:0 auto}
+.wrap{max-width:1100px;margin:0 auto}
+#out>.card,#out>details.card{width:100%;box-sizing:border-box}
 header{display:flex;align-items:center;gap:12px;padding:14px 0 12px;border-bottom:1px solid var(--line)}
 header img{height:48px;width:auto;border-radius:6px;flex:none}
 h1{font:700 22px/1.1 Inter,sans-serif;margin:0;color:var(--acc)}.sub{color:var(--mute);font-size:13px;margin-top:3px}
@@ -42,11 +43,21 @@ table.st th[data-s].asc:after{content:' \25B2';color:var(--acc)}table.st th[data
 .role-for{color:var(--good);font-weight:700}.role-ag{color:var(--bad);font-weight:700}
 .ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line);min-height:36px;padding:6px 12px;font-size:13px;margin-left:8px}
 .dot.amber{background:#ff9800}.dot.red{background:var(--bad)}
+.strip{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 6px}.ch{border:1px solid var(--line);border-radius:7px;padding:2px 7px;font-size:12px;background:var(--chip);white-space:nowrap}
+.ch.lv{border-color:var(--good);background:rgba(76,175,80,.14);font-size:12.5px;padding:3px 8px}.ch.lv b{color:#fff}.ch.dn{opacity:.55}.ch.hid{opacity:.4;padding:2px 6px}.ch .gd{color:var(--good)}
+.stt.on{color:var(--good);font-weight:700}.stt.bh{color:#ff9800;font-weight:700}.stt.mo{color:var(--good);font-weight:700}
+tr.dr[data-always] td{padding-top:0;border-top:0}
 .lg{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;font-size:13px;margin:4px 0 8px}
 .lg>span,.ll>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ll{font-size:13px;margin:4px 0 8px;line-height:1.7}.ll .cpt{color:var(--acc);font-weight:700}
 .tg{display:inline-block;min-width:26px;color:var(--mute);font-size:10.5px;font-weight:700;letter-spacing:.03em}
 table.st:not(.more) .opt{display:none}
+table.st tbody tr:not(.dr)>td{border-top:1px solid rgba(255,255,255,.035);padding-top:12px}
+table.st tbody tr:hover>td,table.st tbody tr:hover+tr.dr>td{background:rgba(255,229,0,.07)}
+.strip{margin:0 0 4px}.mo{background:none;border:0;color:var(--mute);font-size:12px;cursor:pointer;padding:2px 6px}.mo:hover{color:var(--acc)}.sm{font-size:12px}
+.ch{border:0;background:rgba(255,255,255,.07);border-radius:999px;padding:2px 9px}.ch.lv{border:0;background:rgba(76,175,80,.16)}.fullstrip{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.08)}
+.tlb{display:inline-block;width:46px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);vertical-align:middle;overflow:hidden}.tlb i{display:block;height:100%;background:var(--acc)}
+.sd{font-size:11px}.sd.mn,.sd.on{color:var(--good)}.sd.bh{color:#ff9800}.sd.fi{color:var(--mute)}.sw{font-size:12.5px}
 .pg{display:block;margin:8px auto 2px;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 18px;font-size:13px;min-height:40px;font-weight:600;cursor:pointer}
 .sum{font-size:13px;color:var(--mute);margin:2px 0 6px}.sum b{color:var(--ink)}
 .cc{padding:14px}
@@ -64,6 +75,8 @@ details.dt>summary{font-size:15px;padding:10px 0;border-top:1px solid var(--line
 @media(max-width:420px){.roots{grid-template-columns:1fr}}
 .nr{text-align:center;color:var(--mute);padding:10px}
 details>summary{cursor:pointer;color:var(--acc);font-size:13.5px;font-weight:600;margin-top:10px;padding:6px 0;min-height:36px}
+.seg{display:flex;gap:6px;margin:10px 0}.seg button{flex:1;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:9px 6px;font-size:14px;font-weight:600;cursor:pointer}.seg button.on{background:var(--acc);color:#000;border-color:var(--acc)}
+table.basic td,table.basic th{vertical-align:top}.xc>summary{line-height:1.5}.bh{color:#ff9800;font-weight:600}
 .fresh{font-size:12.5px;color:var(--mute);margin:4px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:6px}
 footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--mute);font-size:12px}
 @media(max-width:560px){h1{font-size:19px}td.lu{min-width:170px}}
@@ -94,25 +107,59 @@ function bucket(name) { let h = 0; for (let i = 0; i < name.length; i++) h = (h 
 const $ = (s) => document.getElementById(s);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const money = (x) => x == null ? "–" : "$" + Number(x).toLocaleString(undefined, { maximumFractionDigits: 2 });
+const sg = (d) => { const s = d.toFixed(0); return (s === "-0" || s === "0") ? "0" : (d > 0 ? "+" : "") + s; };
 const SPORT = { cbb: "College basketball", nfl: "NFL", soc: "Soccer", nba: "NBA", nhl: "NHL", cfb: "College football", mma: "MMA", f1: "Formula 1" };
 let META = null;
 const DK = 'https://www.draftkings.com/contest/gamecenter/';
 // minutes in a full lineup (DK TimeRemaining starts at this): pace views only where known
 const TOTMIN = { cbb: { classic: 320 } };   // CBB classic: 8 players x 40 min (verified: untouched lineups show 320 left); other sports are added once their totals are confirmed
 const PRIOR = 20;   // minutes of field-average pace blended in, so early pace does not swing wildly
-function pace(c, e) {
-  const L = c.lines || {}, tot = (TOTMIN[c.sport] || {})[c.gt];
-  if (!tot || L.avg_pts == null || L.avg_trem == null) return null;
-  const played = tot - e[3], fpl = tot - L.avg_trem; if (fpl <= 0) return null;
+const FOOT = new Set(['cfb', 'nfl']);
+function gameElapsed(m) {   // minutes of the 60 played in this player's game, from the ESPN status
+  if (!m || !m.gs || m.gs === 'pre') return 0;
+  if (m.gs === 'post') return 60;
+  const d = String(m.gd || ''), q = d.match(/(\d+):(\d+)\s*-\s*(\d)/);
+  if (q) { const per = +q[3]; if (per > 4) return 60; return 15 * (per - 1) + 15 - (+q[1] + (+q[2]) / 60); }
+  if (/half/i.test(d)) return 30;
+  const en = d.match(/end of (\d)/i); if (en) return 15 * Math.min(4, +en[1]);
+  return 0;
+}
+function tlOf(c, toks) {   // player-minutes of game time left in a lineup (a slot whose game has not started counts as a full 60)
+  if (!toks || !toks.length) return null;
+  let left = 0;
+  toks.forEach((tk) => { const nm = tk.slice(tk.indexOf(' ') + 1); left += nm === 'LOCKED' ? 60 : 60 - gameElapsed(c.pm && c.pm[nm]); });
+  const total = 60 * toks.length; return { left, total, slots: toks.length, pct: 100 * left / total };
+}
+function fieldLeft(c) {   // the average lineup's time left, from who the field owns
+  if (c._fl !== undefined) return c._fl;
+  let left = 0, sl = 0; Object.keys(c.own || {}).forEach((k) => { const o = c.own[k]; if (!o || o[0] == null) return; const nm = c.gt === 'showdown' ? k.replace(/^[A-Z]+ /, '') : k; left += (o[0] / 100) * (60 - gameElapsed(c.pm && c.pm[nm])); sl += o[0] / 100; });
+  return (c._fl = sl > 0 ? { left, slots: sl } : null);
+}
+function pace(c, e, toksIn) {
+  const L = c.lines || {}; let tot = (TOTMIN[c.sport] || {})[c.gt], e3 = e[3], atr = L.avg_trem, unit = 1;
+  if (!tot && FOOT.has(c.sport)) { const t = tlOf(c, toksIn || (e[5] || []).map((x) => META.tok[x])), f = fieldLeft(c); if (!t || !f) return null; tot = t.total; e3 = t.left; atr = f.left * (t.slots / f.slots); unit = t.slots; }
+  if (!tot || L.avg_pts == null || atr == null) return null;
+  const played = tot - e3, fpl = tot - atr; if (fpl <= 0) return null;
   const fpace = L.avg_pts / fpl;                       // field average points per lineup minute
   const own = played > 0 ? e[2] / played : fpace;
   const blend = (played * own + PRIOR * fpace) / (played + PRIOR);
-  const proj = e[2] + blend * e[3];
-  const fproj = L.avg_pts + fpace * L.avg_trem;        // field-average projected final
+  const proj = e[2] + blend * e3;
+  const fproj = L.avg_pts + fpace * atr;        // field-average projected final
   const k = (line) => line == null ? null : line + (fproj - L.avg_pts);   // lines move with the field: add the field's expected remaining points
-  return { played, own, proj, cash: k(L.cash_pts), t10: k(L.top10_pts), t1: k(L.top1_pts) };
+  return { played, left: e3, own: own * unit, proj, cash: k(L.cash_pts), t10: k(L.top10_pts), t1: k(L.top1_pts) };
 }
 
+function slotSal(c, tk) {   // salary of one lineup slot (token "POS Name"); showdown captains cost 1.5x
+  const sl = tk.split(' ')[0], nm = tk.slice(sl.length + 1); if (!c.sal) return null;
+  if (c.gt === 'showdown') return c.sal[(sl === 'CPT' ? 'CPT ' : 'FLEX ') + nm];
+  return c.sal[nm];
+}
+function salStatsT(c, toks, pts) {   // $ spent so far for a lineup given as slot tokens (classic and showdown)
+  if (!c.sal) return null;
+  let vis = 0, nh = 0;
+  for (const tk of toks) { const nm = tk.slice(tk.indexOf(' ') + 1); if (nm === 'LOCKED') { nh++; continue; } const v = slotSal(c, tk); if (v == null) return null; vis += v; }
+  return { vis, nh, pct: 100 * vis / 50000, ppk: vis > 0 ? pts / (vis / 1000) : null };
+}
 function salStats(c, names, pts) {   // salary spent so far = salary of players whose game has started (DK unhides them); hidden slots are not started yet
   const sal = c.sal; if (!sal || c.gt !== 'classic') return null;
   let vis = 0, nh = 0;
@@ -120,6 +167,7 @@ function salStats(c, names, pts) {   // salary spent so far = salary of players 
   return { vis, nh, pct: 100 * vis / 50000, ppk: vis > 0 ? pts / (vis / 1000) : null };
 }
 function minLeft(c, trem) { const tot = (TOTMIN[c.sport] || {})[c.gt]; return tot && trem != null ? Math.max(0, Math.round(trem)) : null; }
+function mlLabel(c) { const tot = (TOTMIN[c.sport] || {})[c.gt]; return tot ? 'Min left of ' + tot : FOOT.has(c.sport) ? 'Player-min left' : 'Min left'; }
 function e2n(c, e) { return e[5].map((t) => META.tok[t].slice(META.tok[t].indexOf(' ') + 1)); }
 function lineStats(c, e, names) {   // pace + salary view of one entry; names = player names in the lineup ('LOCKED' = hidden: its game has not started)
   const pp = pace(c, e), sal = c.sal, tot = (TOTMIN[c.sport] || {})[c.gt];
@@ -140,6 +188,15 @@ let SORTBY = 'rank', CUR = null;
 const QP = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 99];
 function pctile(q, v) { if (!q || !q.length || v == null || isNaN(v)) return null; if (v <= q[0]) return 1; if (v >= q[q.length - 1]) return 99; for (let i = 1; i < q.length; i++) if (v <= q[i]) { const lo = q[i - 1], hi = q[i]; return Math.round(QP[i - 1] + (hi === lo ? 0 : (v - lo) / (hi - lo) * (QP[i] - QP[i - 1]))); } return 99; }
 function visNames(c, e) { return e2n(c, e).filter((n) => n !== 'LOCKED'); }
+function basicRow(c, es, n) {   // one plain line per contest: how you are doing, in words
+  const L = c.lines || {}, paid = L.paid, cash = L.cash_pts;
+  const best = es.slice().sort((a, b) => a[1] - b[1] || b[2] - a[2])[0], top = es.reduce((a, e) => Math.max(a, e[2]), 0);
+  const inm = paid && best[1] <= paid, pay = es.reduce((a, e) => a + payFor(c, e[1]), 0);
+  const pmv = Object.values(c.pm || {}), over = c.fin || (pmv.length > 0 && pmv.every((m) => m.gs === 'post')), need = cash != null ? cash - top : null;
+  const st = inm ? ["In the money", 'good'] : over ? ["Finished, did not cash", 'mute'] : need != null && need > 0 ? ["Needs +" + need.toFixed(1) + " to cash", 'bh'] : ["Playing", 'mute'];
+  const upd = c.at ? new Date(c.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+  return { stake: (c.fee || 0) * n, html: "<tr data-q='" + esc((c.name || c.id).toLowerCase()) + "'><td><a class='dk' href='" + DK + c.id + "' target='_blank' rel='noopener noreferrer'>" + esc(c.name || c.id) + "</a><div class='mute sm'>" + esc(SPORT[c.sport] || c.sport) + (c.fee ? ' · ' + money(c.fee) + ' entry' : '') + "</div></td><td class='n' data-v='" + n + "'>" + n + "</td><td class='n' data-v='" + best[1] + "'>" + best[1].toLocaleString() + " <span class='mute'>of " + (c.size || L.n || '').toLocaleString() + "</span></td><td class='stt'><span class='" + st[1] + "'>" + st[0] + "</span></td><td class='n' data-v='" + top + "'><b>" + top + "</b></td><td class='n' data-v='" + (cash == null ? '' : cash) + "'>" + (cash == null ? '–' : cash) + "</td><td class='n " + (pay ? 'good' : '') + "' data-v='" + pay + "'>" + (pay ? money(pay) : '–') + "</td><td class='mute sm'>" + upd + "</td></tr>" };
+}
 function profileHTML(c, es) {
   const P = c.prof; if (!P || !P.q) return "<div class='lu'>Profile appears once the standings have been pulled with started players.</div>";
   const cls = c.gt === 'classic';
@@ -151,8 +208,12 @@ function profileHTML(c, es) {
     let ov = 0; es.forEach((o) => { if (o === e) return; const t = new Set(visNames(c, o)); const k = nm.filter((n) => t.has(n)).length; if (k > ov) ov = k; });
     const po = pctile(P.q.own, ow), ps = pctile(P.q.sal, sa), pc = pctile(P.q.chalk, chalk);
     const full = nv === e[5].length; const teams = full && c.pm ? new Set(nm.map((n) => c.pm[n] && c.pm[n].team).filter(Boolean)).size : null;
-    return "<tr data-q='" + esc(nm.join(' ').toLowerCase()) + "'><td class='n' data-v='" + e[1] + "'>" + e[1].toLocaleString() + "</td><td class='n' data-v='" + (ow == null ? '' : ow) + "'>" + (ow == null ? '' : ow.toFixed(1) + '%') + (po == null ? '' : " <span class='mute'>p" + po + "</span>") + "</td><td class='n' data-v='" + (chalk == null ? '' : chalk) + "'>" + (chalk == null ? '' : Math.round(100 * chalk) + '%') + (pc == null ? '' : " <span class='mute'>p" + pc + "</span>") + "</td><td class='n' data-v='" + (sa == null ? '' : sa) + "'>" + (sa == null ? '' : '$' + (sa / 1000).toFixed(1) + 'K') + (ps == null ? '' : " <span class='mute'>p" + ps + "</span>") + "</td><td>" + esc(stackInfo(c, e).text) + "</td><td>" + esc(stackInfo(c, e).split) + "</td><td class='n' data-v='" + e[4] + "'>" + (e[4] > 1 ? e[4] + '×' : 'unique') + "</td><td class='n' data-v='" + ov + "'>" + ov + " of " + nv + "</td></tr>";
-  }).join("");
+    const si = stackInfo(c, e); return { k: e[1] + '|' + nm.slice().sort().join(','), st: si.text, sp: si.split, h: "<tr data-q='" + esc(nm.join(' ').toLowerCase()) + "'><td class='n' data-v='" + e[1] + "'>" + e[1].toLocaleString() + "</td><td class='n' data-v='" + (ow == null ? '' : ow) + "'>" + (ow == null ? '' : ow.toFixed(1) + '%') + (po == null ? '' : " <span class='mute'>p" + po + "</span>") + "</td><td class='n' data-v='" + (chalk == null ? '' : chalk) + "'>" + (chalk == null ? '' : Math.round(100 * chalk) + '%') + (pc == null ? '' : " <span class='mute'>p" + pc + "</span>") + "</td><td class='n' data-v='" + (sa == null ? '' : sa) + "'>" + (sa == null ? '' : '$' + (sa / 1000).toFixed(1) + 'K') + (ps == null ? '' : " <span class='mute'>p" + ps + "</span>") + "</td><td class='cs'>" + esc(si.text) + "</td><td class='ct'>" + esc(si.split) + "</td><td class='n' data-v='" + e[4] + "'>" + (e[4] > 1 ? e[4] + '×' : 'unique') + "</td><td class='n' data-v='" + ov + "'>" + ov + " of " + nv + "</td></tr>" };
+  });
+  const grp = {}, ord = []; rows.forEach((r) => { if (grp[r.k]) grp[r.k].n++; else { grp[r.k] = { r, n: 1 }; ord.push(r.k); } });   // identical lineups (same rank, same players) collapse into one row with a count
+  let rowsH = ord.map((k) => { const g = grp[k]; return g.n > 1 ? g.r.h.replace('</td>', " <span class='mute'>×" + g.n + "</span></td>") : g.r.h; }).join("");
+  const hasSt = rows.some((r) => r.st), hasSp = rows.some((r) => r.sp);   // hide columns that are empty for every row (e.g. Stack in CBB)
+  if (!hasSt) rowsH = rowsH.replace(/<td class='cs'>[^<]*<\/td>/g, ''); if (!hasSp) rowsH = rowsH.replace(/<td class='ct'>[^<]*<\/td>/g, '');
   const D = P.dup || {};
   const fieldLine = "Field: " + Math.round(100 * (D.share1 || 0)) + "% of lineups are unique, " + Math.round(100 * (D.share2 || 0)) + "% appear twice, " + Math.round(100 * (D.share35 || 0)) + "% 3–5×, " + Math.round(100 * (D.share610 || 0)) + "% 6–10×, " + Math.round(100 * (D.share11 || 0)) + "% 11×+ (most copied: " + (D.max || 0) + "×). Based on " + P.n.toLocaleString() + " of " + P.of.toLocaleString() + " lineups with 2+ started players. Percentiles (p) compare per-started-player averages with the field.";
   // combos: the user's own most common pairs / trios and how often the field has them
@@ -162,7 +223,7 @@ function profileHTML(c, es) {
   const min2 = (P.pairs || []).length ? P.pairs[P.pairs.length - 1][2] : 0, min3 = (P.trios || []).length ? P.trios[P.trios.length - 1][3] : 0;
   const crow = (k, n, f, mn, kind) => { const me = 100 * n / es.length; return "<tr data-q='" + esc(k.toLowerCase()) + "' data-kind='" + kind + "'><td>" + esc(k) + "</td><td>" + kind + "</td><td class='n' data-v='" + me + "'>" + me.toFixed(0) + "%</td><td class='n' data-v='" + (f == null ? 0 : f) + "'>" + (f == null ? '<' + mn.toFixed(1) + '%' : f.toFixed(1) + '%') + "</td></tr>"; };
   const crows = Object.keys(cnt2).sort((a, b) => cnt2[b] - cnt2[a]).slice(0, 10).map((k) => crow(k, cnt2[k], f2[k], min2, 'pair')).join("") + Object.keys(cnt3).sort((a, b) => cnt3[b] - cnt3[a]).slice(0, 8).map((k) => crow(k, cnt3[k], f3[k], min3, 'trio')).join("");
-  return "<div class='tb' data-key='prof" + c.id + "' data-ph='Filter by player'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th class='n' data-s='n'>Avg own</th><th class='n' data-s='n'>Chalk 20%+</th><th class='n' data-s='n'>Avg salary</th><th data-s='t'>Stack</th><th data-s='t'>Team split</th><th class='n' data-s='n'>Dupes</th><th class='n' data-s='n'>Overlap</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
+  return "<div class='tb' data-key='prof" + c.id + "' data-ph='Filter by player'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th class='n' data-s='n'>Avg own</th><th class='n' data-s='n'>Chalk 20%+</th><th class='n' data-s='n'>Avg salary</th>" + (hasSt ? "<th data-s='t'>Stack</th>" : "") + (hasSp ? "<th data-s='t'>Team split</th>" : "") + "<th class='n' data-s='n'>Dupes</th><th class='n' data-s='n'>Overlap</th></tr></thead><tbody>" + rowsH + "</tbody></table></div>" +
     "<div class='lu' style='margin:6px 0'>" + fieldLine + "</div>" +
     "<div class='tb' data-key='cmb" + c.id + "' data-ph='Filter combos' data-chips='" + JSON.stringify([{ k: 'kind', label: 'Type', opts: [['', 'Pairs + trios'], ['pair', 'Pairs'], ['trio', 'Trios']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Your common combos</th><th data-s='t'>Type</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th></tr></thead><tbody>" + crows + "</tbody></table></div>";
 }
@@ -174,6 +235,65 @@ function lineupHTML(c, e) {   // compact: classic = 2-column grid of "POS Last",
     return "<span class='" + (gs === 'post' ? 'fin ' : '') + (sl === 'CPT' ? 'cpt' : '') + "' title='" + esc(nm + (m ? ' · ' + (m.team || '') + ' ' + (m.pos || '') : '')) + "'>" + (gs === 'in' ? "<span class='live'>●</span>" : "") + "<span class='tg'>" + esc(sl) + "</span>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(sn(nm)) + pt + "</span>"; };
   return c.gt === 'showdown' ? "<div class='ll'>" + toks.map(one).join(" · ") + "</div>" : "<div class='lg'>" + toks.map(one).join("") + "</div>";
 }
+function entryStrip(c, e, toksIn) {   // live players only (short chips); "+N" opens the whole lineup with every detail
+  const toks = toksIn || e[5].map((t) => META.tok[t]), full = [], lv = [], rankOf = { lv: 0, up: 1, dn: 2, hid: 3 };
+  toks.forEach((tk) => {
+    const sl = tk.split(' ')[0], nm = tk.slice(sl.length + 1);
+    if (nm === 'LOCKED') { full.push({ k: 'hid', h: "<span class='ch hid' title='Not started yet: DraftKings hides this slot until its game starts'>" + esc(sl) + " –</span>" }); return; }
+    const m = c.pm && c.pm[nm], gs = m && m.gs, o = c.own && (c.own[nm] || c.own[tk]), pt = o && o[1] != null ? o[1] : null;
+    const sv = slotSal(c, tk), sal = sv != null ? sv : null, ppk = sal && pt != null ? pt / (sal / 1000) : null;
+    const num = m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : '', slt = c.gt === 'showdown' ? "<span class='tg'>" + esc(sl) + "</span>" : '';
+    if (gs === 'in') {
+      lv.push("<span class='ch lv'><span class='live'>●</span> " + slt + "<b>" + esc(sn(nm)) + "</b> " + (pt == null ? '' : pt) + (ppk != null && ppk > 0 ? " <span class='mute'>" + ppk.toFixed(1) + "/$1K</span>" : '') + "</span>");
+      full.push({ k: 'lv', h: "<span class='ch lv'><span class='live'>●</span> " + slt + num + "<b>" + esc(sn(nm)) + "</b> " + (pt == null ? '' : pt + ' pts') + (sal ? " · $" + (sal / 1000).toFixed(1) + "K" : '') + (ppk != null && ppk > 0 ? " · " + ppk.toFixed(1) + "/$1K" : '') + (m && m.gd ? " · <span class='gd'>" + esc(m.gd) + "</span>" : '') + "</span>" });
+    } else if (gs === 'pre') full.push({ k: 'up', h: "<span class='ch'>" + slt + num + esc(sn(nm)) + (m.start ? " <span class='mute'>" + new Date(m.start + 'Z').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + "</span>" : '') + "</span>" });
+    else full.push({ k: 'dn', h: "<span class='ch dn'>" + slt + num + esc(sn(nm)) + (pt == null ? '' : ' ' + pt) + (ppk != null && ppk > 0 ? " · " + ppk.toFixed(1) + "/$1K" : '') + "</span>" });
+  });
+  full.sort((a, b) => rankOf[a.k] - rankOf[b.k]);
+  const rest = toks.length - lv.length;
+  const html = "<div class='strip'>" + (lv.length ? lv.join('') : "<span class='mute sm'>no one live</span>") + (rest > 0 ? "<button type='button' class='mo' onclick='toggleFull(this)'>" + (lv.length ? '+' + rest : 'lineup') + "</button>" : '') + "</div>" + (rest > 0 ? "<div class='strip fullstrip' hidden>" + full.map((x) => x.h).join('') + "</div>" : '');
+  return { html, live: lv.length };
+}
+function toggleFull(b) { const f = b.closest('td').querySelector('.fullstrip'); if (f) f.hidden = !f.hidden; }
+function statusOf(c, e, inm, pp) {
+  const tot0 = (TOTMIN[c.sport] || {})[c.gt];
+  return inm ? ["In the money", 'mn'] : (pp && pp.cash != null && pp.left > 0) ? (pp.proj >= pp.cash ? ["On pace", 'on'] : ["Behind", 'bh']) : (pp ? pp.left <= 0 : e[3] === 0 && tot0) ? ["Finished", 'fi'] : ["", ''];
+}
+const FH = (c, who) => "<thead><tr><th class='n' data-s='n'>Rank</th>" + (who ? "<th data-s='t'>User</th>" : "<th data-s='t'>Core</th>") + "<th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th>" + (FOOT.has(c.sport) ? "<th class='n' data-s='n' title='Share of game time still to be played by the players in this lineup (60 minutes per game, from the ESPN clock)'>Game time left</th>" : "") + "<th data-s='t'>Status</th><th class='n opt' data-s='n'>Est. pay</th><th class='n opt' data-s='n'>$ spent</th><th class='n opt' data-s='n'>" + mlLabel(c) + "</th><th class='n opt' data-s='n'>" + (FOOT.has(c.sport) ? 'Pts per game min' : 'Pts/min') + "</th><th class='n opt' data-s='n'>Live</th></tr></thead>";
+function dataRow(c, e, toks, who, dupN, extra) {   // one row for an entry of yours or anyone in the field: rank, who, pts, pts/$1K, status; the rest behind "columns"
+  const L = c.lines || {}, paid = L.paid, pay = payFor(c, e[1]), inm = paid && e[1] <= paid, pp = pace(c, e, toks), names = toks.map((t) => t.slice(t.indexOf(' ') + 1));
+  const ss = salStatsT(c, toks, e[2]), strip = entryStrip(c, e, toks), stt = statusOf(c, e, inm, pp), tl = FOOT.has(c.sport) ? tlOf(c, toks) : null, ml = tl ? Math.round(tl.left) : minLeft(c, e[3]);
+  return "<tr data-q='" + esc((who + ' ' + names.join(' ')).toLowerCase()) + "' data-live='" + (strip.live ? 'yes' : 'no') + "' data-itm='" + (inm ? 'yes' : 'no') + "'" + (extra || '') + "><td class='n' data-v='" + e[1] + "'>" + e[1].toLocaleString() + (dupN > 1 ? " <span class='mute'>×" + dupN + "</span>" : '') + "</td><td>" + esc(who) + "</td><td class='n' data-v='" + e[2] + "'><b>" + e[2] + "</b></td><td class='n' data-v='" + (ss && ss.ppk != null ? ss.ppk : '') + "'>" + (ss && ss.ppk != null ? (ss.ppk > 0 ? ss.ppk.toFixed(2) : '–') : '') + "</td>" + (tl ? "<td class='n' data-v='" + tl.pct + "' title='" + Math.round(tl.left) + " of " + tl.total + " player-minutes left'><span class='tlb'><i style='width:" + Math.round(tl.pct) + "%'></i></span> <span class='mute sm'>" + Math.round(tl.pct) + "%</span></td>" : "") + "<td data-v='" + stt[0] + "'>" + (stt[0] ? "<span class='sd " + stt[1] + "'>●</span> <span class='sw'>" + stt[0] + "</span>" : '') + "</td><td class='n opt " + (inm ? "good" : "") + "' data-v='" + pay + "'>" + (pay ? money(pay) : (inm ? "cash" : "–")) + "</td><td class='n opt' data-v='" + (ss ? ss.vis : '') + "'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + "K <span class='mute'>" + ss.pct.toFixed(0) + "%</span>" : '') + "</td><td class='n opt' data-v='" + (ml == null ? '' : ml) + "'>" + (ml == null ? '' : ml) + "</td><td class='n opt' data-v='" + (pp ? pp.own : '') + "'>" + (pp ? pp.own.toFixed(2) : '') + "</td><td class='n opt' data-v='" + strip.live + "'>" + (strip.live ? "<span class='live'>" + strip.live + "</span>" : "<span class='mute'>0</span>") + "</td></tr><tr class='dr' data-always='1'><td colspan='12'>" + strip.html + "</td></tr>";
+}
+function groupRows(list, keyf) {   // identical lineups of the same user collapse into one row with a count
+  const n = {}, seen = {}; list.forEach((x) => { const k = keyf(x); n[k] = (n[k] || 0) + 1; });
+  return list.filter((x) => { const k = keyf(x); if (seen[k]) return false; seen[k] = 1; return true; }).map((x) => [x, n[keyf(x)]]);
+}
+function fieldRow(c, e, toks, user) { return dataRow(c, e, toks, user, 1); }
+function fieldHTML(c) {   // the contest's top standings, browsable like your own entries; any username can be looked up
+  const L = c.lines || {}, lead = L.lead || [];
+  const rows = groupRows(lead, (l) => l.u + '|' + l.r + '|' + (l.lu || []).join(',')).map(([l, k]) => dataRow(c, [0, l.r, l.p, l.t == null ? 0 : l.t, 0, []], l.lu || [], l.u, k)).join("");
+  const anyLive = lead.some((l) => (l.lu || []).some((tk) => { const m = c.pm && c.pm[tk.slice(tk.indexOf(' ') + 1)]; return m && m.gs === 'in'; }));
+  const chips = JSON.stringify([{ k: 'live', label: 'Live now', opts: [['', 'All lineups'], ['yes', 'Live now']] }]).replace(/'/g, '&#39;');
+  return "<details><summary>Top lineups <span class='mute'>(" + lead.length + ")</span></summary><div class='tb' data-key='fld" + c.id + "' data-page='10' data-step='25' data-more='1' data-rank0='1' data-ph='Search username or player' data-chips='" + chips + "'><table class='st'>" + FH(c, true) + "<tbody>" + rows + "</tbody></table></div>" +
+    "<div class='fb' style='margin-top:10px'><input class='fu' data-cid='" + c.id + "' placeholder='Find any username in this contest' aria-label='Find a username in this contest'><button type='button' class='ghost fugo' data-cid='" + c.id + "'>Find</button></div><div class='fres' data-cid='" + c.id + "'></div></details>";
+}
+async function findInContest(cid, name) {
+  const box = document.querySelector(".fres[data-cid='" + cid + "']"); if (!box) return;
+  const u = String(name || '').trim().toLowerCase(); if (!u) { box.innerHTML = ''; return; }
+  box.innerHTML = "<div class='lu'>Looking up…</div>";
+  try {
+    const ci = META.contests.findIndex((x) => x && x.id === cid), c = META.contests[ci];
+    const sh = await gtsFetch("u/" + bucket(u) + ".json"), row = sh.u[u];
+    const es = row ? row[1].filter((e) => e[0] === ci) : [];
+    if (!es.length) { box.innerHTML = "<div class='lu'>No entries for “" + esc(u) + "” in this contest (usernames are not case sensitive).</div>"; return; }
+    es.sort((a, b) => a[1] - b[1]);
+    box.innerHTML = "<div class='tb' data-more='1' data-key='fres" + cid + "-" + esc(u) + "'><table class='st'>" + FH(c, true) + "<tbody>" + groupRows(es, (e) => e[1] + '|' + e[5].join(',')).map(([e, k]) => dataRow(c, e, e[5].map((t) => META.tok[t]), row[0], k)).join("") + "</tbody></table></div>";
+    tbAll();
+  } catch (e) { box.innerHTML = "<div class='lu'>Could not look that up right now.</div>"; }
+}
+document.addEventListener("click", (ev) => { const b = ev.target.closest && ev.target.closest('.fugo'); if (b) { const i = b.parentNode.querySelector('.fu'); findInContest(b.dataset.cid, i.value); } });
+document.addEventListener("keydown", (ev) => { if (ev.key === 'Enter' && ev.target.classList && ev.target.classList.contains('fu')) { ev.preventDefault(); findInContest(ev.target.dataset.cid, ev.target.value); } });
 function coreOf(c, e) {   // showdown: the captain; classic: the QB when there is one, else the highest-salary player
   const toks = e[5].map((t) => META.tok[t]);
   if (c.gt === 'showdown') { const cp = toks.find((t) => t.startsWith('CPT ')); return cp ? cp.slice(4) : ''; }
@@ -202,19 +322,20 @@ function contestGames(c, es) {   // one contest: game -> players you own or the 
     g.pl[nm] = { num: m.num, team: m.team, you: yc, ent: n, fw: fd * n, near: nr[nm] || 0, pts: personPts(c, nm) }; });
   return G;
 }
-function gameBlock(g, key) {
+function gameBlock(g, key, nolean) {
   const rows = Object.keys(g.pl).map((nm) => { const p = g.pl[nm], yp = 100 * p.you / p.ent, fp = p.fw / p.ent, d = yp - fp; const role = d > 5 ? 'for' : d < -5 ? 'ag' : 'even'; return { nm, p, yp, fp, d, role, w: Math.max(p.near, p.you) + Math.abs(d) / 100 }; }).sort((a, b) => b.w - a.w).slice(0, 14);
-  const tr = rows.map((r) => "<tr data-q='" + esc(r.nm.toLowerCase()) + "' data-role='" + r.role + "'><td>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + esc(r.nm) + " <span class='mute'>" + esc(r.p.team || '') + "</span></td><td data-v='" + (r.role === 'for' ? 2 : r.role === 'ag' ? 0 : 1) + "'>" + (r.role === 'for' ? "<span class='role-for'>ROOT FOR</span>" : r.role === 'ag' ? "<span class='role-ag'>ROOT AGAINST</span>" : "<span class='mute'>with the field</span>") + "</td><td class='n' data-v='" + r.yp + "'>" + r.yp.toFixed(0) + "% <span class='mute'>(" + r.p.you + ")</span></td><td class='n' data-v='" + r.fp + "'>" + r.fp.toFixed(0) + "%</td><td class='n' data-v='" + r.d + "'>" + (r.d >= 0 ? '+' : '') + r.d.toFixed(0) + "</td><td class='n' data-v='" + r.p.near + "'>" + r.p.near + "</td><td class='n opt' data-v='" + (r.p.pts == null ? '' : r.p.pts) + "'>" + (r.p.pts == null ? '' : r.p.pts) + "</td></tr>").join("");
+  const tr = rows.map((r) => "<tr data-q='" + esc(r.nm.toLowerCase()) + "' data-role='" + r.role + "'><td>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + esc(r.nm) + " <span class='mute'>" + esc(r.p.team || '') + "</span></td><td data-v='" + (r.role === 'for' ? 2 : r.role === 'ag' ? 0 : 1) + "'>" + (r.role === 'for' ? "<span class='role-for'>ROOT FOR</span>" : r.role === 'ag' ? "<span class='role-ag'>ROOT AGAINST</span>" : "<span class='mute'>with the field</span>") + "</td><td class='n' data-v='" + r.yp + "'>" + r.yp.toFixed(0) + "% <span class='mute'>(" + r.p.you + ")</span></td><td class='n' data-v='" + r.fp + "'>" + r.fp.toFixed(0) + "%</td><td class='n' data-v='" + r.d + "'>" + sg(r.d) + "</td><td class='n' data-v='" + r.p.near + "'>" + r.p.near + "</td><td class='n opt' data-v='" + (r.p.pts == null ? '' : r.p.pts) + "'>" + (r.p.pts == null ? '' : r.p.pts) + "</td></tr>").join("");
   const tm = {}; let ty = 0, tf = 0; Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], t = p.team || '?'; const o = tm[t] = tm[t] || { y: 0, f: 0 }; o.y += p.you / p.ent; o.f += p.fw / p.ent / 100; ty += p.you / p.ent; tf += p.fw / p.ent / 100; });
-  const lean = Object.keys(tm).length > 1 && ty > 0 && tf > 0 ? Object.keys(tm).sort().map((t) => { const y = 100 * tm[t].y / ty, f = 100 * tm[t].f / tf, d = y - f; return "<span class='chip'>" + esc(t) + ": you " + y.toFixed(0) + "% vs field " + f.toFixed(0) + "% <b class='" + (d > 5 ? 'good' : d < -5 ? 'bad' : '') + "'>" + (d >= 0 ? '+' : '') + d.toFixed(0) + "</b></span>"; }).join(" ") : "";
-  return "<div style='margin:10px 0 4px'><b>" + esc(g.label) + "</b> · " + statusBadge(g.state, g.detail, g.start) + "</div>" + (lean ? "<div class='k'><span class='mute'>Team lean:</span> " + lean + "</div>" : "") +
-    "<div class='tb' data-key='root" + esc(key) + "' data-more='1' data-ph='Filter players' data-chips='" + JSON.stringify([{ k: 'role', label: 'Role', opts: [['', 'All roles'], ['for', 'Root for'], ['ag', 'Root against']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='n'>Role</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n' data-s='n'>Near $</th><th class='n opt' data-s='n'>Pts</th></tr></thead><tbody>" + tr + "</tbody></table></div>";
+  const lean = Object.keys(tm).length > 1 && ty > 0 && tf > 0 ? Object.keys(tm).sort().map((t) => { const y = 100 * tm[t].y / ty, f = 100 * tm[t].f / tf, d = y - f; return "<span class='chip'>" + esc(t) + ": you " + y.toFixed(0) + "% vs field " + f.toFixed(0) + "% <b class='" + (d > 5 ? 'good' : d < -5 ? 'bad' : '') + "'>" + sg(d) + "</b></span>"; }).join(" ") : "";
+  return "<div style='margin:10px 0 4px'><b>" + esc(g.label) + "</b> · " + statusBadge(g.state, g.detail, g.start) + "</div>" + (lean && !nolean ? "<div class='k'><span class='mute'>Team lean:</span> " + lean + "</div>" : "") +
+    "<details><summary>Player table</summary><div class='tb' data-key='root" + esc(key) + "' data-more='1' data-ph='Filter players' data-chips='" + JSON.stringify([{ k: 'role', label: 'Role', opts: [['', 'All roles'], ['for', 'Root for'], ['ag', 'Root against']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='n'>Role</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n' data-s='n'>Near $</th><th class='n opt' data-s='n'>Pts</th></tr></thead><tbody>" + tr + "</tbody></table></div></details>";
 }
 function gamesHTML(G, key) {
   const keys = Object.keys(G), rank = (g) => g.state === 'in' ? 0 : g.state === 'post' ? 2 : 1;
   keys.sort((a, b) => rank(G[a]) - rank(G[b]) || String(G[a].start).localeCompare(String(G[b].start)));
   const act = keys.filter((k) => G[k].state !== 'post'), done = keys.filter((k) => G[k].state === 'post');
-  return act.map((k) => gameBlock(G[k], key + k)).join("") + (done.length ? "<details><summary>Finished games (" + done.length + ")</summary>" + done.map((k) => gameBlock(G[k], key + k)).join("") + "</details>" : "");
+  const one = keys.length === 1;   // a single game: the team lean repeats the root-for / root-against block above
+  return act.map((k) => gameBlock(G[k], key + k, one)).join("") + (done.length ? "<details><summary>Finished games (" + done.length + ")</summary>" + done.map((k) => gameBlock(G[k], key + k, one)).join("") + "</details>" : "");
 }
 function rootingHTML(by) {
   const items = [];
@@ -257,22 +378,22 @@ function simpleHTML(c, es, n) {   // the default view of a contest: where do I s
   else if (need != null && cash > 0 && need / cash < 0.15) { cls = 'mid'; icon = '🟡'; text = 'Close · need +' + need.toFixed(1) + ' pts to cash · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
   else { cls = 'bad'; icon = '🔴'; text = 'Out of the money' + (need != null ? ' · need +' + need.toFixed(1) + ' pts to cash' : '') + ' · best rank ' + bestRank.toLocaleString() + ' of ' + size.toLocaleString(); }
   const ttl = "<div class='ttl'><b>" + esc(c.name || c.id) + "</b> <a class='dk' href='" + DK + c.id + "' target='_blank' rel='noopener noreferrer'>DK ↗</a></div><div class='sub2'>" + n + " entr" + (n === 1 ? 'y' : 'ies') + (c.fee ? " × " + money(c.fee) + " = " + money(dollars) : "") + (paid && n > 1 ? " · " + itmN + " in the money" : "") + "</div>";
-  const needLine = "<div class='need'>" + (cash != null ? "Cash line <b>" + cash + " pts</b> · your best <b>" + best[2] + "</b>" + (need > 0 ? " (<b>+" + need.toFixed(1) + "</b> needed)" : " ✓") + ". " : "") + (alive ? "Your best entry has <b>" + left + "</b> player" + (left === 1 ? '' : 's') + " still to play." : "All your players are done.") + "</div>";
+  const needLine = "<div class='need'>" + (cash != null ? "Cash line now <b>" + cash + " pts</b> · your best <b>" + best[2] + "</b>" + (need > 0 ? " (<b>+" + need.toFixed(1) + "</b> needed)" : " ✓") + ". " : "") + (alive ? "Your best entry has <b>" + left + "</b> player" + (left === 1 ? '' : 's') + " still to play." : "All your players are done.") + "</div>";
   // who to root for / against: this contest only, live games first
   const G = contestGames(c, es), rows = [];
   Object.keys(G).forEach((gk) => { const g = G[gk]; if (g.state === 'post') return; Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], yp = 100 * p.you / p.ent, fp = p.fw / p.ent, d = yp - fp; rows.push({ nm, p, yp, fp, d, live: g.state === 'in' ? 0 : 1 }); }); });
   const pick = (arr, key) => arr.sort((a, b) => a.live - b.live || key(b) - key(a)).slice(0, 3);
-  const fors = pick(rows.filter((r) => r.d > 5 && r.yp > 0), (r) => r.yp), ags = pick(rows.filter((r) => r.d < -5), (r) => r.fp);
+  const fors = pick(rows.filter((r) => r.d > 5 && r.yp > 0), (r) => r.yp), ags = pick(rows.filter((r) => r.d < -5 && (es.length > 1 || r.yp > 0)), (r) => r.fp);
   const rp = (r) => "<div class='rp'>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + "<b>" + esc(r.nm) + "</b> <span class='mute'>" + esc(r.p.team || '') + (r.live === 0 ? " · <span class='live'>live</span>" : "") + "</span><small>you " + r.yp.toFixed(0) + "% · field " + r.fp.toFixed(0) + "%</small><span class='bar'><i style='width:" + Math.min(100, r.yp).toFixed(0) + "%'></i></span></div>";
   const roots = (fors.length || ags.length) ? "<div class='roots'><div class='for'><h4>Root for</h4>" + (fors.map(rp).join('') || "<div class='mute'>–</div>") + "</div><div class='ag'><h4>Root against</h4>" + (ags.map(rp).join('') || "<div class='mute'>–</div>") + "</div></div>" : "";
   // when this contest's standings were pulled (viewer's local time); amber after 10 min and red after 20 while a game of this contest is live
-  const liveNow = Object.values(c.pm || {}).some((m) => m.gs === 'in'), ageMin = c.at ? (Date.now() - new Date(c.at)) / 60000 : null;
-  const asof = c.at ? "<div class='asof " + (liveNow && ageMin > 20 ? 'red' : liveNow && ageMin > 10 ? 'amber' : '') + "' title='When these standings were pulled from DraftKings'>as of " + new Date(c.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + " · " + (ageMin < 1 ? 'just now' : Math.round(ageMin) + ' min ago') + "</div>" : "";
+  const pmv = Object.values(c.pm || {}), liveNow = pmv.some((m) => m.gs === 'in'), allPost = pmv.length > 0 && pmv.every((m) => m.gs === 'post'), ageMin = c.at ? (Date.now() - new Date(c.at)) / 60000 : null;
+  const asof = c.at ? "<div class='asof " + (liveNow && ageMin > 20 ? 'red' : !allPost && ageMin > 10 ? 'amber' : '') + "' title='When these standings were pulled from DraftKings'>as of " + new Date(c.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + " · " + (ageMin < 1 ? 'just now' : Math.round(ageMin) + ' min ago') + (c.fin ? " · <b>final</b>: games over, these are the last standings we pulled" : '') + "</div>" : "";
   return "<div class='st1 " + cls + "'>" + icon + " " + esc(text) + "</div>" + asof + ttl + needLine + roots;
 }
 function paceNote(c) {   // projected cash / top-10% / top-1% lines for this contest
   const fake = pace(c, [0, 0, 0, (TOTMIN[c.sport] || {})[c.gt] || 0]); if (!fake || fake.cash == null) return "";
-  return "proj. cash " + fake.cash.toFixed(0) + " · top 10% " + (fake.t10 == null ? "–" : fake.t10.toFixed(0)) + " · top 1% " + (fake.t1 == null ? "–" : fake.t1.toFixed(0));
+  return "projected final cash line " + fake.cash.toFixed(0) + " · projected final top 10% " + (fake.t10 == null ? "–" : fake.t10.toFixed(0)) + " · projected final top 1% " + (fake.t1 == null ? "–" : fake.t1.toFixed(0));
 }
 function payFor(c, rank) {
   const L = c.lines || {}; if (!L.pay) return 0;
@@ -293,24 +414,19 @@ function render(user, row) {
     const sk = c.sport + "|" + (c.slate || "");
     (groups[sk] = groups[sk] || []).push([c, by[ci]]);
   });
-  let h = '<div class="card"><b>' + esc(disp) + '</b><div class="k" id="tot"></div></div>';
+  let h = '';
+  const BR = [], XR = [];   // rows of the "My contests" view and the "Exposure" view
   Object.keys(groups).sort().forEach((sk) => {
     const [sp, slate] = sk.split("|");
     h += '<div class="sport">' + esc(SPORT[sp] || sp) + (slate ? " · " + esc(slate) : "") + "</div>";
     groups[sk].sort((a, b) => (b[0].fee || 0) * b[1].length - (a[0].fee || 0) * a[1].length).forEach(([c, es]) => {
       es.sort(SORTBY === 'ppk' ? ((a, b) => { const sa = salStats(c, e2n(c, a), a[2]), sb = salStats(c, e2n(c, b), b[2]); return (sb && sb.ppk != null ? sb.ppk : -1) - (sa && sa.ppk != null ? sa.ppk : -1) || a[1] - b[1]; }) : SORTBY === 'proj' ? ((a, b) => { const pa = pace(c, a), pb = pace(c, b); return (pb ? pb.proj : -1) - (pa ? pa.proj : -1) || a[1] - b[1]; }) : ((a, b) => a[1] - b[1]));
       const L = c.lines || {}, paid = L.paid, n = es.length;
-      const rows = es.map((e) => {
+      const rows = groupRows(es, (e) => e[1] + '|' + e[5].join(',')).map(([e, k]) => {
         const pay = payFor(c, e[1]), inm = paid && e[1] <= paid;
         tot++; if (inm) itm++; win += pay; fees += (c.fee || 0);
-        const pp = pace(c, e);
-        const nmsList = e[5].map((t) => META.tok[t].slice(META.tok[t].indexOf(' ') + 1));
-        const det = lineStats(c, e, nmsList);
-        const gap = (L.cash_pts != null) ? (e[2] - L.cash_pts) : null;
-        const ss = salStats(c, nmsList, e[2]);
-        const core = coreOf(c, e);
-        const extra = (gap == null ? '' : 'vs cash line: ' + (gap >= 0 ? '+' : '') + gap.toFixed(1) + ' pts') + (e[4] > 1 ? ' · ' + e[4] + ' duplicates of this lineup' : '') + (pp ? '<br>pace projection: ' + pp.proj.toFixed(1) + (pp.cash != null ? ' vs projected cash line ' + pp.cash.toFixed(1) : '') : '');
-        return "<tr onclick='toggleRow(this)' style='cursor:pointer' data-q='" + esc((core + ' ' + nmsList.join(' ')).toLowerCase()) + "' data-itm='" + (inm ? 'yes' : 'no') + "' data-core='" + esc(core) + "'><td class='n' data-v='" + e[1] + "'>" + e[1].toLocaleString() + "</td><td>" + esc(sn(core)) + "</td><td class='n'>" + e[2] + "</td><td class='n opt'>" + (minLeft(c, e[3]) == null ? '' : minLeft(c, e[3])) + "</td><td class='n opt' data-v='" + (ss ? ss.vis : '') + "'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + "K" : '') + "</td><td class='n opt' data-v='" + (ss && ss.ppk != null ? ss.ppk : '') + "'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td><td class='n " + (inm ? "good" : "") + "' data-v='" + pay + "'>" + (pay ? money(pay) : (inm ? "cash" : "–")) + "</td></tr><tr class='dr' hidden><td colspan='7' class='lu'>" + lineupHTML(c, e) + (det ? det + '<br>' : '') + extra + "</td></tr>";
+        const core = coreOf(c, e), nm = e2n(c, e);
+        return dataRow(c, e, e[5].map((t) => META.tok[t]), sn(core) || '–', k, " data-core='" + esc(core) + "'");
       }).join("");
       const ranks = es.map((e) => e[1]).sort((a, b) => a - b), ptsv = es.map((e) => e[2]).sort((a, b) => a - b), med = (a) => a[Math.floor(a.length / 2)];
       const itmN = paid ? es.filter((e) => e[1] <= paid).length : 0;
@@ -322,27 +438,28 @@ function render(user, row) {
       const groupHTML = Object.keys(gmap).length > 1 ? "<details><summary>Grouped by " + (c.gt === 'showdown' ? 'captain' : 'core player') + " (" + Object.keys(gmap).length + ")</summary><div class='tb' data-key='grp" + c.id + "' data-ph='Filter groups'><table class='st'><thead><tr><th data-s='t'>" + (c.gt === 'showdown' ? 'Captain' : 'Core') + "</th><th class='n' data-s='n'>Entries</th><th class='n' data-s='n'>Best</th><th class='n' data-s='n'>Median</th><th class='n' data-s='n'>ITM</th><th class='n' data-s='n'>Avg pts</th></tr></thead><tbody>" + grows + "</tbody></table></div></details>" : "";
       // exposure vs field
       const cnt = {}; es.forEach((e) => e[5].forEach((t) => { if (/(^| )LOCKED$/.test(META.tok[t])) return; const k = keyOf(c, META.tok[t]); cnt[k] = (cnt[k] || 0) + 1; }));
-      const ex = Object.keys(cnt).map((k) => ({ k, me: 100 * cnt[k] / n, fd: c.own && c.own[k] ? c.own[k][0] : null, pts: c.own && c.own[k] ? c.own[k][1] : null })).sort((a, b) => b.me - a.me).slice(0, 14);
+      const ex = Object.keys(cnt).map((k) => ({ k, me: 100 * cnt[k] / n, fd: c.own && c.own[k] ? c.own[k][0] : null, pts: c.own && c.own[k] ? c.own[k][1] : null })).sort((a, b) => b.me - a.me);   // every player you own, no cap
       // field favourites this user has 0 of (leverage the other way): top field-owned players not in any of the user's lineups
-      const zero = Object.keys(c.own || {}).filter((k) => !cnt[k] && !/(^| )LOCKED$/.test(k) && c.own[k][0] >= 5).sort((a, b) => c.own[b][0] - c.own[a][0]).slice(0, 10).map((k) => ({ k, me: 0, fd: c.own[k][0], pts: c.own[k][1] }));
+      const zero = Object.keys(c.own || {}).filter((k) => !cnt[k] && !/(^| )LOCKED$/.test(k) && c.own[k][0] >= 2).sort((a, b) => c.own[b][0] - c.own[a][0]).map((k) => ({ k, me: 0, fd: c.own[k][0], pts: c.own[k][1] }));
       const cls = c.gt === 'classic';
       const slotsAll = es.reduce((a, e) => a + e[5].length, 0), slotsHid = es.reduce((a, e) => a + e[5].filter((t) => /(^| )LOCKED$/.test(META.tok[t])).length, 0), hidShare = slotsAll ? slotsHid / slotsAll : 0;   // your exposure only counts started players, the field's % counts everyone
       const exrow = (x, zr) => {
-        const nmk = cls ? x.k : x.k.replace(/^[A-Z]+ /, ''); const m = c.pm && c.pm[nmk]; const sal = cls && c.sal ? c.sal[nmk] : null;
+        const nmk = cls ? x.k : x.k.replace(/^[A-Z]+ /, ''); const m = c.pm && c.pm[nmk]; const sal = c.sal ? (cls ? c.sal[nmk] : c.sal[x.k]) : null;
         const ppk = sal && x.pts != null ? x.pts / (sal / 1000) : null; const d = x.fd == null ? null : x.me - x.fd;
         const lev = zr ? 'zero' : d == null ? '' : d > 5 ? 'over' : d < -5 ? 'under' : 'even';
-        const gs = m ? m.gs : null; return "<tr data-act='" + (gs === 'post' ? 'done' : 'active') + "' class='" + (gs === 'post' ? 'fin' : '') + "' data-q='" + esc((x.k + ' ' + (m ? m.team + ' ' + m.pos : '')).toLowerCase()) + "' data-lev='" + lev + "' data-team='" + esc(m ? m.team || '' : '') + "' data-pos='" + esc(m ? m.pos || '' : '') + "'><td>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(x.k) + "</td><td>" + esc(m ? m.team || '' : '') + "</td><td class='opt'>" + esc(m ? m.pos || '' : '') + "</td><td class='n' data-v='" + x.me + "'>" + x.me.toFixed(0) + "%</td><td class='n' data-v='" + (x.fd == null ? '' : x.fd) + "'>" + (x.fd == null ? "–" : x.fd.toFixed(1) + "%") + "</td><td class='n " + (hidShare > 0.15 ? "mute" : d != null && d > 5 ? "good" : d != null && d < -5 ? "bad" : "") + "' data-v='" + (d == null ? '' : d) + "'>" + (d == null ? "" : (d >= 0 ? "+" : "") + d.toFixed(0)) + "</td><td class='n opt' data-v='" + (sal == null ? '' : sal) + "'>" + (sal == null ? '' : '$' + (sal / 1000).toFixed(1) + 'K') + "</td><td class='n opt' data-v='" + (x.pts == null ? '' : x.pts) + "'>" + (x.pts == null ? "" : x.pts) + "</td><td class='n' data-v='" + (ppk == null ? '' : ppk) + "'>" + (ppk == null ? '' : ppk.toFixed(2)) + "</td><td class='opt' data-v='" + (gs === 'in' ? 0 : gs === 'post' ? 2 : 1) + "'>" + (m && m.gs ? statusBadge(m.gs, m.gd, m.start) : '') + "</td></tr>";
+        const gs = m ? m.gs : null; return "<tr data-act='" + (gs === 'post' ? 'done' : 'active') + "' class='" + (gs === 'post' ? 'fin' : '') + "' data-q='" + esc((x.k + ' ' + (m ? m.team + ' ' + m.pos : '')).toLowerCase()) + "' data-lev='" + lev + "' data-team='" + esc(m ? m.team || '' : '') + "' data-pos='" + esc(m ? m.pos || '' : '') + "'><td>" + (m && m.num ? "<span class='mute'>#" + esc(m.num) + "</span> " : "") + esc(x.k) + "</td><td>" + esc(m ? m.team || '' : '') + "</td><td class='opt'>" + esc(m ? m.pos || '' : '') + "</td><td class='n' data-v='" + x.me + "'>" + x.me.toFixed(0) + "%</td><td class='n' data-v='" + (x.fd == null ? '' : x.fd) + "'>" + (x.fd == null ? "–" : x.fd.toFixed(1) + "%") + "</td><td class='n " + (hidShare > 0.15 ? "mute" : d != null && d > 5 ? "good" : d != null && d < -5 ? "bad" : "") + "' data-v='" + (d == null ? '' : d) + "'>" + (d == null ? "" : sg(d)) + "</td><td class='n opt' data-v='" + (sal == null ? '' : sal) + "'>" + (sal == null ? '' : '$' + (sal / 1000).toFixed(1) + 'K') + "</td><td class='n opt' data-v='" + (x.pts == null ? '' : x.pts) + "'>" + (x.pts == null ? "" : x.pts) + "</td><td class='n' data-v='" + (ppk == null ? '' : ppk) + "'>" + (ppk == null ? '' : ppk > 0 ? ppk.toFixed(2) : '–') + "</td><td class='opt' data-v='" + (gs === 'in' ? 0 : gs === 'post' ? 2 : 1) + "'>" + (m && m.gs ? statusBadge(m.gs, m.gd, m.start) : '') + "</td></tr>";
       };
       const hid = es.some((e) => e[5].some((t) => /(^| )LOCKED$/.test(META.tok[t])));
-      const exh = ex.map((x) => exrow(x, false)).join("") + zero.map((x) => exrow(x, true)).join("");
-      const exnote = "<div class='lu'>" + (hidShare > 0.15 ? "<b>" + Math.round(100 * hidShare) + "% of your lineup slots are still hidden</b> (games not started), so your exposure is understated and Diff is greyed out until more games start. " : hid ? "Hidden (locked) slots can't be counted, so exposure is slightly understated. " : "") + "Zero = the field owns 5%+ and you have none.</div>";
+      const exh = ex.concat(zero.map((x) => Object.assign(x, { zr: 1 }))).sort((a, b) => Math.max(b.me, b.fd || 0) - Math.max(a.me, a.fd || 0)).map((x) => exrow(x, !!x.zr)).join("");   // you and the field together, biggest first; the table pages in steps
+      const exnote = "<div class='lu'>" + (hidShare > 0.15 ? "<b>" + Math.round(100 * hidShare) + "% of your lineup slots are still hidden</b> (games not started), so your exposure is understated and Diff is greyed out until more games start. " : hid ? "Hidden (locked) slots can't be counted, so exposure is slightly understated. " : "") + "Zero = the field owns 2%+ and you have none. Every player you own or the field owns 2%+ is listed.</div>";
       const chipsJson = JSON.stringify([{ k: 'act', label: 'Status', opts: [['active', 'Live + upcoming'], ['done', 'Finished'], ['', 'All']] }, { k: 'lev', label: 'Leverage', opts: [['', 'Leverage: all'], ['over', 'Over (you > field)'], ['under', 'Under'], ['zero', 'Zero (you have none)']] }, { k: 'team', label: 'Team', opts: 'auto' }, { k: 'pos', label: 'Pos', opts: 'auto' }]).replace(/'/g, '&#39;');
-      const lead = (L.lead || []).map((l) => { const e = [0, l.r, l.p, l.t == null ? 0 : l.t, 0, []]; const nl = l.lu ? l.lu.map((t) => t.slice(t.indexOf(' ') + 1)) : []; const ss = l.lu ? salStats(c, nl, l.p) : null; const det = l.lu ? lineStats(c, e, nl) : ''; return "<tr onclick='toggleRow(this)' style='cursor:pointer'><td class='n'>" + l.r + "</td><td>" + esc(l.u) + "</td><td class='n'>" + l.p + "</td><td class='n'>" + (minLeft(c, l.t) == null ? '' : minLeft(c, l.t)) + "</td><td class='n'>" + (ss ? '$' + (ss.vis / 1000).toFixed(1) + 'K' : '') + "</td><td class='n'>" + (ss && ss.ppk != null ? ss.ppk.toFixed(2) : '') + "</td></tr>" + (det ? "<tr class='dr' hidden><td colspan='6' class='lu'>" + det + "</td></tr>" : ''); }).join("");
-      h += '<div class="card cc">' + simpleHTML(c, es, n) + '<details class="dt"><summary>Details</summary><b>' + esc(c.name || c.id) + '</b> <a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">DK ↗</a><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + gcChips(c) + "</div>" +
-        sumLine + groupHTML + "<div class='tb' data-key='ent" + c.id + "' data-page='25' data-more='1' data-ph='Filter entries (player or captain)' data-chips='" + JSON.stringify([{ k: 'itm', label: 'Money', opts: [['', 'All entries'], ['yes', 'In the money'], ['no', 'Out of the money']] }, { k: 'core', label: 'Core', opts: 'auto' }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>" + (c.gt === 'showdown' ? 'Captain' : 'Core') + "</th><th class='n' data-s='n'>Pts</th><th class='n opt' data-s='n'>Min left</th><th class='n opt' data-s='n'>$ spent</th><th class='n opt' data-s='n'>Pts/$1K</th><th class='n' data-s='n'>Est. pay</th></tr></thead><tbody>" + rows + "</tbody></table></div><div class='lu'>Tap an entry to see its lineup.</div>" +
-        "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary><div class='tb' data-key='exp" + c.id + "' data-more='1' data-ph='Filter player or team' data-def='{&quot;act&quot;:&quot;active&quot;}' data-chips='" + chipsJson + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='t'>Team</th><th data-s='t' class='opt'>Pos</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n opt' data-s='n'>Salary</th><th class='n opt' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th><th data-s='n' class='opt'>Game</th></tr></thead><tbody>" + exh + "</tbody></table>" + exnote + "</div></details>" +
+      const expTbl = (key) => "<div class='tb' data-key='" + key + "' data-page='20' data-step='25' data-more='1' data-ph='Filter player or team' data-def='{&quot;act&quot;:&quot;active&quot;}' data-chips='" + chipsJson + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='t'>Team</th><th data-s='t' class='opt'>Pos</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n opt' data-s='n'>Salary</th><th class='n opt' data-s='n'>Pts</th><th class='n' data-s='n'>Pts/$1K</th><th data-s='n' class='opt'>Game</th></tr></thead><tbody>" + exh + "</tbody></table>" + exnote + "</div>";
+      BR.push(basicRow(c, es, n)); XR.push("<details class='card xc'><summary><b>" + esc(c.name || c.id) + "</b> <a class='dk' href='" + DK + c.id + "' target='_blank' rel='noopener noreferrer'>DK ↗</a> <span class='mute'>" + (c.fee ? money(c.fee) + ' entry' : 'free') + " · " + n + " of yours</span></summary>" + expTbl('expv' + c.id) + "<div class='k' style='margin-top:12px'><b>Duplicate lineups</b> <span class='mute'>how many other people have the same lineup as you</span></div>" + profileHTML(c, es) + "</details>");
+      h += '<div class="card cc">' + simpleHTML(c, es, n) + '<details class="dt"' + (es.some((e) => entryStrip(c, e).live) ? ' open' : '') + '><summary>Details</summary><a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">DK ↗</a><div class="k"><span class="chip">' + (c.fee != null ? money(c.fee) + " entry" : "") + '</span><span class="chip">' + (c.size || L.n || "").toLocaleString() + ' entries</span><span class="chip">' + n + ' yours</span>' + (c.prize ? '<span class="chip">' + money(c.prize) + ' prizes</span>' : "") + (L.paid ? '<span class="chip">pays ' + L.paid.toLocaleString() + (L.cash_pts != null ? " · cash line now " + L.cash_pts + " pts" : "") + "</span>" : "") + (L.top10_pts != null ? '<span class="chip">top 10% line now ' + L.top10_pts + ' pts</span>' : "") + (paceNote(c) ? '<span class="chip">' + paceNote(c) + '</span>' : "") + gcChips(c) + "</div>" +
+        sumLine + groupHTML + "<div class='tb' data-key='ent" + c.id + "' data-page='25' data-more='1' data-ph='Filter entries (player or captain)'" + (es.some((e) => entryStrip(c, e).live) ? " data-def='{&quot;live&quot;:&quot;yes&quot;}'" : '') + " data-chips='" + JSON.stringify([{ k: 'live', label: 'Live now', opts: es.some((e) => entryStrip(c, e).live) ? [['yes', 'Live now (a player is playing)'], ['', 'All entries']] : [['', 'All entries'], ['yes', 'Live now (a player is playing)']] }, { k: 'itm', label: 'Money', opts: [['', 'All entries'], ['yes', 'In the money'], ['no', 'Out of the money']] }, { k: 'core', label: 'Core', opts: 'auto' }]).replace(/'/g, '&#39;') + "'><table class='st'>" + FH(c, false) + "<tbody>" + rows + "</tbody></table></div><div class='lu'>Live players first on each entry. A dash is a slot DraftKings keeps hidden until its game starts.</div>" +
+        "<details><summary>Exposure vs field (incl. field favourites you have 0 of)</summary>" + expTbl('exp' + c.id) + "</details>" +
         "<details><summary>Lineup profile vs field</summary>" + profileHTML(c, es) + "</details>" +
-        "<details><summary>Leaderboard top 10</summary><div class='tb' data-key='lb" + c.id + "' data-ph='Filter leaderboard'><table class='st'><thead><tr><th class='n' data-s='n'>Rank</th><th data-s='t'>User</th><th class='n' data-s='n'>Pts</th><th class='n' data-s='n'>Min left</th><th class='n' data-s='n'>$ spent</th><th class='n' data-s='n'>Pts/$1K</th></tr></thead><tbody>" + lead + "</tbody></table></div></details></details></div>";
+        fieldHTML(c) + "</details></div>";
     });
   });
   // every contest we track, by sport: open for sports the user plays, collapsed for the rest
@@ -352,17 +469,34 @@ function render(user, row) {
   h += '<details class="card"><summary><b>Full rooting guide</b> <span class="mute">every game, every contest</span></summary>' + rootingHTML(by) + '</details>';
   h += '<details class="card"><summary><b>All contests</b> <span class="mute">every contest we track, with winning and top 1% scores</span></summary>';
   Object.keys(asp).sort((a, b) => (mysp.has(b) ? 1 : 0) - (mysp.has(a) ? 1 : 0) || a.localeCompare(b)).forEach((sp) => {
-    const list = asp[sp].slice().sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0) || (b.fee || 0) - (a.fee || 0));
-    const chips = JSON.stringify([{ k: 'in', label: 'Mine', opts: [['', 'All contests'], ['yes', 'Ones I am in'], ['no', 'Ones I am not in']] }, { k: 'main', label: 'Type', opts: [['', 'Main + other'], ['main', 'Main only'], ['other', 'Satellites / small']] }]).replace(/'/g, '&#39;');
+    const list = asp[sp].slice().sort((a, b) => (mine.has(b.id) ? 1 : 0) - (mine.has(a.id) ? 1 : 0) || (b.fee || 0) - (a.fee || 0) || (b.size || 0) - (a.size || 0));
+    const youN = {}; Object.keys(by).forEach((ci) => { const cc = META.contests[ci]; if (cc) youN[cc.id] = by[ci].length; });
+    const chips = JSON.stringify([{ k: 'in', label: 'Mine', opts: [['', 'All contests'], ['yes', 'Ones I am in'], ['no', 'Ones I am not in']] }, { k: 'main', label: 'Type', opts: list.some((c) => c.main) ? [['main', 'Main contests only'], ['', 'Show everything'], ['other', 'Satellites / small only']] : [['', 'Show everything'], ['main', 'Main contests only'], ['other', 'Satellites / small only']] }]).replace(/'/g, '&#39;');
     const num = (v) => v == null || v === '' ? '' : v;
-    h += '<details class="card"' + (mysp.has(sp) ? ' open' : '') + '><summary>' + esc(SPORT[sp] || sp) + ' · ' + list.length + ' contests' + (mysp.has(sp) ? '' : ' · you are not in this sport') + "</summary><div class='tb' data-key='all" + sp + "' data-ph='Filter contests' data-chips='" + chips + "'><table class='st'><thead><tr><th data-s='t'>Contest</th><th class='n' data-s='n'>Entry</th><th class='n' data-s='n'>Entries</th><th class='n' data-s='n'>Win</th><th class='n' data-s='n'>Top 1%</th><th class='n' data-s='n'>Cash</th></tr></thead><tbody>" +
-      list.map((c) => { const L = c.lines || {}; const win = L.win_pts != null ? L.win_pts : (L.lead && L.lead[0] ? L.lead[0].p : ''); return "<tr data-q='" + esc((c.name || c.id).toLowerCase()) + "' data-in='" + (mine.has(c.id) ? 'yes' : 'no') + "' data-main='" + (c.main ? 'main' : 'other') + "'><td>" + (mine.has(c.id) ? '<span class="good">●</span> ' : '') + '<a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">' + esc(c.name || c.id) + "</a></td><td class='n' data-v='" + num(c.fee) + "'>" + (c.fee != null ? money(c.fee) : "") + "</td><td class='n' data-v='" + num(c.size) + "'>" + (c.size || "").toLocaleString() + "</td><td class='n' data-v='" + num(win) + "'>" + win + "</td><td class='n' data-v='" + num(L.top1_pts) + "'>" + (L.top1_pts != null ? L.top1_pts : "") + "</td><td class='n' data-v='" + num(L.cash_pts) + "'>" + (L.cash_pts != null ? L.cash_pts : "") + "</td></tr>"; }).join("") + "</tbody></table></div></details>";
+    h += '<details class="card"' + (mysp.has(sp) ? ' open' : '') + '><summary>' + esc(SPORT[sp] || sp) + ' · ' + list.length + ' contests' + (mysp.has(sp) ? '' : ' · you are not in this sport') + "</summary><div class='tb' data-key='all" + sp + "'" + (list.some((c) => c.main) ? " data-def='{&quot;main&quot;:&quot;main&quot;}'" : '') + " data-ph='Filter contests' data-chips='" + chips + "'><table class='st'><thead><tr><th data-s='t'>Contest</th><th class='n' data-s='n'>Entry</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Entries</th><th class='n' data-s='n'>Win</th><th class='n' data-s='n'>Top 1%</th><th class='n' data-s='n'>Cash</th></tr></thead><tbody>" +
+      list.map((c) => { const L = c.lines || {}; const win = L.win_pts != null ? L.win_pts : (L.lead && L.lead[0] ? L.lead[0].p : ''); return "<tr data-q='" + esc((c.name || c.id).toLowerCase()) + "' data-in='" + (mine.has(c.id) ? 'yes' : 'no') + "' data-main='" + (c.main ? 'main' : 'other') + "'><td>" + (mine.has(c.id) ? '<span class="good">●</span> ' : '') + '<a class="dk" href="' + DK + c.id + '" target="_blank" rel="noopener noreferrer">' + esc(c.name || c.id) + "</a></td><td class='n' data-v='" + num(c.fee) + "'>" + (c.fee != null ? money(c.fee) : "") + "</td><td class='n' data-v='" + (youN[c.id] || 0) + "'>" + (youN[c.id] || "") + "</td><td class='n' data-v='" + num(c.size) + "'>" + (c.size || "").toLocaleString() + "</td>" + (((c.size || L.n || 0) < 20) ? "<td class='n mute' colspan='3' title='Too few entries for these lines to mean anything'>n/a (small contest)</td>" : "<td class='n' data-v='" + num(win) + "'>" + win + "</td><td class='n' data-v='" + num(L.top1_pts) + "'>" + (L.top1_pts != null ? L.top1_pts : "") + "</td><td class='n' data-v='" + num(L.cash_pts) + "'>" + (L.cash_pts != null ? L.cash_pts : "") + "</td>") + "</tr>"; }).join("") + "</tbody></table></div></details>";
   });
   h += '</details>';
-  out.innerHTML = h; CUR = [user, row]; $('sortbox').hidden = false; tbAll();
+  BR.sort((a, b) => b.stake - a.stake);
+  const basic = "<div class='fresh'>Scores update about every 10 minutes. DraftKings is the live source, so for the exact second-by-second score open the contest on DraftKings.</div>" +
+    "<div class='card'><table class='st basic'><thead><tr><th>Contest</th><th class='n'>Your entries</th><th class='n'>Best rank</th><th>Where you stand</th><th class='n'>Best score</th><th class='n'>Score needed to cash</th><th class='n'>Paid so far</th><th>Updated</th></tr></thead><tbody>" + BR.map((x) => x.html).join('') + "</tbody></table></div>" +
+    "<details class='card'><summary><b>How to read this</b></summary><div class='lu'><p><b>Where you stand</b>: <i>In the money</i> means your best entry is currently high enough to be paid. <i>Needs +X to cash</i> is how many more points your best entry needs to reach the cash line right now. The line moves as other lineups score.</p><p><b>Score needed to cash</b>: the lowest score that is being paid right now.</p><p><b>Paid so far</b>: what your entries would win if the contest ended now. It changes until the last game is over.</p><p>Use the <b>Exposure</b> tab to see which players you own compared with everyone else, and the <b>Live</b> tab for every lineup and who is playing right now.</p></div></details>";
+  const expo = "<div class='fresh'>Who you own compared with the whole contest, and how many other people have your lineup. Tap a contest to open it.</div>" + XR.join('');
+  out.innerHTML = '<div class="card"><b>' + esc(disp) + '</b><div class="k" id="tot"></div></div>' +
+    "<div class='seg' role='tablist'><button type='button' data-v='basic'>My contests</button><button type='button' data-v='exposure'>Exposure</button><button type='button' data-v='live'>Live</button></div>" +
+    "<div id='v-basic' class='vw'>" + basic + "</div><div id='v-exposure' class='vw' hidden>" + expo + "</div><div id='v-live' class='vw' hidden>" + h + "</div>";
+  CUR = [user, row]; tbAll(); showView(curView());
   $("tot").innerHTML = '<span class="chip">' + tot + ' live entries</span><span class="chip">' + itm + ' in the money</span><span class="chip">est. winnings ' + money(win) + '</span>';
 }
 
+function curView() { const v = (location.hash || '').replace('#', ''); return ['basic', 'exposure', 'live'].includes(v) ? v : 'basic'; }
+function showView(v) {
+  document.querySelectorAll('.vw').forEach((d) => { d.hidden = d.id !== 'v-' + v; });
+  document.querySelectorAll('.seg button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
+  const sb = $('sortbox'); if (sb) sb.hidden = v !== 'live';
+}
+document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('.seg button'); if (b) { history.replaceState(null, '', location.pathname + location.search + '#' + b.dataset.v); showView(b.dataset.v); } });
+window.addEventListener('hashchange', () => showView(curView()));
 let LASTCHECK = 0, LASTUSER = null, BUSY = false;
 function snapUI() { return { y: window.scrollY, open: [...document.querySelectorAll('#out details')].map((d) => d.open), dr: [...document.querySelectorAll('#out tr.dr')].map((r) => !r.hidden) }; }
 function restoreUI(u) { if (!u) return; const ds = [...document.querySelectorAll('#out details')]; if (ds.length === u.open.length) ds.forEach((d, i) => { d.open = u.open[i]; }); const rs = [...document.querySelectorAll('#out tr.dr')]; if (rs.length === u.dr.length) rs.forEach((r, i) => { r.hidden = !u.dr[i]; }); window.scrollTo(0, u.y); }
@@ -389,9 +523,12 @@ async function lookup(user) {
 function banner() {   // stale-data warning from the loops' heartbeat: only for sports that are live right now
   const b = $("banner"); const H = (META && META.health) || {}; let worst = 0, msg = '';
   Object.keys(H).forEach((sp) => { const h = H[sp]; if (!h.live) return;
-    const pa = h.pull ? (Date.now() - new Date(h.pull)) / 60000 : 999, ta = h.tick ? (Date.now() - new Date(h.tick)) / 60000 : 999;
-    const lvl = ta > 15 || pa > 40 ? 2 : pa > 20 || h.fail >= 3 ? 1 : 0;
-    if (lvl > worst) { worst = lvl; msg = (SPORT[sp] || sp) + (lvl === 2 ? ': updates have stopped. Showing the last good data from ' : ': updates are delayed. Last good update ') + (h.pull ? Math.round(pa) + ' min ago' : 'unknown') + '.'; } });
+    const hasPull = !!h.pull, pa = hasPull ? (Date.now() - new Date(h.pull)) / 60000 : null, ta = h.tick ? (Date.now() - new Date(h.tick)) / 60000 : 999;
+    const at = hasPull ? new Date(h.pull).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+    // red only when the loop itself has gone quiet (its heartbeat is over 30 min old); amber when the last good update is over 20 min old or pulls keep failing. A tick can run long while it waits its turn.
+    const lvl = ta > 30 ? 2 : (hasPull && pa > 20) || h.fail >= 3 ? 1 : 0;
+    if (h.behind >= 3 && h.live_n && h.behind / h.live_n > 0.1 && worst < 1) { worst = 1; msg = (SPORT[sp] || sp) + ': ' + h.behind + ' of ' + h.live_n + ' live contests are behind (oldest ' + h.worst + ' min). Refreshing.'; }
+    if (lvl > worst) { worst = lvl; msg = (SPORT[sp] || sp) + (lvl === 2 ? ': updates have stopped' + (hasPull ? '. Showing data from ' + at + '.' : '.') : ': updates are delayed. Showing data from ' + at + ' (' + Math.round(pa) + ' min ago).'); } });
   b.hidden = !worst; b.className = worst === 2 ? 'red' : 'amber'; b.textContent = msg;
 }
 function stamp() {
@@ -400,6 +537,13 @@ function stamp() {
   $("fresh").innerHTML = "<span class='dot " + cls + "'></span>Data from " + b.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }) + " (" + (age < 1 ? 'under a minute' : Math.round(age) + ' min') + " ago)" + (chk != null ? " · checked " + chk + "s ago" : "") + "<button type='button' class='ghost' id='rf'>↻ Refresh</button>";
   $("rf").addEventListener("click", () => { if (LASTUSER) load(LASTUSER, true); });
 }
+async function pageCheck() {   // a tab left open for hours keeps old code: when the deployed page differs from the running one, reload it
+  try { const r = await fetch(location.pathname + '?pv=' + Date.now(), { cache: 'no-store' }); const t = await r.text();
+    const i = t.lastIndexOf('<scr' + 'ipt>'), j = t.lastIndexOf('</scr' + 'ipt>'); if (i < 0 || j < i) return;
+    const mine = [...document.scripts].filter((x) => !x.src).pop(); if (!mine) return;
+    if (t.slice(i + 8, j).replace(/\r/g, '').length !== mine.textContent.length && !BUSY) { const u = new URL(location.href); u.searchParams.set('r', Date.now()); location.replace(u.toString()); } } catch (e) {}
+}
+pageCheck(); setInterval(pageCheck, 120000);
 async function poll() {
   if (document.hidden || !LASTUSER || BUSY) return;
   try { const m = await gtsFetch("meta.json"); LASTCHECK = Date.now(); if (!META || m.built !== META.built) await load(LASTUSER, true); else stamp(); } catch (e) {}
@@ -418,15 +562,16 @@ function tbApply(box) {
     gs = gs.map((g, i) => ({ g, v: val(g), i })).sort((a, b) => (a.v === null) - (b.v === null) || (a.v < b.v ? -st.dir : a.v > b.v ? st.dir : 0) || a.i - b.i).map((x) => x.g);
     [...tb.tHead.rows[0].cells].forEach((c, i) => { c.classList.toggle('asc', i === st.col && st.dir === 1); c.classList.toggle('desc', i === st.col && st.dir === -1); });
   }
+  if (st.col < 0 && box.dataset.rank0) [...tb.tHead.rows[0].cells].forEach((c, i) => { c.classList.toggle('asc', i === 0); c.classList.remove('desc'); });
   const body = tb.tBodies[0]; let shown = 0; const lim = parseInt(box.dataset.page || '0', 10), cap = lim ? (st.lim || lim) : 1e9;
   gs.forEach((g) => {
     const r = g[0]; const q = (r.dataset.q || r.innerText).toLowerCase(); let ok = !st.q || q.includes(st.q.toLowerCase());
     for (const k in st.f) if (st.f[k] && r.dataset[k] !== st.f[k]) ok = false;
-    const vis = ok && shown < cap; g.forEach((x) => { if (x.classList.contains('dr')) { if (!vis) x.hidden = true; } else x.hidden = !vis; body.appendChild(x); });
+    const vis = ok && shown < cap; g.forEach((x) => { if (x.classList.contains('dr')) { if (!vis) x.hidden = true; else if (x.dataset.always) x.hidden = false; } else x.hidden = !vis; body.appendChild(x); });
     if (ok) shown++;
   });
   let pg = box.querySelector('.pg'); const left = lim ? Math.max(0, shown - cap) : 0;
-  if (left > 0) { if (!pg) { pg = document.createElement('button'); pg.type = 'button'; pg.className = 'pg'; pg.addEventListener('click', () => { st.lim = (st.lim || lim) + lim; tbApply(box); }); box.appendChild(pg); } pg.textContent = 'Show ' + Math.min(lim, left) + ' more (' + left + ' left)'; } else if (pg) pg.remove();
+  if (left > 0) { if (!pg) { pg = document.createElement('button'); pg.type = 'button'; pg.className = 'pg'; pg.addEventListener('click', () => { st.lim = (st.lim || lim) + parseInt(box.dataset.step || lim, 10); tbApply(box); }); box.appendChild(pg); } pg.textContent = 'Show ' + Math.min(parseInt(box.dataset.step || lim, 10), left) + ' more (' + left + ' left)'; } else if (pg) pg.remove();
   let nr = box.querySelector('.nr');
   if (!shown) { if (!nr) { nr = document.createElement('div'); nr.className = 'nr'; nr.textContent = 'Nothing matches the filter.'; box.appendChild(nr); } } else if (nr) nr.remove();
 }
@@ -453,7 +598,7 @@ function tbInit(box) {
 function tbAll() { document.querySelectorAll('.tb').forEach(tbInit); }
 document.addEventListener("change", (ev) => { if (ev.target && ev.target.id === 'rgg') { RG_GROUP = ev.target.value; if (CUR) render(CUR[0], CUR[1]); } });
 $("sortby").addEventListener("change", (ev) => { SORTBY = ev.target.value; if (CUR) render(CUR[0], CUR[1]); });
-$("f").addEventListener("submit", (ev) => { ev.preventDefault(); const u = $("u").value; history.replaceState(null, "", "?u=" + encodeURIComponent(u.trim())); lookup(u); });
+$("f").addEventListener("submit", (ev) => { ev.preventDefault(); const u = $("u").value; history.replaceState(null, "", "?u=" + encodeURIComponent(u.trim()) + location.hash); lookup(u); });
 const q = new URLSearchParams(location.search).get("u"); if (q) { $("u").value = q; lookup(q); }
 </script>
 </body>
