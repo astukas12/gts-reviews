@@ -176,40 +176,52 @@ function statusBadge(gs, gd, start) {
   return "<span class='badge'>" + esc(gd || (start ? start.slice(11) + 'Z' : 'Upcoming')) + "</span>";
 }
 // ---- rooting guide: per game, your players across all your entries and contests, vs the field (standings + ESPN game status only)
-function rootingHTML(by) {
-  const G = {};
-  Object.keys(by).forEach((ci) => {
-    const c = META.contests[ci]; if (!c || !c.pm || !c.own) return;
-    const es = by[ci], n = es.length, L = c.lines || {}, near = L.paid ? L.paid * 1.3 : 0;
-    const cnt = {}, nr = {};
-    es.forEach((e) => { const inNear = near && e[1] <= near; new Set(visNames(c, e)).forEach((nm) => { cnt[nm] = (cnt[nm] || 0) + 1; if (inNear) nr[nm] = (nr[nm] || 0) + 1; }); });
-    Object.keys(c.pm).forEach((nm) => {
-      const m = c.pm[nm], o = c.gt === 'showdown' ? (c.own['FLEX ' + nm] || c.own['CPT ' + nm]) : c.own[nm]; const fd = o ? o[0] : 0, yc = cnt[nm] || 0;
-      if (!yc && fd < 8) return;
-      const gk = m.ge || m.game || '?';
-      const g = G[gk] = G[gk] || { sport: c.sport, label: m.game || '', state: m.gs, detail: m.gd, start: m.start, pl: {} };
-      const p = g.pl[nm] = g.pl[nm] || { num: m.num, team: m.team, you: 0, ent: 0, fw: 0, near: 0, pts: null };
-      p.you += yc; p.ent += n; p.fw += fd * n; p.near += nr[nm] || 0; if (o && o[1] != null) p.pts = o[1];
-    });
-  });
-  const keys = Object.keys(G); if (!keys.length) return '';
-  const rank = (g) => g.state === 'in' ? 0 : g.state === 'post' ? 2 : 1;
-  keys.sort((a, b) => rank(G[a]) - rank(G[b]) || String(G[a].start).localeCompare(String(G[b].start)));
-  const block = (gk) => {
-    const g = G[gk];
-    const rows = Object.keys(g.pl).map((nm) => { const p = g.pl[nm], yp = 100 * p.you / p.ent, fp = p.fw / p.ent, d = yp - fp; const role = d > 5 ? 'for' : d < -5 ? 'ag' : 'even';
-      return { nm, p, yp, fp, d, role, w: Math.max(p.near, p.you) }; }).sort((a, b) => b.w - a.w || Math.abs(b.d) - Math.abs(a.d)).slice(0, 14);
-    const tr = rows.map((r) => "<tr data-q='" + esc(r.nm.toLowerCase()) + "' data-role='" + r.role + "'><td>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + esc(r.nm) + " <span class='mute'>" + esc(r.p.team || '') + "</span></td><td data-v='" + (r.role === 'for' ? 2 : r.role === 'ag' ? 0 : 1) + "'>" + (r.role === 'for' ? "<span class='role-for'>ROOT FOR</span>" : r.role === 'ag' ? "<span class='role-ag'>ROOT AGAINST</span>" : "<span class='mute'>with the field</span>") + "</td><td class='n' data-v='" + r.p.you + "'>" + r.p.you + " <span class='mute'>(" + r.yp.toFixed(0) + "%)</span></td><td class='n' data-v='" + r.fp + "'>" + r.fp.toFixed(0) + "%</td><td class='n' data-v='" + r.p.near + "'>" + r.p.near + "</td><td class='n' data-v='" + (r.p.pts == null ? '' : r.p.pts) + "'>" + (r.p.pts == null ? '' : r.p.pts) + "</td></tr>").join("");
-    const tm = {}; let ty = 0, tf = 0; Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], t = p.team || '?'; const o = tm[t] = tm[t] || { y: 0, f: 0 }; o.y += p.you; o.f += p.fw / p.ent; ty += p.you; tf += p.fw / p.ent; });
-    const lean = Object.keys(tm).length > 1 && ty > 0 && tf > 0 ? Object.keys(tm).sort().map((t) => { const y = 100 * tm[t].y / ty, f = 100 * tm[t].f / tf, d = y - f; return "<span class='chip'>" + esc(t) + ": you " + y.toFixed(0) + "% vs field " + f.toFixed(0) + "% <b class='" + (d > 5 ? 'good' : d < -5 ? 'bad' : '') + "'>" + (d >= 0 ? '+' : '') + d.toFixed(0) + "</b></span>"; }).join(" ") : "";
-    return "<div style='margin:10px 0 4px'><b>" + esc(g.label) + "</b> · " + esc(SPORT[g.sport] || g.sport) + " · " + statusBadge(g.state, g.detail, g.start) + "</div>" + (lean ? "<div class='k'><span class='mute'>Team lean (share of your players vs the field):</span> " + lean + "</div>" : "") + "<div class='tb' data-key='root" + esc(gk) + "' data-ph='Filter players' data-chips='" + JSON.stringify([{ k: 'role', label: 'Role', opts: [['', 'All roles'], ['for', 'Root for'], ['ag', 'Root against']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='n'>Role</th><th class='n' data-s='n'>Your entries</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Near money</th><th class='n' data-s='n'>Pts</th></tr></thead><tbody>" + tr + "</tbody></table></div>";
-  };
-  const active = keys.filter((k) => G[k].state !== 'post'), done = keys.filter((k) => G[k].state === 'post');
-  return "<div class='card'><b>Rooting guide</b><div class='lu'>By game, live first. Root for = you own a bigger share of him than the field; root against = the field has him and you don't. 'Near money' counts your entries inside or close to the paid places that include him.</div>" + active.map(block).join("") + (done.length ? "<details><summary>Finished games (" + done.length + ")</summary>" + done.map(block).join("") + "</details>" : "") + "</div>";
+// ---- rooting guide: PER CONTEST (biggest dollars first) plus a clearly labelled roll-up weighted by dollars at stake (entry fee x your entries).
+// Field % is the PERSON's ownership (showdown: captain + flex). Root for = you own a bigger share than the field; root against = the field owns him and you own little or none.
+let RG_GROUP = '';
+function personField(c, nm) { if (c.gt === 'showdown') { const a = c.own['CPT ' + nm], b = c.own['FLEX ' + nm]; return Math.min(100, (a ? a[0] : 0) + (b ? b[0] : 0)); } const o = c.own[nm]; return o ? o[0] : 0; }
+function personPts(c, nm) { const o = c.gt === 'showdown' ? (c.own['FLEX ' + nm] || c.own['CPT ' + nm]) : c.own[nm]; return o && o[1] != null ? o[1] : null; }
+function contestGames(c, es) {   // one contest: game -> players you own or the field owns (8%+)
+  const L = c.lines || {}, n = es.length, near = L.paid ? L.paid * 1.3 : 0, cnt = {}, nr = {}, G = {};
+  es.forEach((e) => { const inNear = near && e[1] <= near; new Set(visNames(c, e)).forEach((nm) => { cnt[nm] = (cnt[nm] || 0) + 1; if (inNear) nr[nm] = (nr[nm] || 0) + 1; }); });
+  Object.keys(c.pm || {}).forEach((nm) => { const m = c.pm[nm], fd = personField(c, nm), yc = cnt[nm] || 0; if (!yc && fd < 8) return;
+    const gk = m.ge || m.game || '?'; const g = G[gk] = G[gk] || { sport: c.sport, label: m.game || '', state: m.gs, detail: m.gd, start: m.start, pl: {} };
+    g.pl[nm] = { num: m.num, team: m.team, you: yc, ent: n, fw: fd * n, near: nr[nm] || 0, pts: personPts(c, nm) }; });
+  return G;
 }
-function gcChips(c) {   // market context from the slate sheet's game tab: total, spread (home-relative, negative = home favoured) and implied team totals
-  return (c.gc || []).map((g) => { const fav = g.fav, m = g.margin;
-    return "<span class='chip' title='Vegas total, spread and implied team totals'>" + esc(g.away) + " @ " + esc(g.home) + " · total " + g.total + " · " + (fav === 'PK' ? 'pick' : esc(fav) + " -" + m) + " · implied " + esc(g.away) + " " + g.imp_away + " / " + esc(g.home) + " " + g.imp_home + "</span>"; }).join("");
+function gameBlock(g, key) {
+  const rows = Object.keys(g.pl).map((nm) => { const p = g.pl[nm], yp = 100 * p.you / p.ent, fp = p.fw / p.ent, d = yp - fp; const role = d > 5 ? 'for' : d < -5 ? 'ag' : 'even'; return { nm, p, yp, fp, d, role, w: Math.max(p.near, p.you) + Math.abs(d) / 100 }; }).sort((a, b) => b.w - a.w).slice(0, 14);
+  const tr = rows.map((r) => "<tr data-q='" + esc(r.nm.toLowerCase()) + "' data-role='" + r.role + "'><td>" + (r.p.num ? "<span class='mute'>#" + esc(r.p.num) + "</span> " : "") + esc(r.nm) + " <span class='mute'>" + esc(r.p.team || '') + "</span></td><td data-v='" + (r.role === 'for' ? 2 : r.role === 'ag' ? 0 : 1) + "'>" + (r.role === 'for' ? "<span class='role-for'>ROOT FOR</span>" : r.role === 'ag' ? "<span class='role-ag'>ROOT AGAINST</span>" : "<span class='mute'>with the field</span>") + "</td><td class='n' data-v='" + r.yp + "'>" + r.yp.toFixed(0) + "% <span class='mute'>(" + r.p.you + ")</span></td><td class='n' data-v='" + r.fp + "'>" + r.fp.toFixed(0) + "%</td><td class='n' data-v='" + r.d + "'>" + (r.d >= 0 ? '+' : '') + r.d.toFixed(0) + "</td><td class='n' data-v='" + r.p.near + "'>" + r.p.near + "</td><td class='n opt' data-v='" + (r.p.pts == null ? '' : r.p.pts) + "'>" + (r.p.pts == null ? '' : r.p.pts) + "</td></tr>").join("");
+  const tm = {}; let ty = 0, tf = 0; Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], t = p.team || '?'; const o = tm[t] = tm[t] || { y: 0, f: 0 }; o.y += p.you / p.ent; o.f += p.fw / p.ent / 100; ty += p.you / p.ent; tf += p.fw / p.ent / 100; });
+  const lean = Object.keys(tm).length > 1 && ty > 0 && tf > 0 ? Object.keys(tm).sort().map((t) => { const y = 100 * tm[t].y / ty, f = 100 * tm[t].f / tf, d = y - f; return "<span class='chip'>" + esc(t) + ": you " + y.toFixed(0) + "% vs field " + f.toFixed(0) + "% <b class='" + (d > 5 ? 'good' : d < -5 ? 'bad' : '') + "'>" + (d >= 0 ? '+' : '') + d.toFixed(0) + "</b></span>"; }).join(" ") : "";
+  return "<div style='margin:10px 0 4px'><b>" + esc(g.label) + "</b> · " + statusBadge(g.state, g.detail, g.start) + "</div>" + (lean ? "<div class='k'><span class='mute'>Team lean:</span> " + lean + "</div>" : "") +
+    "<div class='tb' data-key='root" + esc(key) + "' data-more='1' data-ph='Filter players' data-chips='" + JSON.stringify([{ k: 'role', label: 'Role', opts: [['', 'All roles'], ['for', 'Root for'], ['ag', 'Root against']] }]).replace(/'/g, '&#39;') + "'><table class='st'><thead><tr><th data-s='t'>Player</th><th data-s='n'>Role</th><th class='n' data-s='n'>You</th><th class='n' data-s='n'>Field</th><th class='n' data-s='n'>Diff</th><th class='n' data-s='n'>Near $</th><th class='n opt' data-s='n'>Pts</th></tr></thead><tbody>" + tr + "</tbody></table></div>";
+}
+function gamesHTML(G, key) {
+  const keys = Object.keys(G), rank = (g) => g.state === 'in' ? 0 : g.state === 'post' ? 2 : 1;
+  keys.sort((a, b) => rank(G[a]) - rank(G[b]) || String(G[a].start).localeCompare(String(G[b].start)));
+  const act = keys.filter((k) => G[k].state !== 'post'), done = keys.filter((k) => G[k].state === 'post');
+  return act.map((k) => gameBlock(G[k], key + k)).join("") + (done.length ? "<details><summary>Finished games (" + done.length + ")</summary>" + done.map((k) => gameBlock(G[k], key + k)).join("") + "</details>" : "");
+}
+function rootingHTML(by) {
+  const items = [];
+  Object.keys(by).forEach((ci) => { const c = META.contests[ci]; if (!c || !c.pm || !c.own) return; const es = by[ci], fee = c.fee || 0; items.push({ c, es, fee, dollars: fee * es.length, G: contestGames(c, es) }); });
+  if (!items.length) return '';
+  items.sort((a, b) => b.dollars - a.dollars || b.es.length - a.es.length);
+  const groups = [...new Set(items.map((x) => x.c.group).filter(Boolean))].sort();
+  // dollar-weighted roll-up
+  const R = {}; let totalD = 0;
+  items.filter((x) => !RG_GROUP || x.c.group === RG_GROUP).forEach((x) => { const w = x.fee || 1; totalD += x.dollars;
+    Object.keys(x.G).forEach((gk) => { const g = x.G[gk]; const r = R[gk] = R[gk] || { sport: g.sport, label: g.label, state: g.state, detail: g.detail, start: g.start, pl: {} };
+      Object.keys(g.pl).forEach((nm) => { const p = g.pl[nm], q = r.pl[nm] = r.pl[nm] || { num: p.num, team: p.team, you: 0, ent: 0, fw: 0, near: 0, pts: p.pts }; q.you += p.you * w; q.ent += p.ent * w; q.fw += p.fw * w; q.near += p.near; }); }); });
+  const card = (x, i) => "<details class='card rgc' data-group='" + esc(x.c.group || '') + "'" + (i < 2 ? ' open' : '') + "><summary><b>" + esc(x.c.name || x.c.id) + "</b> <span class='mute'>" + esc(x.c.group || '') + " · " + (x.fee ? money(x.fee) : 'free') + " × " + x.es.length + " entr" + (x.es.length === 1 ? 'y' : 'ies') + " = <b>" + money(x.dollars) + "</b> at stake</span></summary>" + gamesHTML(x.G, 'c' + x.c.id) + "</details>";
+  const opts = "<option value=''>All buy-in tiers / types</option>" + groups.map((g) => "<option value='" + esc(g) + "'" + (RG_GROUP === g ? ' selected' : '') + ">" + esc(g) + "</option>").join('');
+  return "<div class='card'><b>Rooting guide</b><div class='fb'><select id='rgg' aria-label='Contest type'>" + opts + "</select></div><div class='lu'>One card per contest, biggest dollars at stake first (entry fee × your entries). Root for = you own more of him than the field; root against = the field owns him and you own little or none. Near $ = your entries inside or within 30% of the paid places that include him.</div></div>" +
+    items.filter((x) => !RG_GROUP || x.c.group === RG_GROUP).map(card).join("") +
+    "<details class='card'><summary><b>All contests rolled up</b> <span class='mute'>weighted by dollars at stake (" + money(totalD) + ") — a blend of different buy-ins, so use the per-contest cards for decisions</span></summary>" + gamesHTML(R, 'rollup') + "</details>";
+}
+function gcChips(c) {   // market context from the slate sheet's game tab: total, favourite and margin, implied team totals
+  return (c.gc || []).map((g) => "<span class='chip' title='Vegas total, spread and implied team totals'>" + esc(g.away) + " @ " + esc(g.home) + " · total " + g.total + " · " + (g.fav === 'PK' ? 'pick' : esc(g.fav) + " -" + g.margin) + " · implied " + esc(g.away) + " " + g.imp_away + " / " + esc(g.home) + " " + g.imp_home + "</span>").join("");
 }
 function stackInfo(c, e) {   // QB + same-team pass catchers, bring-back from the other team, and the team split (positions from ESPN rosters / DK, teams from DK)
   const nm = visNames(c, e), pm = c.pm || {}; const pl = nm.map((n) => ({ n, t: pm[n] && pm[n].team, p: pm[n] && pm[n].pos })).filter((x) => x.t);
@@ -399,6 +411,7 @@ function tbInit(box) {
   tbApply(box);
 }
 function tbAll() { document.querySelectorAll('.tb').forEach(tbInit); }
+document.addEventListener("change", (ev) => { if (ev.target && ev.target.id === 'rgg') { RG_GROUP = ev.target.value; if (CUR) render(CUR[0], CUR[1]); } });
 $("sortby").addEventListener("change", (ev) => { SORTBY = ev.target.value; if (CUR) render(CUR[0], CUR[1]); });
 $("f").addEventListener("submit", (ev) => { ev.preventDefault(); const u = $("u").value; history.replaceState(null, "", "?u=" + encodeURIComponent(u.trim())); lookup(u); });
 const q = new URLSearchParams(location.search).get("u"); if (q) { $("u").value = q; lookup(q); }
