@@ -53,7 +53,7 @@ const SPORT = { cbb: "CBB", nfl: "NFL", soc: "Soccer", nba: "NBA", nhl: "NHL", c
 let ROWS = [], ST = { col: 0, dir: 1 };
 const detail = {};
 async function det(c) { if (detail[c.id]) return detail[c.id]; try { detail[c.id] = await gf("c/" + c.id + ".json"); } catch (e) { detail[c.id] = {}; } return detail[c.id]; }
-function payFor(pay, rank) { for (const b of pay || []) if (rank >= b[0] && rank <= b[1]) return b[2] || 0; return 0; }
+function payFor(pay, rank, ties) { const k = (ties && ties[rank]) || 1; if (k > 1) { let s = 0; for (const b of pay || []) { const n = Math.min(b[1], rank + k - 1) - Math.max(b[0], rank) + 1; if (n > 0) s += n * (b[2] || 0); } return Math.floor(100 * s / k + 1e-6) / 100; } for (const b of pay || []) if (rank >= b[0] && rank <= b[1]) return b[2] || 0; return 0; }
 async function load() {
   const users = await gu(); const META = await gf("meta.json");
   const rows = [];
@@ -69,7 +69,7 @@ async function load() {
         let anyLive = false;
         es.forEach((e) => {
           const rk = e[1]; if (r.best == null || rk < r.best) r.best = rk;
-          if (paid && rk <= paid) r.itm++; r.won += payFor(d.pay, rk);
+          if (paid && rk <= paid) r.itm++; r.won += payFor(d.pay, rk, d.ties);
           e[5].forEach((t) => { const nm = META.tok[t].slice(META.tok[t].indexOf(" ") + 1); const m = pm[nm]; if (m && m.gs === "in") { anyLive = true; r.root[nm] = (r.root[nm] || 0) + 1; } });
         });
         if (anyLive) r.live++;
