@@ -90,6 +90,7 @@ h3{font:600 12.5px/1.2 Inter,sans-serif;letter-spacing:.05em;text-transform:uppe
 <div class="row" id="users" role="group" aria-label="Username"></div>
 <div class="row" id="sports" role="group" aria-label="Sport"></div><div id="fresh"></div></div>
 <div id="msg" class="note"></div>
+<div id="tonight"></div>
 <div id="today"></div>
 <div id="hist" hidden>
 <div class="tiles" id="tiles"></div>
@@ -200,6 +201,7 @@ function rootBlock(rk,u){
 }
 function renderToday(){
  var el=$("today");fresh();
+ if(T&&T.built&&(Date.now()-Date.parse(T.built.replace(" ","T")+"Z"))/3600000>14){el.innerHTML='<section><h2>NFL</h2><div class="note">No NFL slate in progress. The last NFL data ('+esc(T.built)+' UTC) is too old to show as today.</div></section>';return}
  if(!T){el.innerHTML='<section><h2>Today</h2><div class="note">No live data yet. The live feed runs while games are on.</div></section>';return}
  var u=USER?USER.toLowerCase():null;
  var cs=T.contests.filter(function(c){return !u||c.entries[u]});
@@ -283,16 +285,39 @@ function todayBody(c,all){
  h+='<details open><summary>Entries ('+all.length+')</summary><div class="tw"><table><thead><tr><th>Rank</th><th>User</th><th>Pts</th><th>Prize now</th><th>To cash</th><th>Time left</th><th style="text-align:left">Lineup</th></tr></thead><tbody>'+all.slice().sort(function(a,b){return a.e[0]-b.e[0]}).slice(0,300).map(function(x){return '<tr><td>'+n0(x.e[0])+'</td><td class="n">'+esc(x.u)+'</td><td>'+x.e[1]+'</td><td>'+(function(){var z=prizeAt(c.lines,x.e[0]);return z>0?'<span class="pos">'+money(z)+'</span>':'-'})()+'</td><td>'+(function(){var L=c.lines;if(!L||L.cash==null)return '-';var g=L.cash-x.e[1];return g<=0?'<span class="pos">in</span>':g.toFixed(1)})()+'</td><td>'+(x.e[2]==null?"-":x.e[2])+'</td><td class="lu">'+x.e[3].map(function(p,i){if(hid(p))return '<span class="mute">hidden</span>';var cp=sd&&i===0,f=infoOf(c,(cp?"CPT:":"")+p);return (cp?'<span class="c">CPT</span>':"")+esc(p)+(f.tm?' <span class="mute">'+esc(f.pos)+' '+esc(f.tm)+'</span>':"")}).join(" · ")+'</td></tr>'}).join("")+'</tbody></table></div></details>';
  return h;
 }
+var NBK=128;function bkt(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%65521;return h%NBK}
+var SPN={cbb:"College basketball",nfl:"NFL",soc:"Soccer",cfb:"College football",nba:"NBA",nhl:"NHL"};
+function pubj(p){return fetch("../../pub/live/"+p+"?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})}
+function loadTonight(){
+ var el=$("tonight");if(!el)return;
+ Promise.all([pubj("meta.json"),fetch("users.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()})]).then(function(a){
+  var M=a[0],us=a[1].users||[],built=M.built?new Date(M.built):null;
+  return Promise.all(us.map(function(u){var low=u.toLowerCase();return pubj("u/"+bkt(low)+".json").then(function(sh){return [u,sh.u&&sh.u[low]]}).catch(function(){return [u,null]})})).then(function(rows){
+   var h='<section><h2>Tonight, every sport</h2><div class="note">From the public lookup data'+(built?' &middot; updated '+built.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"")+'. Finished slates drop off 2 hours after the last game.</div>';
+   rows.forEach(function(r){
+    var u=r[0],row=r[1],by={};
+    if(row)row[1].forEach(function(e){(by[e[0]]=by[e[0]]||[]).push(e)});
+    var cis=Object.keys(by).filter(function(ci){return M.contests[ci]&&!M.contests[ci].dead});
+    h+='<div class="card"><div class="t"><b>'+esc(u)+'</b> <a class="mute" href="../../pub/lookup/?u='+encodeURIComponent(u)+'#basic" target="_blank" rel="noopener">open in the public lookup &#8599;</a></div>';
+    if(!cis.length){h+='<div class="note">No live entries right now.</div></div>';return}
+    cis.sort(function(a,b){var ca=M.contests[a],cb=M.contests[b];return String(ca.sport).localeCompare(cb.sport)||(cb.fee||0)*by[b].length-(ca.fee||0)*by[a].length});
+    h+='<table class="tb"><thead><tr><th>Contest</th><th>Entries</th><th>Best rank</th><th>Where</th><th>Best pts</th><th>Cash line</th></tr></thead><tbody>';
+    cis.forEach(function(ci){var c=M.contests[ci],es=by[ci],L=c.lines||{},best=es.slice().sort(function(a,b){return a[1]-b[1]})[0],top=es.reduce(function(m,e){return Math.max(m,e[2])},0),paid=L.paid,inm=paid&&best[1]<=paid;
+     h+='<tr><td><span class="mute">'+esc(SPN[c.sport]||c.sport)+'</span> <a href="https://www.draftkings.com/contest/gamecenter/'+esc(c.id)+'" target="_blank" rel="noopener">'+esc(c.name||c.id)+'</a>'+(c.fin?' <span class="mute">(final)</span>':'')+'</td><td>'+es.length+'</td><td>'+best[1].toLocaleString()+' <span class="mute">of '+(c.size||"").toLocaleString()+'</span></td><td>'+(inm?'<b style="color:#4caf50">In the money</b>':(L.cash_pts!=null&&top<L.cash_pts?'Needs +'+(L.cash_pts-top).toFixed(1):'Playing'))+'</td><td><b>'+top+'</b></td><td>'+(L.cash_pts==null?"&ndash;":L.cash_pts)+'</td></tr>'});
+    h+='</tbody></table></div>'});
+   el.innerHTML=h+'</section>'})
+ }).catch(function(){el.innerHTML='<section><h2>Tonight, every sport</h2><div class="note">The all-sports feed is not reachable right now.</div></section>'})
+}
 function loadToday(){fetch("today.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){T=d;fresh();if(VIEW==="today")renderToday()}).catch(function(){if(VIEW==="today")renderToday()})}
-function setView(v){VIEW=v;document.querySelectorAll("#views button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===v)});$("today").hidden=v!=="today";$("hist").hidden=v!=="hist";$("sports").hidden=v!=="hist";if(v==="today"){tabs();renderToday()}else{render()}fresh()}
+function setView(v){VIEW=v;document.querySelectorAll("#views button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===v)});$("today").hidden=v!=="today";if($("tonight"))$("tonight").hidden=v!=="today";$("hist").hidden=v!=="hist";$("sports").hidden=v!=="hist";if(v==="today"){tabs();renderToday()}else{render()}fresh()}
 document.addEventListener("click",function(ev){
  var vb=ev.target.closest&&ev.target.closest("#views button");if(vb){setView(vb.getAttribute("data-v"));return}
  var fb=ev.target.closest&&ev.target.closest("button[data-cf]");if(fb){CF=fb.getAttribute("data-cf");renderToday();return}
  var hd=ev.target.closest&&ev.target.closest("#today .hd");if(!hd)return;var k=hd.parentNode.getAttribute("data-tk");TOPEN[k]=!TOPEN[k];renderToday()
 });
-setInterval(function(){if(VIEW==="today"&&!document.hidden)loadToday()},60000);
+setInterval(function(){if(VIEW==="today"&&!document.hidden){loadToday();loadTonight()}},120000);
 
 fetch("data.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
- D=d;$("sub").textContent="Private page · history: final standings from the GTS contest database, built "+d.built;setView("today");loadToday();
+ D=d;$("sub").textContent="Private page · history: final standings from the GTS contest database, built "+d.built;setView("today");loadToday();loadTonight();
 }).catch(function(e){$("sub").textContent="Could not load data ("+e.message+")"});
 </script></body></html>
